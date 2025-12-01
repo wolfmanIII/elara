@@ -54,7 +54,7 @@ questo campo su `DocumentChunk` è letteralmente:
 
 Quando viene indicizzato un chunk:
 * viene preso il testo (__$chunkText__)
-* viene passato al modello `text-embedding-3-small` di Ollama
+* viene passato al modello `nomic-embed-text` di Ollama
 * il modello restituisce un array di 1536 numeri tipo:
 ```json
 [-0.023, 0.114, ..., 0.002]
@@ -128,8 +128,7 @@ IVF-Flat è un tipo di indice approximate (ANN):
 non garantisce risultati 100% identici alla ricerca esatta, ma è molto più veloce e la differenza è spesso irrilevante per casi RAG.  
 È composto da due elementi:
 #### 1. Centroidi (cluster)
-L’indice divide tutti i vettori in liste (inverted lists), ognuna associata a un centroide.  
-Quindi raggruppa i vettori in cluster tramite una forma di K-means “light”(più leggera).  
+L’indice divide tutti i vettori in liste (inverted lists), ognuna associata a un centroide. Quindi raggruppa i vettori in cluster tramite una forma di K-means “light”(più leggera).  
 Per avere più informazioni su che cos'è una forma K-means, fate riferimento a questo link:  
 [K-means](https://it.wikipedia.org/wiki/K-means)  
 tutto sommato è solo un pò di matematica 🤣🤣🤣
@@ -139,7 +138,7 @@ Quando cerchi i vettori più simili:
 * esegue una ricerca flat (lineare) solo dentro quei cluster
 
 Questo riduce drasticamente la quantità di vettori da confrontare.
-## 4. Backend AI Ollama/Open
+## 4. Backend AI Ollama | OpenAI
 ### Variabili d'ambiente, nel file .env.local
 ```env
 DATABASE_URL="postgresql://app:!ChangeMe!@127.0.0.1:5432/app?serverVersion=16&charset=utf8"
