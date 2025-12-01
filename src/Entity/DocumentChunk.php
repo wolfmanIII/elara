@@ -1,0 +1,83 @@
+<?php
+
+namespace App\Entity;
+
+use App\Repository\DocumentChunkRepository;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Uid\Uuid;
+
+#[ORM\Entity(repositoryClass: DocumentChunkRepository::class)]
+class DocumentChunk
+{
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    private ?Uuid $id = null;
+
+    #[ORM\ManyToOne(inversedBy: 'chunks')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?DocumentFile $file = null;
+
+    #[ORM\Column]
+    private int $chunkIndex;
+
+    #[ORM\Column(type: 'text')]
+    private string $content;
+
+    // colonna pgvector(1536)
+    #[ORM\Column(type: 'vector', length: 1536)]
+    private array $embedding = [];
+
+    public function __construct()
+    {
+        $this->id = Uuid::v7();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getFile(): ?DocumentFile
+    {
+        return $this->file;
+    }
+
+    public function setFile(?DocumentFile $file): self
+    {
+        $this->file = $file;
+        return $this;
+    }
+
+    public function getChunkIndex(): int
+    {
+        return $this->chunkIndex;
+    }
+
+    public function setChunkIndex(int $chunkIndex): self
+    {
+        $this->chunkIndex = $chunkIndex;
+        return $this;
+    }
+
+    public function getContent(): string
+    {
+        return $this->content;
+    }
+
+    public function setContent(string $content): self
+    {
+        $this->content = $content;
+        return $this;
+    }
+
+    public function getEmbedding(): array
+    {
+        return $this->embedding;
+    }
+
+    public function setEmbedding(array $embedding): self
+    {
+        $this->embedding = $embedding;
+        return $this;
+    }
+}
