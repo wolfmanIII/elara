@@ -21,13 +21,13 @@ composer require \
 ```bash
 sudo apt install postgresql-18 postgresql-18-pgvector
 ```
-### Eseguire il comando:
-```bash
-php bin/console doctrine:migrations:migrate
-```
 ### Nel database PostgreSQL, eseguire:
 ```sql
 CREATE EXTENSION IF NOT EXISTS vector;
+```
+### Eseguire il comando:
+```bash
+php bin/console doctrine:migrations:migrate
 ```
 Sono necessari i permessi relativi
 ### Creare indice ivfflat per velocizzare le ricerche(tabella document_chunk)
