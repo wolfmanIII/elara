@@ -43,7 +43,7 @@ __pgvector__ è un’estensione per PostgreSQL che aggiunge:
 * operatori e funzioni per confrontare questi vettori (distanze, similarità)
 * indici speciali (ivfflat / hnsw) per rendere le ricerche veloci
 
-Nel nostro schema abbiamno:
+Nel nostro schema abbiamo:
 ```php
 #[ORM\Column(type: 'vector', length: 1536)]
 private array $embedding;
@@ -190,8 +190,9 @@ Tramite la variabile di ambiente `APP_IVFFLAT_PROBES`, impostiamo il rapporto qu
 * 5–10 = super veloce
 * 20–30 = molto preciso
 * 50–100 = qualità altissima (RAG più consistente, più lento)
-## 5. Command per indicizzare per open-ai
+## 5. Command per indicizzare i file
 ### Esempi di utilizzo
+I file da indicizzare devono essere aggiunti nella cartella /var/knowledge
 ### 1. Full index, sfruttando hash (solo file nuovi/modificati)
 ```bash
 php bin/console app:index-docs -v
