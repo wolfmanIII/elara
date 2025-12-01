@@ -25,11 +25,11 @@ sudo apt install postgresql-18 postgresql-18-pgvector
 ```sql
 CREATE EXTENSION IF NOT EXISTS vector;
 ```
+Sono necessari i permessi relativi
 ### Eseguire il comando:
 ```bash
 php bin/console doctrine:migrations:migrate
 ```
-Sono necessari i permessi relativi
 ### Creare indice ivfflat per velocizzare le ricerche(tabella document_chunk)
 ```sql
 CREATE INDEX IF NOT EXISTS document_chunk_embedding_ivfflat_idx
