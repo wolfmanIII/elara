@@ -32,7 +32,7 @@ class DocumentChunk
         $this->id = Uuid::v7();
     }
 
-    public function getId(): ?int
+    public function getId(): ?Uuid
     {
         return $this->id;
     }
