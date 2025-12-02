@@ -54,7 +54,7 @@ questo campo su `DocumentChunk` è letteralmente:
 
 Quando viene indicizzato un chunk:
 * viene preso il testo (__$chunkText__)
-* viene passato al modello `nomic-embed-text` di Ollama
+* viene passato al modello `nomic-embed-text` di Ollama o `text-embedding-3-small` di OpenAI
 * il modello restituisce un array di 1536 numeri tipo:
 ```json
 [-0.023, 0.114, ..., 0.002]
