@@ -101,6 +101,12 @@ OPENAI_API_KEY
 OLLAMA_URL  
 DATABASE_URL
 
-## 10. Conclusione tecnica
+## 11. Conclusione tecnica
 ELARA implementa un motore RAG modulare, estensibile e robusto,
 idoneo sia per uso locale (Ollama) sia cloud (OpenAI).
+
+## 11. Cosa manca
+1. Autenticazione e Gestione utenti
+2. Interfaccia grafica per il chatbot
+3. Interfaccia grafica Admin(EasyAdmin) per il caricamento dei file da indicizzare
+4. Scheduler per automatizzare l'indicizzazione dei documenti caricati
