@@ -7,14 +7,36 @@ ELARA (Embedding Linking & Retrieval Answering) è un motore RAG progettato per 
 * generazione e formulazione delle risposte (Answering)
 
 Il tutto con un flusso semplice, trasparente e controllabile.
-## 2. Dipendenze aggiuntive da installare
+## 2. Dipendenze aggiuntive che verranno installate con il comando:
 ```bash
-composer require \
-    smalot/pdfparser \
-    phpoffice/phpword \
-    openai-php/client \
-    partitech/doctrine-pgvector \
-    symfony/uid
+composer install
+```
+* smalot/pdfparser
+* phpoffice/phpword
+* openai-php/client
+* partitech/doctrine-pgvector
+* symfony/uid
+* symfonycasts/tailwind-bundle
+### Interfaccia grafica, Tailwind, Tipography e DaisyUI
+#### Installare nvm (nodejs version manager)
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+```
+#### Aggiornare il proprio profilo utente, file .bash_profile o .bashrc nella propria home directory
+```bash
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+```
+#### Ricaricare la configurazione della shell
+```bash
+source ~/.bashrc
+```
+### Installare nodejs e i plugin aggiuntivi per Tailwind
+```bash
+nvm install --lts
+npm init
+npm install -D @tailwindcss/typography
+npm i -D daisyui@latest
 ```
 ## 3. PostgreSQL + pgvector + Doctrine
 ### Installare postgres + pgvector
