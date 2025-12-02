@@ -4,7 +4,7 @@ namespace App\Service;
 
 use Smalot\PdfParser\Parser as PdfParser;
 
-readonly class DocumentTextExtractor
+class DocumentTextExtractor
 {
     public function __construct(
         private PdfParser $pdfParser,

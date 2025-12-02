@@ -7,7 +7,7 @@ use App\Entity\DocumentChunk;
 use App\Repository\DocumentChunkRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
-readonly class ChatbotService
+class ChatbotService
 {
     public function __construct(
         private EntityManagerInterface  $em,
