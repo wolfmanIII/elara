@@ -95,11 +95,22 @@ Contiene ricerca vettoriale KNN per pgvector.
 ChatController espone /api/chat e usa ChatbotService senza logica propria.
 
 ## 9. .env.local
-Configura:  
-AI_CLIENT=openai | ollama  
-OPENAI_API_KEY  
-OLLAMA_URL  
-DATABASE_URL
+
+Database:
+- DATABASE_URL
+
+Ollama backend:
+- AI_BACKEND
+- OLLAMA_HOST
+- OLLAMA_CHAT_MODEL
+- OLLAMA_EMBED_MODEL
+
+Test mode e Fallback:
+- APP_AI_TEST_MODE=true
+- APP_AI_OFFLINE_FALLBACK=false
+
+Sonde IVF-FLAT per ricerca vettoriale:
+- APP_IVFFLAT_PROBES=10
 
 ## 11. Conclusione tecnica
 ELARA implementa un motore RAG modulare, estensibile e robusto,
