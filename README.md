@@ -64,7 +64,7 @@ In questo spazio:
 Testi “simili” sono “vicini”; testi diversi sono “lontani”.
 
 `pgvector` serve esattamente a questo:  
-Postgres li usa per memorizzare questi vettori e confrontarli.
+Postgres lo usa per memorizzare questi vettori e confrontarli.
 
 All'interno dell'applicativo:
 * quando indicizzi → salvi per ogni `DocumentChunk` il suo `embedding` (vector(1536))

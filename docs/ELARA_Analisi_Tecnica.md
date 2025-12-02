@@ -61,7 +61,7 @@ ASK(question):
   → ritorno risposta pulita
 
 ### 4.2 Retrieval vettoriale
-findNearest() esegue:
+findTopKSimilar() esegue:
 ORDER BY embedding <=> :vec LIMIT k
 
 ### 4.3 Prompt engineering
