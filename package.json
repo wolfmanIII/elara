@@ -1,0 +1,28 @@
+{
+  "name": "elara",
+  "version": "1.0.0",
+  "description": "ELARA (Embedding Linking & Retrieval Answering) è un motore RAG progettato per collegare embedding semantici, recuperare i contenuti più rilevanti e generare risposte precise basate sulle fonti disponibili. La pipeline integra: * vettorizzazione dei contenuti (Embedding) * correlazione tra query e documenti (Linking) * ricerca e ordinamento dei frammenti pertinenti (Retrieval) * generazione e formulazione delle risposte (Answering)",
+  "homepage": "https://github.com/wolfmanIII/elara#readme",
+  "bugs": {
+    "url": "https://github.com/wolfmanIII/elara/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wolfmanIII/elara.git"
+  },
+  "license": "ISC",
+  "author": "Space Wolf",
+  "type": "commonjs",
+  "main": "tailwind.config.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.19",
+    "daisyui": "^5.5.5"
+  }
+}

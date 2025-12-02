@@ -28,6 +28,14 @@ final class ChatController extends BaseController
         ]);
     } */
 
+    #[Route('/', name: 'app_home', methods: ['GET'])]
+    public function console(): Response
+    {
+        return $this->render('base.html.twig', []);
+    }
+
+
+
     #[Route('/api/chat', name: 'api_chat', methods: ['POST'])]
     public function chat(Request $request, ChatbotService $bot): JsonResponse
     {

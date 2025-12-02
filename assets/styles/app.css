@@ -1,3 +1,30 @@
-body {
-    background-color: skyblue;
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@plugin "daisyui" {
+    themes: all;
+}
+
+.inner-bordered-table th,
+.inner-bordered-table td {
+    @apply border border-base-content/4;
+}
+
+/* Rimuove i bordi esterni per preservare i rounded corners */
+.inner-bordered-table th:first-child,
+.inner-bordered-table td:first-child {
+    @apply border-l-0;
+}
+
+.inner-bordered-table th:last-child,
+.inner-bordered-table td:last-child {
+    @apply border-r-0;
+}
+
+.inner-bordered-table thead tr:first-child th {
+    @apply border-t-0;
+    @apply bg-info-content
+}
+
+.inner-bordered-table tbody tr:last-child td {
+    @apply border-b-0;
 }
