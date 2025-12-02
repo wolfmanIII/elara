@@ -1,4 +1,4 @@
-# ELARA — Flusso RAG & Servizi Core (ChatbotService + DocumentTextExtractor) ULTRA-dettagliato
+# ELARA — Flusso RAG & Servizi Core (ChatbotService + DocumentTextExtractor) Dettagliato
 
 ## 1. Panoramica architetturale del motore RAG
 Il flusso completo:
@@ -37,7 +37,7 @@ Normalizza input, rimuove punteggiatura, whitespace, parole corte, duplicati.
 
 ---
 
-## 3. DocumentTextExtractor — Analisi ultra dettagliata
+## 3. DocumentTextExtractor — Analisi dettagliata
 ### Estrazione testo per estensione:
 - PDF: Smalot PdfParser
 - Markdown: file_get_contents()
