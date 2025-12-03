@@ -213,7 +213,7 @@ Tramite la variabile di ambiente `APP_IVFFLAT_PROBES`, impostiamo il rapporto qu
 * 50–100 = qualità altissima (RAG più consistente, più lento)
 ## 5. Command per indicizzare i file
 ### Esempi di utilizzo
-I file da indicizzare devono essere aggiunti nella cartella /var/knowledge
+I file da indicizzare devono essere caricati nella cartella var/knowledge
 ### 1. Full index, sfruttando hash (solo file nuovi/modificati)
 ```bash
 php bin/console app:index-docs -v

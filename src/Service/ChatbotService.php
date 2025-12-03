@@ -34,7 +34,7 @@ class ChatbotService
             $queryVec = $this->ai->embed($question);
 
             // vecchia versione 2) recupero chunk più simili (top 5) usando cosine_similarity
-            /*
+            
             $chunks = $this->em->getRepository(DocumentChunk::class)->findTopSimilarByCosineSimilarity($queryVec, 5);
             if (!$chunks) {
                 return 'Non trovo informazioni rilevanti nei documenti indicizzati.';
@@ -45,9 +45,9 @@ class ChatbotService
                 $context .= "Fonte: ".$file->getPath()." (chunk ".$chunk->getChunkIndex().")\n";
                 $context .= $chunk->getContent()."\n\n";
             }
-            */
 
             // 2) Recupero i chunk più simili usando il repository ottimizzato (ivfflat + <=>)
+            /*
             $topChunks = $this->chunkRepository->findTopKSimilar($queryVec, 5);
 
             if (!$topChunks) {
@@ -68,6 +68,7 @@ class ChatbotService
                 $context .= "Fonte: {$filePath} (chunk {$chunkIndex}{$distanceInfo})\n";
                 $context .= ($row['content'] ?? '') . "\n\n";
             }
+            */
 
             // 4) Lascio che il backend AI generi la risposta usando contesto + domanda
             $answer = $this->ai->chat($question, $context);
@@ -78,7 +79,7 @@ class ChatbotService
                 return $this->answerInOfflineFallback($question, $e);
             }
 
-            return 'Errore nella chiamata al servizio AI: ' . $e->getMessage();
+            return 'Errore nella chiamata al servizio AI: ' . $e->getMessage() . $e->getTraceAsString();
         }
     }
 

@@ -6,7 +6,9 @@ use App\Entity\DocumentChunk;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Exception;
 use Doctrine\Persistence\ManagerRegistry;
+use Partitech\DoctrinePgVector\Type\VectorType;
 use PDO;
+use Doctrine\DBAL\Types\Type;
 
 class DocumentChunkRepository extends ServiceEntityRepository
 {
@@ -51,6 +53,13 @@ ORDER BY c.embedding <=> :query_vec ASC
 LIMIT :k
 SQL;
 
+        $platform   = $conn->getDatabasePlatform();
+        /** @var VectorType $vectorType */
+        $vectorType = Type::getType('vector');
+
+        // 👇 converte l'array nel formato pgvector (es. [0.1,0.2,0.3])
+        $queryVec   = $vectorType->convertToDatabaseValue($embedding, $platform);
+
         // L'estensione pgvector accetta il vettore come array PostgreSQL o come testo.
         // Doctrine, se ha il tipo "vector" configurato, converte l'array PHP in formato giusto.
         $stmt = $conn->prepare($sql);
@@ -79,7 +88,7 @@ SQL;
             ->where('c.embedding IS NOT NULL')
             ->orderBy('cosine_similarity(c.embedding, :vec)', 'DESC')
             ->setMaxResults(5)
-            ->setParameter('vec', $embedding)
+            ->setParameter('vec', $embedding, 'vector')
             ->getQuery()->getResult();
     }
 }
