@@ -81,7 +81,7 @@ Se non vengono trovati chunk, ChatbotService restituisce risposta neutra:
 UUID, path, hash, createdAt, relazione chunks.
 
 ### DocumentChunk
-UUID, contenuto, indice, embedding vector(1536), relazione ManyToOne.
+UUID, contenuto, indice, embedding vector(1024), relazione ManyToOne.
 
 ## 6. Middleware IVF-FLAT
 Ricostruzione indice vettoriale:

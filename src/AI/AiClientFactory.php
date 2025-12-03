@@ -17,8 +17,8 @@ class AiClientFactory
             'ollama' => new OllamaClient(
                 $this->httpClient,
                 host: $_ENV['OLLAMA_HOST'] ?? 'http://localhost:11434',
-                embedModel: $_ENV['OLLAMA_EMBED_MODEL'] ?? 'nomic-embed-text',
-                chatModel: $_ENV['OLLAMA_CHAT_MODEL'] ?? 'llama3.2'
+                embedModel: $_ENV['OLLAMA_EMBED_MODEL'] ?? 'qwen3-embedding:0.6b',
+                chatModel: $_ENV['OLLAMA_CHAT_MODEL'] ?? 'qwen3:7b'
             ),
 
             'openai' => new OpenAiClient(

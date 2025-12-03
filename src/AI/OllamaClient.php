@@ -14,8 +14,8 @@ class OllamaClient implements AiClientInterface
     public function __construct(
         private HttpClientInterface $httpClient,
         private string              $host = 'http://localhost:11434',
-        private string              $embedModel = 'nomic-embed-text',
-        private string              $chatModel = 'llama3.2',
+        private string              $embedModel = 'qwen3-embedding:0.6b',
+        private string              $chatModel = 'qwen3:4b',
     ) {}
 
     /**
@@ -27,20 +27,34 @@ class OllamaClient implements AiClientInterface
      */
     public function embed(string $text): array
     {
+        // Ollama /api/embed si aspetta SEMPRE un array di stringhe in "input"
         $response = $this->httpClient->request(
             'POST',
-            $this->host.'/api/embed',
+            rtrim($this->host, '/') . '/api/embed',
             [
                 'json' => [
-                    'model' => $this->embedModel,
-                    'input' => $text,
-                ]
+                    'model' => $this->embedModel,   // es. 'qwen3-embedding:0.6b'
+                    'input' => [$text],             // singolo testo -> array con 1 elemento
+                ],
             ]
         );
 
-        $data = $response->toArray();
+        $data = $response->toArray(false);
 
-        return $data['embeddings'][0] ?? [];
+        // Verifica robusta: ci deve essere almeno embeddings[0]
+        if (
+            !isset($data['embeddings'][0])
+            || !is_array($data['embeddings'][0])
+            || count($data['embeddings'][0]) === 0
+        ) {
+            throw new \RuntimeException(
+                'Embedding mancante o vuoto dalla API Ollama per il testo: ' .
+                mb_substr($text, 0, 80)
+            );
+        }
+
+        // Ritorno il vettore singolo (array<float>, dim ~1024)
+        return $data['embeddings'][0];
     }
 
     /**
@@ -64,7 +78,7 @@ TXT;
 
         $response = $this->httpClient->request(
             'POST',
-            $this->host.'/api/generate',
+            $this->host . '/api/generate',
             [
                 'json' => [
                     'model' => $this->chatModel,

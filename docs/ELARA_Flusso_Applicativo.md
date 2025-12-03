@@ -30,7 +30,7 @@ Ogni chunk:
 
 ### 2.5 Embedding
 Ogni chunk viene embeddato tramite AiClientInterface (OpenAI o Ollama),
-che restituisce un vettore float[] poi salvato nel campo `embedding vector(1536)`.
+che restituisce un vettore float[] poi salvato nel campo `embedding vector(1024)`.
 
 ### 2.6 Persistenza
 Ogni chunk viene salvato con relazione ManyToOne verso DocumentFile.
