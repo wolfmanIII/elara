@@ -23,10 +23,11 @@ services:
     # abilta il servizio per il parsing dei file PDF
     Smalot\PdfParser\Parser: ~
 
+    ## alla fine ho deciso di utilizzare solo indici hnsw
     # Middleware per abilitare l'uso delle sonde sugli indici ivfflat(pgvector)
-    App\Middleware\PgvectorIvfflatMiddleware:
-        arguments:
-            $probes: '%env(int:APP_IVFFLAT_PROBES)%'
+    # App\Middleware\PgvectorIvfflatMiddleware:
+    #    arguments:
+    #        $probes: '%env(int:APP_IVFFLAT_PROBES)%'
 
     # AiClientInterface per gestire il backend Ollama | OpenAi
     App\AI\AiClientInterface:

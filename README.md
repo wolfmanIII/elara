@@ -52,12 +52,11 @@ Sono necessari i permessi relativi
 ```bash
 php bin/console doctrine:migrations:migrate
 ```
-### Creare indice ivfflat per velocizzare le ricerche(tabella document_chunk)
+### Creare indice hnsw per velocizzare le ricerche(tabella document_chunk)
 ```sql
-CREATE INDEX IF NOT EXISTS document_chunk_embedding_ivfflat_idx
+CREATE INDEX document_chunk_embedding_hnsw
 ON document_chunk
-USING ivfflat (embedding vector_cosine_ops)
-WITH (lists = 100)
+USING hnsw (embedding vector_cosine_ops);
 ```
 ### Cos'è pgvector
 __pgvector__ è un’estensione per PostgreSQL che aggiunge:
@@ -67,7 +66,7 @@ __pgvector__ è un’estensione per PostgreSQL che aggiunge:
 
 Nel nostro schema abbiamo:
 ```php
-#[ORM\Column(type: 'vector', length: 1536)]
+#[ORM\Column(type: 'vector', length: 768)]
 private array $embedding;
 ```
 questo campo su `DocumentChunk` è letteralmente:  
@@ -77,7 +76,7 @@ questo campo su `DocumentChunk` è letteralmente:
 Quando viene indicizzato un chunk:
 * viene preso il testo (__$chunkText__)
 * viene passato al modello `nomic-embed-text` di Ollama o `text-embedding-3-small` di OpenAI
-* il modello restituisce un array di 1536 numeri tipo:
+* il modello restituisce un array di 768 numeri tipo:
 ```json
 [-0.023, 0.114, ..., 0.002]
 ```
@@ -89,7 +88,7 @@ Testi “simili” sono “vicini”; testi diversi sono “lontani”.
 Postgres lo usa per memorizzare questi vettori e confrontarli.
 
 All'interno dell'applicativo:
-* quando indicizzi → salvi per ogni `DocumentChunk` il suo `embedding` (vector(1536))
+* quando indicizzi → salvi per ogni `DocumentChunk` il suo `embedding` (vector(768))
 * quando interroghi il chatbot → calcoli l’`embedding` della domanda e lo confronti con quelli salvati.
 ### Cos’è cosine_similarity e cosa fa nella query
 Nel ChatbotService abbiamo:
@@ -146,6 +145,8 @@ doctrine:
         distance: Partitech\DoctrinePgVector\Query\Distance
 ```
 ### Cos’è IVF-Flat in pgvector
+## **Alla fine ho deciso utilizzare solo indici hnsw(non ha bisogno di clustering, e nessun tuning per le sonde da fare)**
+## **Lascio comunque per informazione**
 IVF-Flat è un tipo di indice approximate (ANN):  
 non garantisce risultati 100% identici alla ricerca esatta, ma è molto più veloce e la differenza è spesso irrilevante per casi RAG.  
 È composto da due elementi:
@@ -181,8 +182,9 @@ OLLAMA_EMBED_MODEL=nomic-embed-text
 APP_AI_TEST_MODE=true
 APP_AI_OFFLINE_FALLBACK=false
 
+## Uso solo indici hwsn
 # Postgres pgvector - sonde per indice ivfflat
-APP_IVFFLAT_PROBES=10
+# APP_IVFFLAT_PROBES=10
 ```
 ### Configurazione AI_BACKEND, PDF parser, Ivfflat Probes, nel file services.yaml
 ```yaml
@@ -197,10 +199,11 @@ services:
   # abilta il servizio per il parsing dei file PDF
   Smalot\PdfParser\Parser: ~
 
+  ## Alla fine ho deciso di utilizzare solo indici hnsw
   # Middleware per abilitare l'uso delle sonde sugli indici ivfflat(pgvector)
-  App\Middleware\PgvectorIvfflatMiddleware:
-      arguments:
-          $probes: '%env(int:APP_IVFFLAT_PROBES)%'
+  # App\Middleware\PgvectorIvfflatMiddleware:
+  #    arguments:
+  #        $probes: '%env(int:APP_IVFFLAT_PROBES)%'
 
   # AiClientInterface per gestire il backend Ollama | OpenAi
   App\AI\AiClientInterface:

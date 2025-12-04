@@ -218,8 +218,8 @@ class IndexDocsCommand extends Command
 
             // Split in chunk
             $output->writeln("  -> split in chunk...");
-            //$chunks = $this->splitIntoChunks($text, 1000);
-            $chunks = $this->chunkText($text);
+            $chunks = $this->splitIntoChunks($text, 1400);
+            //$chunks = $this->chunkText($text);
             $now    = new \DateTimeImmutable();
 
             // DRY-RUN → solo log, niente DB / niente embeddings reali
@@ -361,33 +361,46 @@ class IndexDocsCommand extends Command
     }
 
     /**
-     * algoritmo di chunking ottimizzato, che evita chunk troppo corti e include overlap:
+     * Algoritmo di chunking ottimizzato, che evita chunk troppo corti e include overlap.
      */
-    function chunkText(string $text, int $min = 400, int $target = 1200, int $max = 1400, int $overlap = 250): array
-    {
-        $parts = preg_split('/{2,}/', $text); // Splitta per paragrafi
+    function chunkText(
+        string $text,
+        int $min = 400,
+        int $target = 1200,
+        int $max = 1400,
+        int $overlap = 250
+    ): array {
+        // Splitta per paragrafi (due o più newline consecutivi)
+        $parts = preg_split("/\R{2,}/", $text, -1, PREG_SPLIT_NO_EMPTY);
+
         $chunks = [];
         $buffer = '';
 
         foreach ($parts as $p) {
+            
+            $p = preg_replace('/\s+/', ' ', $p);
             $p = trim($p);
-            if ($p === '') continue;
+            if ($p === '') {
+                continue;
+            }
 
-            // Se il paragrafo è troppo corto → merge
+            // Se il paragrafo è troppo corto → accumula nel buffer
             if (strlen($p) < $min) {
-                $buffer .= ($buffer ? "" : '') . $p;
+                $buffer .= ($buffer !== '' ? " " : "") . $p;
                 continue;
             }
 
             // Se buffer + paragrafo supera max → chiudi chunk
             if (strlen($buffer) + strlen($p) > $max) {
-                if ($buffer !== '') $chunks[] = $buffer;
+                if ($buffer !== '') {
+                    $chunks[] = $buffer;
+                }
                 $buffer = $p;
                 continue;
             }
 
             // Aggiungi al buffer
-            $buffer .= ($buffer ? "" : '') . $p;
+            $buffer .= ($buffer !== '' ? " " : "") . $p;
 
             // Se raggiungiamo il target → chiudiamo il chunk
             if (strlen($buffer) >= $target) {
@@ -396,21 +409,30 @@ class IndexDocsCommand extends Command
             }
         }
 
-        if ($buffer !== '') $chunks[] = $buffer;
+        if ($buffer !== '') {
+            $chunks[] = $buffer;
+        }
 
         // Aggiungi overlap
         $final = [];
-        for ($i = 0; $i < count($chunks); $i++) {
+        $count = count($chunks);
+
+        for ($i = 0; $i < $count; $i++) {
             $chunk = $chunks[$i];
-            if ($i > 0) {
+
+            if ($i > 0 && $overlap > 0) {
                 $prev = $chunks[$i - 1];
-                $chunk = substr($prev, -$overlap) . "" . $chunk;
+                // ultimi $overlap caratteri del chunk precedente
+                $prefix = substr($prev, -$overlap);
+                $chunk  = $prefix . $chunk;
             }
+
             $final[] = $chunk;
         }
 
         return $final;
     }
+
 
     private function isInExcludedDir(string $dirName): bool
     {
