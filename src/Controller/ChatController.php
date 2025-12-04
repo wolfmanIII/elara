@@ -34,7 +34,14 @@ final class ChatController extends BaseController
         return $this->render('base.html.twig', []);
     }
 
-
+    #[Route('/engine/status', name: 'app_engine_status', methods: ['GET'])]
+    public function engineStatus(): JsonResponse
+    {
+         return $this->json([
+            'test_mode'   => $_ENV['APP_AI_TEST_MODE'],
+            'offline_fallback' => $_ENV['APP_AI_OFFLINE_FALLBACK'],
+        ]);
+    }
 
     #[Route('/api/chat', name: 'api_chat', methods: ['POST'])]
     public function chat(Request $request, ChatbotService $bot): JsonResponse

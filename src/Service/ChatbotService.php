@@ -41,9 +41,11 @@ class ChatbotService
             }
             $context = '';
             foreach ($chunks as $chunk) {
-                $file = $chunk->getFile();
-                $context .= "Fonte: ".$file->getPath()." (chunk ".$chunk->getChunkIndex().")\n";
-                $context .= $chunk->getContent()."\n\n";
+                //$file = $chunk->getFile();
+                //$context .= "Fonte: ".$file->getPath()." (chunk ".$chunk->getChunkIndex().")\n";
+                //$context .= $chunk->getContent()."\n\n";
+                $context .= "Fonte: " . $chunk['file_path'] . " chunk ". $chunk["chunk_index"] . ")\n";
+                $context .= $chunk["chunk_content"] . "\n\n";
             }
 
             // 2) Recupero i chunk più simili usando il repository ottimizzato (ivfflat + <=>)

@@ -14,8 +14,8 @@ class OllamaClient implements AiClientInterface
     public function __construct(
         private HttpClientInterface $httpClient,
         private string              $host = 'http://localhost:11434',
-        private string              $embedModel = 'qwen3-embedding:0.6b',
-        private string              $chatModel = 'qwen3:4b',
+        private string              $embedModel = 'nomic-embed-text',
+        private string              $chatModel = 'llama3.1:8b',
     ) {}
 
     /**
@@ -53,7 +53,7 @@ class OllamaClient implements AiClientInterface
             );
         }
 
-        // Ritorno il vettore singolo (array<float>, dim ~1024)
+        // Ritorno il vettore singolo (array<float>, dim ~768)
         return $data['embeddings'][0];
     }
 
@@ -90,6 +90,6 @@ TXT;
 
         $data = $response->toArray();
 
-        return $data['response'] ?? '';
+        return $data['response'] . $context ?? '';
     }
 }
