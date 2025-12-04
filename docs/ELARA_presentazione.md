@@ -24,11 +24,11 @@ Il vantaggio rispetto a un “chatbot generico” è che:
 * riduce molto il rischio di risposte inventate (hallucination)
 
 In pratica RAG significa: “AI che risponde, ma con il naso dentro i tuoi documenti, non solo nella sua memoria addestrata.”
-# 2. La missione di ELARA
+# 2. Lo Scopo di ELARA
 ELARA è il nome che abbiamo dato al motore RAG interno:
 E.L.A.R.A. — Embedding Linking & Retrieval Answering.
 
-La sua missione è molto chiara:
+Il suo Scopo è molto chiara:
 
 *Permettere a chiunque, senza competenze tecniche, di interrogare la documentazione disponibile semplicemente parlando con un chatbot.*
 
@@ -216,22 +216,20 @@ Scegliere una dimensione standard come 1536 significa:
 * pieno supporto da parte delle librerie AI usate da ELARA (sia OpenAI che Ollama)
 In altre parole: è una scelta che protegge l’investimento tecnico e mantiene il sistema flessibile nel tempo.
 
-### In sintesi, cosa puoi dire in presentazione
+### In sintesi(cosa avrei voluto)
 
 Ecco una frase sintetica che puoi usare a voce:
 > *Abbiamo scelto embedding a 1536 dimensioni perché sono lo standard moderno per ottenere una rappresentazione molto precisa del significato del testo. Più dimensioni significano più sfumature, più accuratezza nella ricerca dei chunk e risposte migliori del chatbot. È una scelta che massimizza la qualità ma mantiene il sistema veloce, stabile e compatibile con i modelli attuali e futuri.*
 
-# 6. Ordine suggerito per presentare i documenti
-
-Pensando alla presentazione, ti propongo questo ordine, lasciando README.md alla fine, come hai chiesto:
+# 6. Ordine di presentazione dei documenti
 1. ELARA_Flusso_Applicativo.md
    * Per iniziare dal quadro generale: 
   “FILE → Estrattore → Chunking → Embedding → DB → IVF-FLAT → Retrieval → Prompt → AI → Risposta”
-   * Qui spieghi la pipeline end-to-end e i command principali (app:index-docs, app:list-docs, app:unindex-file).
+   * Qui spiego la pipeline end-to-end e i command principali (app:index-docs, app:list-docs, app:unindex-file).
 
 2. ELARA_Flusso_Servizi_Dettagliato.md
    * Secondo step: zoom sui servizi core, soprattutto ChatbotService e DocumentTextExtractor.
-   * Qui puoi far vedere come la domanda passa attraverso ask(), come viene costruito il contesto e come funziona la modalità test/offline.
+   * Qui posso far vedere come la domanda passa attraverso ask(), come viene costruito il contesto e come funziona la modalità test/offline.
 
 3. ELARA_Analisi_Tecnica.md
    * Terzo step: entra nell’architettura applicativa:
@@ -245,7 +243,7 @@ Pensando alla presentazione, ti propongo questo ordine, lasciando README.md alla
      * endpoint /api/chat
      * esempi curl
      * gestione degli errori e variabili ENV per test mode / fallback.
-   * Qui fai vedere quanto è semplice consumare il servizio dal punto di vista di un’app esterna.
+   * Qui faccio quanto è semplice utilizzare il servizio dal punto di vista di un’app esterna.
 
 5. README.md
    * Alla fine, come “landing page” e riepilogo:
@@ -253,22 +251,22 @@ Pensando alla presentazione, ti propongo questo ordine, lasciando README.md alla
      * dipendenze principali
      * setup PostgreSQL + pgvector + indice ivfflat
      * comandi per indicizzare, elencare e rimuovere file
-   * Perfetto come chiusura: è ciò che chi vuole provarlo deve seguire.
+   * Ciò che chi vuole provarlo deve seguire.
 # 7. Conclusioni: perché conviene un motore RAG interno
 
 Chiudo con qualche punto che puoi usare nelle conclusioni:
-1. Conoscenza aziendale davvero sfruttata
+1. Conoscenza accumulata davvero sfruttata
     I documenti non restano “morti” in una cartella o in un wiki: diventano una base di conoscenza a cui si accede in linguaggio naturale, via chatbot.
 2. Risposte contestualizzate e aggiornabili
-    Se aggiorni una procedura o un manuale e re-indicizzi i documenti, il motore RAG inizierà a rispondere usando le informazioni nuove, senza dover ri-addestrare un modello.
+    Se si aggiorna una procedura o un manuale e re-indicizzi i documenti, il motore RAG inizierà a rispondere usando le informazioni nuove, senza dover ri-addestrare un modello.
 3. Controllo su dati e fonti
-    Gli embedding e i testi stanno nel tuo PostgreSQL, con pgvector e gli indici configurati da te. Puoi decidere cosa indicizzare, cosa escludere, come strutturare gli accessi e in futuro agganciare autenticazione e ruoli.
+    Gli embedding e i testi nel PostgreSQL in locale, con pgvector e gli indici configurati e personalizzati. Si può decidere cosa indicizzare, cosa escludere, come strutturare gli accessi e in futuro agganciare autenticazione e ruoli.
 4. Privacy e conformità
-    Puoi usare backend locali (Ollama) per evitare che i tuoi documenti escano dall’infrastruttura, oppure usare OpenAI solo per la parte di generazione, mantenendo comunque in casa l’indice vettoriale e i dati sensibili.
+    Si possono usare backend locali (Ollama) per evitare che i documenti escano all'esterno, oppure usare OpenAI solo per la parte di generazione, mantenendo comunque in casa l’indice vettoriale e i dati sensibili.
 5. Integrazione con lo stack esistente
-    ELARA è scritto in Symfony, usa Doctrine e PostgreSQL: si integra bene con applicazioni già esistenti, riutilizza strumenti e competenze che spesso in azienda ci sono già.
+    ELARA è scritto in Symfony, usa Doctrine e PostgreSQL: si integra bene con applicazioni già esistenti.
 6. Scalabilità graduale
-    Parti da pochi documenti, cresce nel tempo; gli indici vettoriali come IVF-FLAT e le sonde configurabili ti permettono di bilanciare prestazioni e qualità senza stravolgere l’architettura.
+    Si parte da pochi documenti, cresce nel tempo; gli indici vettoriali come IVF-FLAT e le sonde configurabili permettono di bilanciare prestazioni e qualità senza stravolgere l’architettura.
 
 In sintesi:  
-un motore RAG interno come ELARA trasforma la documentazione aziendale in un assistente consultabile in linguaggio naturale, mantenendo però controllo, trasparenza e integrazione con l’infrastruttura esistente.
+un motore RAG interno come ELARA trasforma la documentazione in un assistente consultabile in linguaggio naturale, mantenendo però controllo, trasparenza e integrazione con l’infrastruttura esistente.

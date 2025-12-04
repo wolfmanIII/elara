@@ -64,7 +64,7 @@ I valori nella colonna *target* sono quelli consigliati come default pratici.
 
 ---
 
-# 🧩 4. Parametri di chunking consigliati per il tuo sistema (WSL2 + 16GB RAM)
+# 🧩 4. Parametri di chunking consigliati per un sistema (WSL2 + 16GB RAM)
 
 Con embedding **768** + modello chat 8B:
 
@@ -83,7 +83,7 @@ Questo bilancia qualità del retrieval e performance, evitando timeout e surrisc
 
 ### ✓ Evitare chunk "quasi vuoti"
 - Se un paragrafo è troppo corto (<300–400 caratteri), va unito al precedente/successivo.
-- Se spezzetti a misura fissa, aggiungi overlap.
+- Se spezzetti a misura fissa, si aggiunge un overlap.
 
 ### ✓ Ridurre il rumore nelle query
 top_k troppo alto genera contesto troppo esteso, lento e dispersivo.
@@ -103,7 +103,7 @@ Per un setup self‑hosted moderno ma non estremo (16GB RAM):
 - **top_k = 5**
 - **Overlap 200–300**
 
-Questi valori sono adatti a documenti tecnici, world‑building, personaggi, narrativa e tutto il materiale Traveller.
+Questi valori sono adatti a documenti tecnici e qualunque tipo di conoscenza
 
 ---
 
@@ -114,7 +114,7 @@ Questi valori sono adatti a documenti tecnici, world‑building, personaggi, nar
 - Anche se modelli diversi producono dimensionalità diverse, puoi:
   - **ridurre** vettori maggiori (troncamento)
   - **zero‑padding** per vettori più piccoli
-- Il modo più stabile è scegliere UN formato per il tuo progetto.
+- Il modo più stabile è scegliere il formato per il proprio progetto.
 
 ### Consiglio pratico
 Per self‑hosting → **VECTOR(768)** è la scelta più equilibrata.
@@ -131,8 +131,8 @@ ON document_chunk USING hnsw (embedding vector_cosine_ops);
 - HNSW è molto più veloce dell’IVFFlat, specialmente su dataset medi (< 500k chunk).
 
 ### Quando usare IVF Flat
-- Solo se hai **milioni** di chunk.
-- Richiede `REINDEX` quando aggiungi molti dati.
+- Solo se hanno **milioni** di chunk.
+- Richiede `REINDEX` quando si aggiungono molti dati.
 - Va calibrato con `lists = 100–200`.
 
 ### Vacuum & manutenzione
@@ -143,7 +143,7 @@ VACUUM ANALYZE document_chunk;
 
 ---
 
-# 🧰 8. Funzione di chunking consigliata
+# 🧰 8. Funzione di chunking utilizzata
 
 Di seguito un algoritmo di chunking che evita chunk troppo corti e include overlap:
 
@@ -256,7 +256,7 @@ Se la risposta non è presente nel contesto, di' che non è disponibile.
 # DOMANDA
 {{question}}
 
-Rispondi in modo chiaro e sintetico.
+Rispondi in modo chiaro e sintetico nella lingua dell'utente.
 ```
 
 ### Perché funziona bene
@@ -269,7 +269,7 @@ Rispondi in modo chiaro e sintetico.
 # 🗄️ 11. È utile usare **IVFFlat + HNSW insieme?**
 
 ## ❌ Risposta breve
-Per un sistema RAG **self‑hosted**, con **16 GB di RAM** e dataset di dimensioni medio‑piccole (documentazione, lore, manuali, personaggi), **NO**: usare **entrambi gli indici** sulla stessa colonna di embedding **non è né necessario né utile**.
+Per un sistema RAG **self‑hosted**, con **16 GB di RAM** e dataset di dimensioni medio‑piccole (documentazione, lore, manuali), **NO**: usare **entrambi gli indici** sulla stessa colonna di embedding **non è né necessario né utile**.
 
 Un solo indice — **HNSW** — è la scelta corretta nel 99% dei casi.
 
@@ -316,7 +316,7 @@ Avere **due indici** (HNSW + IVFFlat) sulla stessa colonna comporta:
 - **Manutenzione raddoppiata**
 - **Recall instabile** se IVFFlat non è configurato bene
 
-### 👍 Nel tuo contesto
+### 👍 In questo contesto
 - Dataset non enorme
 - Self‑hosting in WSL2
 - Performance già buone con HNSW
@@ -348,7 +348,7 @@ In qualunque altro caso → **HNSW è migliore, più semplice e più affidabile*
 
 ---
 
-# 🧪 11.4. Come verificare che Postgres usi davvero HNSW
+# 🧪 11.4. Come verificare che Postgres sta davvero HNSW
 
 ```sql
 EXPLAIN ANALYZE
@@ -358,11 +358,11 @@ ORDER BY embedding <=> :q
 LIMIT 5;
 ```
 
-Dovresti vedere qualcosa come:
+Si dovrebbe vedere qualcosa come:
 ```
 Index Scan using document_chunk_embedding_hnsw on document_chunk
 ```
-Se invece vedi "Seq Scan" → manca l'indice o Postgres non lo ritiene conveniente.
+Se invece si vede "Seq Scan" → manca l'indice o Postgres non lo ritiene conveniente.
 
 ---
 
