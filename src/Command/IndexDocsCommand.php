@@ -13,6 +13,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use App\Service\ChunkingService;
 
 #[AsCommand(name: 'app:index-docs')]
 class IndexDocsCommand extends Command
@@ -50,6 +51,7 @@ class IndexDocsCommand extends Command
 
     public function __construct(
         private EntityManagerInterface $em,
+        private ChunkingService $chunkingService,
         private DocumentTextExtractor  $extractor,
         private AiClientInterface      $ai,
     ) {
@@ -219,7 +221,8 @@ class IndexDocsCommand extends Command
             // Split in chunk
             $output->writeln("  -> split in chunk...");
             //$chunks = $this->splitIntoChunks($text, 1400);
-            $chunks = $this->chunkText($text);
+            //$chunks = $this->chunkText($text);
+            $chunks = $this->chunkingService->chunkText($text);
             $now    = new \DateTimeImmutable();
 
             // DRY-RUN → solo log, niente DB / niente embeddings reali
@@ -373,191 +376,6 @@ class IndexDocsCommand extends Command
         }
 
         return $chunks;
-    }
-
-    /**
-     * Algoritmo di chunking ottimizzato, che evita chunk troppo corti,
-     * include overlap ed è UTF-8 safe. I paragrafi più lunghi di $max
-     * vengono spezzati usando splitIntoChunks().
-     */
-    private function chunkText(
-        string $text,
-        int $min = 300,
-        int $target = 800,
-        int $max = 1000,
-        int $overlap = 150
-    ): array {
-        $text = trim($text);
-        if ($text === '') {
-            return [];
-        }
-
-        // Splitta per paragrafi (due o più newline consecutivi)
-        $parts = preg_split("/\R{2,}/u", $text, -1, PREG_SPLIT_NO_EMPTY);
-
-        $chunks = [];
-        $buffer = '';
-
-        foreach ($parts as $p) {
-            $p = trim($p);
-            if ($p === '') {
-                continue;
-            }
-
-            $pLen = mb_strlen($p, 'UTF-8');
-
-            // 1) Paragrafo singolo più lungo di $max → spezzalo con splitIntoChunks
-            if ($pLen > $max) {
-                // Flush del buffer corrente
-                if ($buffer !== '') {
-                    $chunks[] = $buffer;
-                    $buffer = '';
-                }
-
-                // Riusa il vecchio algoritmo a frasi
-                $subChunks = $this->splitIntoChunks($p, $max);
-                foreach ($subChunks as $sc) {
-                    if (trim($sc) !== '') {
-                        $chunks[] = $sc;
-                    }
-                }
-                continue;
-            }
-
-            // 2) Paragrafo corto: gestito col buffer/min/target/max
-
-            $bufferLen = mb_strlen($buffer, 'UTF-8');
-
-            // Se il paragrafo è troppo corto → accumula nel buffer
-            if ($pLen < $min) {
-                $buffer .= ($buffer !== '' ? ' ' : '') . $p;
-                continue;
-            }
-
-            // Se buffer + paragrafo superano max → chiudi chunk corrente e riparti
-            if ($bufferLen + $pLen > $max) {
-                if ($buffer !== '') {
-                    $chunks[] = $buffer;
-                }
-                $buffer = $p;
-                continue;
-            }
-
-            // Aggiungi al buffer
-            $buffer .= ($buffer !== '' ? ' ' : '') . $p;
-
-            // Se raggiungiamo il target → chiudiamo il chunk
-            if (mb_strlen($buffer, 'UTF-8') >= $target) {
-                $chunks[] = $buffer;
-                $buffer = '';
-            }
-        }
-
-        // Flush finale del buffer se rimasto qualcosa
-        if ($buffer !== '') {
-            $chunks[] = $buffer;
-        }
-
-        // 3) Aggiungi overlap TRA CHUNK, ma basato su parole
-        $final = [];
-        $count = count($chunks);
-
-        for ($i = 0; $i < $count; $i++) {
-            $chunk = $chunks[$i];
-
-            if ($i > 0 && $overlap > 0) {
-                $prev   = $chunks[$i - 1];
-
-                // prefix = ultime parole del chunk precedente
-                $prefix = $this->buildWordOverlap($prev, $overlap);
-
-                $chunk = $prefix . $chunk;
-            }
-
-            $chunk = $this->fixMissingSpaces($chunk);
-
-            $chunk = trim($chunk);
-            if ($chunk !== '') {
-                $final[] = $chunk;
-            }
-        }
-
-        return $final;
-    }
-
-    /**
-     * Costruisce un overlap basato su parole (non su caratteri).
-     * Prende le ultime parole del chunk precedente finché non
-     * supera approssimativamente overlapChars caratteri.
-     */
-    private function buildWordOverlap(string $prev, int $overlapChars): string
-    {
-        $prev = trim($prev);
-        if ($overlapChars <= 0 || $prev === '') {
-            return '';
-        }
-
-        $words = preg_split('/\s+/', $prev, -1, PREG_SPLIT_NO_EMPTY);
-        if (!$words || count($words) === 0) {
-            return '';
-        }
-
-        $selected  = [];
-        $totalLen  = 0;
-
-        // parti dalla fine e risali
-        for ($i = count($words) - 1; $i >= 0; $i--) {
-            $w    = $words[$i];
-            $wLen = mb_strlen($w, 'UTF-8');
-
-            // +1 per lo spazio che aggiungeremo tra le parole
-            if ($totalLen > 0) {
-                $wLen += 1;
-            }
-
-            if ($totalLen + $wLen > $overlapChars && !empty($selected)) {
-                break;
-            }
-
-            array_unshift($selected, $w);
-            $totalLen += $wLen;
-
-            if ($totalLen >= $overlapChars) {
-                break;
-            }
-        }
-
-        return implode(' ', $selected) . ' ';
-    }
-
-    private function fixMissingSpaces(string $text): string
-    {
-        // 1) Spazio dopo ., !, ?, ;, : se NON c'è già uno spazio
-        // es: "dominanti:Carisma" -> "dominanti: Carisma"
-        $text = preg_replace(
-            '/([\.!?;:])([^\s])/u',
-            '$1 $2',
-            $text
-        );
-
-        // 2) Spazio tra parola ALL-CAPS e parola Capitalized attaccate
-        // es: "MOTIVAZIONIRuolo" -> "MOTIVAZIONI Ruolo"
-        //     "PSICOLOGICOEtà"   -> "PSICOLOGICO Età"
-        $text = preg_replace(
-            '/\b([A-ZÀ-ÖØ-Ý]{2,})([A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ]+)/u',
-            '$1 $2',
-            $text
-        );
-
-        // 3) Spazio tra minuscola e maiuscola attaccate (caso generico)
-        // es: "standard.Origini" -> "standard. Origini"
-        $text = preg_replace(
-            '/([\p{Ll}])([\p{Lu}])/u',
-            '$1 $2',
-            $text
-        );
-
-        return $text;
     }
 
     private function isInExcludedDir(string $dirName): bool
