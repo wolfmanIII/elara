@@ -87,13 +87,13 @@ TXT;
                     'model' => $this->chatModel,
                     'prompt' => $prompt,
                     'stream' => false,
-                    'num_predict' => 300,
+                    //'num_predict' => 300,
                 ]
             ]
         );
 
         $data = $response->toArray();
 
-        return $data['response'] . "<br><br>" . $context ?? '';
+        return $data['response'] . "\n\n" . $context ?? '';
     }
 }
