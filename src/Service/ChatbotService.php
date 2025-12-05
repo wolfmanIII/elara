@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\AI\AiClientInterface;
@@ -33,44 +35,18 @@ class ChatbotService
             // 1) Embedding della domanda (usa il backend configurato, es. Ollama o OpenAI)
             $queryVec = $this->ai->embed($question);
 
-            // vecchia versione 2) recupero chunk più simili (top 5) usando cosine_similarity
-            
+            // 2) recupera chunk più simili (top 5) usando cosine_similarity
             $chunks = $this->em->getRepository(DocumentChunk::class)->findTopSimilarByCosineSimilarity($queryVec, 5);
             if (!$chunks) {
-                return 'Non trovo informazioni rilevanti nei documenti indicizzati.';
-            }
-            $context = '';
-            foreach ($chunks as $chunk) {
-                //$file = $chunk->getFile();
-                //$context .= "Fonte: ".$file->getPath()." (chunk ".$chunk->getChunkIndex().")\n";
-                //$context .= $chunk->getContent()."\n\n";
-                $context .= "Fonte: " . $chunk['file_path'] . " chunk ". $chunk["chunk_index"] . ")\n";
-                $context .= $chunk["chunk_content"] . "\n\n";
-            }
-
-            // 2) Recupero i chunk più simili usando il repository ottimizzato (ivfflat + <=>)
-            /*
-            $topChunks = $this->chunkRepository->findTopKSimilar($queryVec, 5);
-
-            if (!$topChunks) {
                 return 'Non trovo informazioni rilevanti nei documenti indicizzati.';
             }
 
             // 3) Costruisco il contesto per il modello
             $context = '';
-            foreach ($topChunks as $row) {
-                $filePath   = $row['file_path'] ?? 'sconosciuto';
-                $chunkIndex = $row['chunk_index'] ?? 0;
-                $distance   = $row['distance'] ?? null;
-
-                $distanceInfo = $distance !== null
-                    ? sprintf(' (distanza %.4f)', $distance)
-                    : '';
-
-                $context .= "Fonte: {$filePath} (chunk {$chunkIndex}{$distanceInfo})\n";
-                $context .= ($row['content'] ?? '') . "\n\n";
+            foreach ($chunks as $chunk) {
+                $context .= "Fonte: " . $chunk['file_path'] . " chunk ". $chunk["chunk_index"] . "similarity " . $chunk["similarity"] . ")\n";
+                $context .= $chunk["chunk_content"] . "\n\n";
             }
-            */
 
             // 4) Lascio che il backend AI generi la risposta usando contesto + domanda
             $answer = $this->ai->chat($question, $context);
@@ -138,7 +114,7 @@ class ChatbotService
 
     /**
      * Modalità fallback: se la chiamata al modello AI fallisce per errore tecnico,
-     * proviamo comunque a dare almeno degli estratti dai documenti locali.
+     * prova comunque a dare almeno degli estratti dai documenti locali.
      */
     private function answerInOfflineFallback(string $question, \Throwable $e): string
     {

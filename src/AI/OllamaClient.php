@@ -30,7 +30,7 @@ class OllamaClient implements AiClientInterface
         // Ollama /api/embed si aspetta SEMPRE un array di stringhe in "input"
         $response = $this->httpClient->request(
             'POST',
-            rtrim($this->host, '/') . '/api/embed',
+            $this->host. '/api/embed',
             [
                 'json' => [
                     'model' => $this->embedModel,   // es. 'nomic-embed-text'
@@ -87,12 +87,13 @@ TXT;
                     'model' => $this->chatModel,
                     'prompt' => $prompt,
                     'stream' => false,
+                    'num_predict' => 300,
                 ]
             ]
         );
 
         $data = $response->toArray();
 
-        return $data['response'] ?? '';
+        return $data['response'] . "<br><br>" . $context ?? '';
     }
 }

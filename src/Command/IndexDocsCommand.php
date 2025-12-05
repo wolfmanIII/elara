@@ -51,7 +51,7 @@ class IndexDocsCommand extends Command
 
     public function __construct(
         private EntityManagerInterface $em,
-        private ChunkingService $chunkingService,
+        private ChunkingService        $chunkingService,
         private DocumentTextExtractor  $extractor,
         private AiClientInterface      $ai,
     ) {
@@ -84,7 +84,7 @@ class IndexDocsCommand extends Command
                 'path',
                 null,
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'Sotto-percorsi da indicizzare (es: manuali, log/2025). Puoi usare più --path.'
+                'Sotto-percorsi da indicizzare (es: manuali, log/2025). Si possono usare più --path.'
             );
     }
 
@@ -100,7 +100,7 @@ class IndexDocsCommand extends Command
         $forceReindex = (bool) $input->getOption('force-reindex');
         $dryRun       = (bool) $input->getOption('dry-run');
 
-        // test-mode può essere attivato da option o da env
+        // test-mode e offline_fallback possono essere attivati da option o da env
         $testMode =
             (bool) $input->getOption('test-mode')
             || (($_ENV['APP_AI_TEST_MODE'] ?? 'false') === 'true');
@@ -168,7 +168,7 @@ class IndexDocsCommand extends Command
         }
 
         // ---------------------------------------------------------------------
-        // 2) Barra di progresso
+        // 2) Progress Bar
         // ---------------------------------------------------------------------
         $progressBar = null;
         if ($output->isVerbose()) {
@@ -191,7 +191,7 @@ class IndexDocsCommand extends Command
             /** @var DocumentFile|null $fileEntity */
             $fileEntity = $fileRepo->findOneBy(['path' => $relPath]);
 
-            // Se il file è già presente e l'hash non è cambiato, possiamo saltare
+            // Se il file è già presente e l'hash non è cambiato, posso saltare
             if ($fileEntity !== null) {
                 $oldHash = $fileEntity->getHash();
                 if (!$forceReindex && !$dryRun && !$testMode && $oldHash === $fileHash) {
@@ -237,7 +237,7 @@ class IndexDocsCommand extends Command
                 continue;
             }
 
-            // Creiamo o aggiorniamo DocumentFile
+            // Creo o aggiorno DocumentFile
             if ($fileEntity === null) {
                 $fileEntity = (new DocumentFile())
                     ->setPath($relPath)
@@ -254,7 +254,7 @@ class IndexDocsCommand extends Command
                 //$output->writeln("  -> aggiornato record DocumentFile");
             }
 
-            // Cancella eventuali chunk già esistenti per questo file
+            // Cancello eventuali chunk già esistenti per questo file
             //$output->writeln("  -> cancello chunk esistenti (se presenti)...");
             $this->em->createQueryBuilder()
                 ->delete(DocumentChunk::class, 'c')
@@ -270,11 +270,11 @@ class IndexDocsCommand extends Command
                 $embedding = null;
 
                 if ($testMode) {
-                    // Embedding finto, niente AI (puoi tenere 768 per compatibilità col DB)
+                    // Embedding finto, niente AI (mantiene 768 per compatibilità col DB)
                     $embedding = $this->fakeEmbeddingFromText($chunkText, 768);
                 } else {
                     try {
-                        // Usa il backend configurato (Ollama/OpenAI/altro)
+                        // Uso il backend configurato (Ollama/OpenAI/altro)
                         $embedding = $this->ai->embed($chunkText);
                     } catch (\Throwable $e) {
                         if ($offlineFallback) {
@@ -282,9 +282,9 @@ class IndexDocsCommand extends Command
                             $embedding = $this->fakeEmbeddingFromText($chunkText, 768);
                         } else {
                             $output->writeln("  -> errore embedding: " . $e->getMessage());
-                            // Se preferisci saltare solo questo chunk:
+                            // Si potrebbe anche saltare questo chunk:
                             // continue;
-                            // Per ora continuiamo con embedding finto per non bucare l'indice:
+                            // Per ora continuo con embedding finto per non bucare l'indice:
                             $embedding = $this->fakeEmbeddingFromText($chunkText, 768);
                         }
                     }
@@ -319,65 +319,8 @@ class IndexDocsCommand extends Command
     }
 
     // =====================================================================
-    // METODI DI SUPPORTO
+    // FUNZIONI DI SUPPORTO
     // =====================================================================
-
-    # TODO le funzioni riguardanti l'algoritmo di Chunking
-    # devono diventare un servzio
-
-    /**
-     * Split semplice in chunk di ~maxLen caratteri,
-     * tagliando su punto o spazio quando possibile
-     * e cercando di NON spezzare parole.
-     */
-    private function splitIntoChunks(string $text, int $maxLen): array
-    {
-        $text = preg_replace('/\s+/', ' ', $text);
-        $text = trim($text);
-
-        $chunks = [];
-        $len    = mb_strlen($text, 'UTF-8');
-        $offset = 0;
-
-        if ($len === 0) {
-            return [];
-        }
-
-        while ($offset < $len) {
-            $remaining = $len - $offset;
-            $length    = min($maxLen, $remaining);
-
-            $slice = mb_substr($text, $offset, $length, 'UTF-8');
-
-            // 1) prova ultimo punto nella slice
-            $cut = mb_strrpos($slice, '.', 0, 'UTF-8');
-
-            // 2) se niente punto, prova ultimo spazio
-            if ($cut === false || $cut <= 0) {
-                $cut = mb_strrpos($slice, ' ', 0, 'UTF-8');
-            }
-
-            // 3) se ancora niente, estendi fino al prossimo spazio globale
-            if ($cut === false || $cut <= 0) {
-                $nextSpacePos = mb_strpos($text, ' ', $offset + $length, 'UTF-8');
-
-                if ($nextSpacePos !== false) {
-                    $cut = $nextSpacePos - $offset; // taglia dopo la parola
-                } else {
-                    $cut = $remaining; // nessuno spazio → prendi tutto quello che resta
-                }
-            }
-
-            $chunkText = trim(mb_substr($text, $offset, $cut, 'UTF-8'));
-            if ($chunkText !== '') {
-                $chunks[] = $chunkText;
-            }
-
-            $offset += $cut;
-        }
-
-        return $chunks;
-    }
 
     private function isInExcludedDir(string $dirName): bool
     {

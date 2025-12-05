@@ -76,7 +76,7 @@ class DocumentTextExtractor
             return null;
         }
 
-        // Si potrebbe aggiungere qui rimozione di front matter YAML, se usi --- ... ---
+        // Si potrebbe aggiungere qui rimozione di front matter YAML, se è stato usato --- ... ---
         // Esempio molto semplice:
         // if (str_starts_with($content, "---\n")) { ... }
 
@@ -103,7 +103,7 @@ class DocumentTextExtractor
         }
 
         // content.xml è XML con tag <text:p>, <text:span>, ecc.
-        // Rimuove i tag e normalizzo gli spazi
+        // Rimuovo i tag e normalizzo gli spazi
         $text = strip_tags($contentXml);
 
         return $text ?: null;

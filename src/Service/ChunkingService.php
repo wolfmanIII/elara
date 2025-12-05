@@ -39,7 +39,7 @@ class ChunkingService
 
             $pLen = mb_strlen($p, 'UTF-8');
 
-            // 1) Paragrafo singolo più lungo di $max → spezzalo con splitIntoChunks
+            // 1) Paragrafo singolo più lungo di $max → lo spezza con splitIntoChunks
             if ($pLen > $max) {
                 // Flush del buffer corrente
                 if ($buffer !== '') {
@@ -47,7 +47,7 @@ class ChunkingService
                     $buffer = '';
                 }
 
-                // Riusa lo splitter a frasi/parole
+                // Viene usato lo splitter a frasi/parole
                 $subChunks = $this->splitIntoChunks($p, $max);
                 foreach ($subChunks as $sc) {
                     $sc = trim($sc);
@@ -79,7 +79,7 @@ class ChunkingService
             // Aggiungi al buffer
             $buffer .= ($buffer !== '' ? ' ' : '') . $p;
 
-            // Se raggiungiamo il target → chiudiamo il chunk
+            // Se raggiungo il target → chiudo il chunk
             if (mb_strlen($buffer, 'UTF-8') >= $target) {
                 $chunks[] = $buffer;
                 $buffer = '';
@@ -160,7 +160,7 @@ class ChunkingService
                 if ($nextSpacePos !== false) {
                     $cut = $nextSpacePos - $offset; // taglia dopo la parola
                 } else {
-                    $cut = $remaining; // nessuno spazio → prendi tutto quello che resta
+                    $cut = $remaining; // nessuno spazio → prendo tutto quello che resta
                 }
             }
 
@@ -195,12 +195,12 @@ class ChunkingService
         $selected  = [];
         $totalLen  = 0;
 
-        // parti dalla fine e risali
+        // parte dalla fine e risale
         for ($i = count($words) - 1; $i >= 0; $i--) {
             $w    = $words[$i];
             $wLen = mb_strlen($w, 'UTF-8');
 
-            // +1 per lo spazio che aggiungeremo tra le parole
+            // +1 per lo spazio che aggiunge tra le parole
             if ($totalLen > 0) {
                 $wLen += 1;
             }
@@ -221,7 +221,7 @@ class ChunkingService
     }
 
     /**
-     * Fix euristico per rimettere spazi dove l'estrazione (PDF/Docx)
+     * Fix euristico per rimettere spazi dove l'estrazione
      * ha incollato parole e frasi.
      */
     private function fixMissingSpaces(string $text): string
