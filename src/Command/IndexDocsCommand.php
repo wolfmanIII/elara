@@ -204,7 +204,7 @@ class IndexDocsCommand extends Command
             }
 
             // Estrazione testo
-            $output->writeln("  -> estrazione testo...");
+            //$output->writeln("  -> estrazione testo...");
             $text = $this->extractor->extract($file);
 
             if ($text === null || $text === '') {
@@ -216,13 +216,14 @@ class IndexDocsCommand extends Command
             }
 
             $len = mb_strlen($text);
-            $output->writeln("  -> testo estratto, len = $len caratteri");
+            //$output->writeln("  -> testo estratto, len = $len caratteri");
 
             // Split in chunk
-            $output->writeln("  -> split in chunk...");
-            //$chunks = $this->splitIntoChunks($text, 1400);
-            //$chunks = $this->chunkText($text);
+            //$output->writeln("  -> split in chunk...");
+            
+            // Uso il servizio contenente l'algoritmo per il chunking
             $chunks = $this->chunkingService->chunkText($text);
+            
             $now    = new \DateTimeImmutable();
 
             // DRY-RUN → solo log, niente DB / niente embeddings reali
@@ -244,17 +245,17 @@ class IndexDocsCommand extends Command
                     ->setHash($fileHash)
                     ->setIndexedAt($now);
                 $this->em->persist($fileEntity);
-                $output->writeln("  -> creato record DocumentFile");
+                //$output->writeln("  -> creato record DocumentFile");
             } else {
                 $fileEntity
                     ->setExtension($extension)
                     ->setHash($fileHash)
                     ->setIndexedAt($now);
-                $output->writeln("  -> aggiornato record DocumentFile");
+                //$output->writeln("  -> aggiornato record DocumentFile");
             }
 
             // Cancella eventuali chunk già esistenti per questo file
-            $output->writeln("  -> cancello chunk esistenti (se presenti)...");
+            //$output->writeln("  -> cancello chunk esistenti (se presenti)...");
             $this->em->createQueryBuilder()
                 ->delete(DocumentChunk::class, 'c')
                 ->where('c.file = :file')
@@ -262,7 +263,7 @@ class IndexDocsCommand extends Command
                 ->getQuery()
                 ->execute();
 
-            $output->writeln("  -> creo chunk + embedding (test-mode: " . ($testMode ? 'sì' : 'no') . ")");
+            //$output->writeln("  -> creo chunk + embedding (test-mode: " . ($testMode ? 'sì' : 'no') . ")");
 
             // Creazione nuovi chunk
             foreach ($chunks as $index => $chunkText) {
