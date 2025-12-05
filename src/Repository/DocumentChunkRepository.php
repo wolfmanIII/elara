@@ -34,7 +34,7 @@ class DocumentChunkRepository extends ServiceEntityRepository
             ->join('c.file', 'f')
             ->where('c.embedding IS NOT NULL')
             ->orderBy('cosine_similarity(c.embedding, :vec)', 'DESC')
-            ->setMaxResults(20)
+            ->setMaxResults(5)
             ->setParameter('vec', $embedding, 'vector')
             ->getQuery()->getResult();
     }

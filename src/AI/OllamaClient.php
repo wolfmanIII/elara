@@ -33,7 +33,7 @@ class OllamaClient implements AiClientInterface
             rtrim($this->host, '/') . '/api/embed',
             [
                 'json' => [
-                    'model' => $this->embedModel,   // es. 'qwen3-embedding:0.6b'
+                    'model' => $this->embedModel,   // es. 'nomic-embed-text'
                     'input' => [$text],             // singolo testo -> array con 1 elemento
                 ],
             ]
@@ -67,13 +67,16 @@ class OllamaClient implements AiClientInterface
     public function chat(string $question, string $context): string
     {
         $prompt = <<<TXT
+Sei un assistente e DEVI rispondere esclusivamente usando il contesto sotto.
+Se la risposta non è presente nel contesto, di' che non è disponibile.
+
 CONTESTO:
 $context
 
 DOMANDA:
 $question
 
-Rispondi SOLO usando il contesto sopra. Se non trovi la risposta, dì che non è presente nei documenti.
+Rispondi in modo chiaro nella lingua dell'utente.
 TXT;
 
         $response = $this->httpClient->request(
@@ -90,6 +93,6 @@ TXT;
 
         $data = $response->toArray();
 
-        return $data['response'] . $context ?? '';
+        return $data['response'] ?? '';
     }
 }
