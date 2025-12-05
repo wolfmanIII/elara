@@ -6,14 +6,12 @@ namespace App\Service;
 
 use App\AI\AiClientInterface;
 use App\Entity\DocumentChunk;
-use App\Repository\DocumentChunkRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class ChatbotService
 {
     public function __construct(
         private EntityManagerInterface  $em,
-        private DocumentChunkRepository $chunkRepository,
         private AiClientInterface       $ai,
     ) {}
 

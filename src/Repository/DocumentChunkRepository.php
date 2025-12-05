@@ -4,11 +4,7 @@ namespace App\Repository;
 
 use App\Entity\DocumentChunk;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\DBAL\Exception;
 use Doctrine\Persistence\ManagerRegistry;
-use Partitech\DoctrinePgVector\Type\VectorType;
-use PDO;
-use Doctrine\DBAL\Types\Type;
 
 class DocumentChunkRepository extends ServiceEntityRepository
 {
