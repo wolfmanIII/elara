@@ -91,7 +91,7 @@ All'interno dell'applicativo:
 * quando indicizzi → salvi per ogni `DocumentChunk` il suo `embedding` (vector(768))
 * quando interroghi il chatbot → calcoli l’`embedding` della domanda e lo confronti con quelli salvati.
 ### Cos’è cosine_similarity e cosa fa nella query
-Nel ChatbotService abbiamo:
+Ecco un esempio:
 ```php
 $qb = $this->em->createQueryBuilder()
     ->select('c', 'f')
@@ -103,10 +103,10 @@ $qb = $this->em->createQueryBuilder()
     ->setParameter('vec', $queryVec);
 ```
 Qui accadono 2 cose molto importanti:
-1. `:vec` è l’embedding della domanda (array di 1536 float).
+1. `:vec` è l’embedding della domanda (array di 768 float).
 2. `cosine_similarity(c.embedding, :vec)` è una funzione di pgvector che calcola quanto sono simili i due vettori.
 ### Cos’è la cosine similarity in parole povere
-Immagina ogni embedding come una freccia in uno spazio a 1536 dimensioni 😅
+Immagina ogni embedding come una freccia in uno spazio a 768 dimensioni 😅
 
 La `cosine similarity` misura l’angolo tra le due frecce(domanda, chunk):
 * angolo piccolo → frecce “puntano” nella stessa direzione → `contenuti simili`
@@ -211,7 +211,7 @@ services:
       arguments: [ '%ai.backend%' ]
 ```
 Tramite la variabile di ambiente `APP_IVFFLAT_PROBES`, impostiamo il rapporto qualità velocità del nostro sistema RAG:
-* 5–10 = super veloce
+* 5–10 = super veloce(si ok, ma dipende dal hardware)
 * 20–30 = molto preciso
 * 50–100 = qualità altissima (RAG più consistente, più lento)
 ## 5. Command per indicizzare i file

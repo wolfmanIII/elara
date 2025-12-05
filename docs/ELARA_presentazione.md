@@ -20,7 +20,7 @@ Solo a questo punto entra in gioco il modello di AI generativa: gli passiamo la 
 
 Il vantaggio rispetto a un “chatbot generico” è che:
 * risponde in base alle tue fonti interne
-* può citare o riassumere documenti aziendali
+* può citare o riassumere documenti
 * riduce molto il rischio di risposte inventate (hallucination)
 
 In pratica RAG significa: “AI che risponde, ma con il naso dentro i tuoi documenti, non solo nella sua memoria addestrata.”
