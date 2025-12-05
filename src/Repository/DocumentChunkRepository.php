@@ -53,7 +53,7 @@ class DocumentChunkRepository extends ServiceEntityRepository
      * @param int $k
      * @return array
      */
-    public function findTopSimilarByCosineSimilarity(array $embedding, int $k = 5): array
+    public function findTopKCosineSimilarity(array $embedding, int $k = 5): array
     {
         return $this->createQueryBuilder('c')
             ->select('c.id')

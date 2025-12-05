@@ -36,7 +36,7 @@ class ChatbotService
             $queryVec = $this->ai->embed($question);
 
             // 2) recupera chunk più simili (top 5) usando cosine_similarity
-            $chunks = $this->em->getRepository(DocumentChunk::class)->findTopSimilarByCosineSimilarity($queryVec, 5);
+            $chunks = $this->em->getRepository(DocumentChunk::class)->findTopKCosineSimilarity($queryVec, 5);
             if (!$chunks) {
                 return 'Non trovo informazioni rilevanti nei documenti indicizzati.';
             }

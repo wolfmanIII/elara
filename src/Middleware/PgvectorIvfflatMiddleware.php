@@ -34,7 +34,7 @@ final class PgvectorIvfflatDriver extends AbstractDriverMiddleware
     {
         $connection = parent::connect($params);
 
-        // QUI settiamo la sessione pgvector
+        // QUI imposto la sessione pgvector
         $connection->exec('SET ivfflat.probes = '.$this->probes);
 
         return $connection;

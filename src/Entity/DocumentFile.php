@@ -15,7 +15,7 @@ class DocumentFile
     #[ORM\Column(type: 'uuid', unique: true)]
     private ?Uuid $id = null;
 
-    // Percorso relativo (es: "manuali/nemici_trast.md")
+    // Percorso relativo (es: "manuali/{nome_file}.md")
     #[ORM\Column(length: 500)]
     private ?string $path = null;
 
