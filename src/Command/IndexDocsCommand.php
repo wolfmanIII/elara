@@ -318,6 +318,9 @@ class IndexDocsCommand extends Command
     // METODI DI SUPPORTO
     // =====================================================================
 
+    # TODO le funzioni riguardanti l'algoritmo di Chunking
+    # devono diventare un servzio
+
     /**
      * Split semplice in chunk di ~maxLen caratteri,
      * tagliando su punto o spazio quando possibile
