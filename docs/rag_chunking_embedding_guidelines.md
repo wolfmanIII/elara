@@ -75,7 +75,8 @@ Con embedding **768** + modello chat 8B:
 - **top_k**: 5
 - **token totali contesto**: ~1200–1500 token
 
-Questo bilancia qualità del retrieval e performance, evitando timeout e surriscaldamenti.
+Questo bilancia qualità del retrieval e performance, evitando timeout e surriscaldamenti.  
+>*per problemi del modello nomic-text-embed per Ollama 0.13.1(latest), sono stato costretto ad usare il modello bge-m3 che utilizza vettori a 1024*
 
 ---
 
