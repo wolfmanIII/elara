@@ -1,0 +1,154 @@
+{# templates/chat/console.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}ELARA Console{% endblock %}
+
+{% block pageContent %}
+<div class="w-full min-h-[calc(100vh-4rem)] flex items-center justify-center bg-base-200">
+    <div class="w-full max-w-5xl mx-auto px-4">
+        <div class="card bg-base-100 shadow-xl border border-base-300">
+            <div class="card-body gap-4">
+
+                {# Header card #}
+                <div class="flex items-center justify-between gap-4 border-b border-base-200 pb-3">
+                    <div>
+                        <h1 class="card-title text-xl">
+                            ELARA · Knowledge
+                        </h1>
+                        <p class="text-sm opacity-70">
+                            Almeno - Chatbot collegato al motore RAG sulla tua documentazione interna.
+                        </p>
+                    </div>
+
+                    <div class="flex flex-col items-end gap-1 text-right">
+                        <span
+                            id="engine-status-badge"
+                            class="badge badge-outline badge-sm"
+                        >
+                            Verifica motore…
+                        </span>
+                        <span id="engine-status-sub" class="text-[11px] opacity-70">
+                            Controllo stato backend
+                        </span>
+                    </div>
+                </div>
+
+                {# Corpo: chat + colonna destra #}
+                <div class="grid grid-cols-1 md:grid-cols-[minmax(0,2.3fr)_minmax(0,1fr)] gap-4">
+
+                    {# Colonna principale: chat #}
+                    <turbo-frame id="chat_frame" class="col-span-1">
+                        <div
+                            class="flex flex-col gap-3 h-[480px]"
+                            data-controller="chat"
+                            data-chat-endpoint-value="{{ path('app_ai_console') }}"
+                            data-chat-engine-status-url-value="{{ path('app_engine_status') }}"
+                        >
+                            <div
+                                id="chat-log"
+                                class="flex-1 overflow-y-auto pr-2 space-y-3 text-sm leading-relaxed"
+                            >
+                                {# Messaggio iniziale del bot #}
+                                <div class="chat chat-start">
+                                    <div class="chat-image avatar">
+                                        <div class="w-8 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                                            <span class="flex items-center justify-center text-xs font-bold">
+                                                AI
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="chat-header">
+                                        Alemeno
+                                        <time class="text-xs opacity-50 ml-1">
+                                            ora
+                                        </time>
+                                    </div>
+                                    <div class="chat-bubble chat-bubble-primary">
+                                        Ciao, sono Almeno. Posso aiutarti con domande sulla documentazione
+                                        indicizzata (codice, specifiche, note interne). Cosa vuoi sapere?
+                                    </div>
+                                    <div class="chat-footer opacity-70 text-[11px]">
+                                        Motore RAG attivo
+                                    </div>
+                                </div>
+                            </div>
+
+                            {# Form input utente #}
+                            <form
+                                data-chat-target="form"
+                                data-action="submit->chat#submit"
+                                class="mt-2"
+                            >
+                                <div class="join w-full items-stretch">
+                                    <textarea
+                                        class="textarea textarea-bordered join-item w-full resize-none"
+                                        rows="2"
+                                        placeholder="Scrivi la tua domanda… (Shift+Invio per andare a capo)"
+                                        data-chat-target="input"
+                                        name="question"
+                                    ></textarea>
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-primary join-item h-auto px-4"
+                                        data-chat-target="submitButton"
+                                    >
+                                        <span data-chat-target="submitLabel">Invia</span>
+                                        <span
+                                            class="loading loading-spinner loading-sm ml-2 hidden"
+                                            data-chat-target="spinner"
+                                        ></span>
+                                    </button>
+                                </div>
+
+                                <div class="mt-1 flex justify-between items-center">
+                                    <p class="text-[11px] opacity-70">
+                                        Invio = invia · Shift+Invio = nuova riga
+                                    </p>
+                                    <p class="text-[11px] opacity-70">
+                                        Le risposte sono basate solo sui documenti indicizzati.
+                                    </p>
+                                </div>
+                            </form>
+                        </div>
+                    </turbo-frame>
+
+                    {# Colonna destra: suggerimenti + stato #}
+                    <div class="hidden md:flex flex-col gap-3 text-sm">
+
+                        <div class="alert alert-info">
+                            <span class="font-semibold">Suggerimenti</span>
+                            <ul class="list-disc list-inside mt-1 space-y-1 text-xs">
+                                <li>“Riassumi l’architettura del motore ELARA.”</li>
+                                <li>“Spiegami il flusso di indicizzazione dei documenti.”</li>
+                                <li>“Quali parametri di configurazione influiscono sulla qualità delle risposte?”</li>
+                            </ul>
+                        </div>
+
+                        <div class="card bg-base-100 border border-base-300">
+                            <div class="card-body gap-2">
+                                <h2 class="card-title text-sm">Stato motore</h2>
+                                <p id="engine-status-text" class="text-xs opacity-80">
+                                    In attesa di risposta dallo status endpoint…
+                                </p>
+                            </div>
+                        </div>
+
+                        {# Qui un box futuro per DocumentFile / DocumentChunk se vuoi #}
+                        {#
+                        <div class="card bg-base-100 border border-base-300">
+                            <div class="card-body gap-2">
+                                <h2 class="card-title text-sm">Documenti indicizzati</h2>
+                                <p class="text-xs opacity-80">
+                                    Qui puoi mostrare un riepilogo di DocumentFile (path, indexedAt, ecc.).
+                                </p>
+                            </div>
+                        </div>
+                        #}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

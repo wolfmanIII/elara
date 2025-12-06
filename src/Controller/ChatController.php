@@ -13,41 +13,48 @@ final class ChatController extends BaseController
     public const CONTROLLER_NAME = 'ChatController';
 
     /**
-     * @todo implementare interfaccia grafica
+     * Console grafica del chatbot (ELARA).
      */
-    /* #[Route('/ai/console', name: 'app_ai_console', methods: ['GET'])]
+    #[Route('/ai/console', name: 'app_ai_console', methods: ['GET'])]
     public function console(): Response
     {
-        $testMode = ($_ENV['APP_AI_TEST_MODE'] ?? 'false') === 'true';
-        $offlineFallback = ($_ENV['APP_AI_OFFLINE_FALLBACK'] ?? 'true') === 'true';
-
-        return $this->render('ai/console.html.twig', [
-            'controller_name'   => self::CONTROLLER_NAME,
-            'test_mode'         => $testMode,
-            'offline_fallback'  => $offlineFallback,
+        return $this->render('chat/console.html.twig', [
+            'controller_name' => self::CONTROLLER_NAME,
         ]);
-    } */
-
-    #[Route('/', name: 'app_home', methods: ['GET'])]
-    public function console(): Response
-    {
-        return $this->render('base.html.twig', []);
     }
 
     #[Route('/engine/status', name: 'app_engine_status', methods: ['GET'])]
     public function engineStatus(): JsonResponse
     {
-         return $this->json([
+        $status = [
+            'ok' => true,
+            'model' => $_ENV["OLLAMA_CHAT_MODEL"],
+            'source' => "Ollama",
             'test_mode'   => $_ENV['APP_AI_TEST_MODE'],
             'offline_fallback' => $_ENV['APP_AI_OFFLINE_FALLBACK'],
-        ]);
+        ];
+        return $this->json($status);
     }
 
-    #[Route('/api/chat', name: 'api_chat', methods: ['POST'])]
-    public function chat(Request $request, ChatbotService $bot): JsonResponse
+    /**
+     * API JSON del chatbot.
+     * Accetta sia JSON ({"question": "..."}), sia form-encoded (question=...).
+     */
+    #[Route('/api/chat', name: 'app_api_chat', methods: ['POST'])]
+    public function apiChat(Request $request, ChatbotService $bot): JsonResponse
     {
-        $data = json_decode($request->getContent(), true) ?? [];
-        $question = trim($data['message'] ?? '');
+        // 1) Proviamo a leggere JSON
+        $payload = json_decode($request->getContent() ?? '', true);
+        $question = null;
+
+        if (is_array($payload) && array_key_exists('question', $payload)) {
+            $question = $payload['question'];
+        } else {
+            // 2) fallback su form-encoded (POST classico)
+            $question = $request->request->get('question', '');
+        }
+
+        $question = trim((string) $question);
 
         if ($question === '') {
             return $this->json([

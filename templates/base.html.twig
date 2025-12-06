@@ -1,21 +1,108 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<html data-theme="dark" lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>{% block title %}Elara{% endblock %}</title>
+    <link rel="icon"
+          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+    {% block stylesheets %}
+    {% endblock %}
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}
-            <div class="prose">
-                <h1>Homepage</h1>
+    {% block javascripts %}
+        {% block importmap %}{{ importmap('app') }}{% endblock %}
+    {% endblock %}
+</head>
+<body>
+
+    <div class="drawer lg:drawer-open">
+        <input id="my-drawer-4" type="checkbox" class="drawer-toggle"/>
+
+        <!-- CONTENUTO PAGINA -->
+        <div class="drawer-content flex flex-col min-h-screen">
+            <nav class="navbar w-full bg-base-300">
+                <!-- Bottone: visibile solo su schermi piccoli -->
+                <div class="flex-none lg:hidden">
+                    <label for="my-drawer-4"
+                           aria-label="open sidebar"
+                           class="btn btn-square btn-ghost drawer-button">
+                        <!-- icona -->
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                             stroke-linejoin="round" stroke-linecap="round"
+                             stroke-width="2" fill="none" stroke="currentColor"
+                             class="my-1.5 inline-block size-4">
+                            <path d="M4 6h16"></path>
+                            <path d="M4 12h16"></path>
+                            <path d="M4 18h16"></path>
+                        </svg>
+                    </label>
+                </div>
+
+                <div class="flex-none px-4">
+                    <img src="{{ asset('img/captain_log_logo.png') }}" width="48" alt="logo">
+                </div>
+                <div class="flex-none px-4 text-[30px]">
+                    <b>Elara</b>
+                </div>
+            </nav>
+
+            <div class="p-4">
+
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div role="alert" class="alert alert-{{ label }} alert-outline">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+
+                {% block pageContent %}{% endblock %}
             </div>
-        {% endblock %}
-    </body>
+
+            {#
+            <footer class="footer sm:footer-horizontal footer-center bg- text-base-content p-4 sticky top-[100vh]">
+                <aside>
+                    <p>Space Wolf</p>
+                </aside>
+            </footer>
+            #}
+
+            {# FOOTER SEMPLICE #}
+            <footer class="p-5 border-base-300 text-xs opacity-70 flex flex-wrap justify-between gap-2 sticky top-[100vh] pr-15">
+                <span>ELARA — Motore RAG interno · Symfony 7.3</span>
+                <span>Stack: PostgreSQL · pgvector · Tailwind · DaisyUI</span>
+            </footer>
+
+        </div>
+
+        <!-- SIDEBAR -->
+        <div class="drawer-side">
+            <label for="my-drawer-4" aria-label="close sidebar" class="drawer-overlay"></label>
+
+            <div class="min-h-full w-64 bg-base-200 flex flex-col items-start">
+                <ul class="menu w-full grow">
+                    
+                    <li>
+                        <a href="{{ path('app_ai_console') }}"
+                            class="{% if controller_name == constant('App\\Controller\\ChatController::CONTROLLER_NAME') %}menu-active{% endif %}">
+                            {# icona "sparkles" #}
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                stroke-linejoin="round" stroke-linecap="round"
+                                stroke-width="2" fill="none" stroke="currentColor"
+                                class="my-1.5 inline-block size-4">
+                                <path d="M12 3l1.5 3.5L17 8l-3.5 1.5L12 13l-1.5-3.5L7 8l3.5-1.5L12 3z"></path>
+                                <path d="M5 16l.75 1.75L8 18.5l-1.75.75L5 21l-.75-1.75L2.5 18.5 4.25 17.75 5 16z"></path>
+                                <path d="M18 14l.75 1.75L21 16.5l-1.75.75L18 19l-.75-1.75L15.5 16.5 17.25 15.75 18 14z"></path>
+                            </svg>
+                            <span>Elara Assistant</span>
+                        </a>
+                    </li>
+
+
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</body>
 </html>

@@ -1,0 +1,346 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ELARA — Embedding Linking & Retrieval Answering{% endblock %}
+
+{% block pageContent %}
+<div class="bg-base-200 text-base-content">
+    <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-10 space-y-10 lg:space-y-12">
+
+        {# HERO #}
+        <section class="grid gap-8 xl:gap-10 lg:grid-cols-[minmax(0,1.4fr),minmax(0,1fr)] items-start">
+            <div class="space-y-6 text-center lg:text-left">
+                <div class="badge badge-primary badge-lg font-semibold mx-auto lg:mx-0">
+                    Motore RAG interno · Symfony 7.3 · PostgreSQL + pgvector
+                </div>
+
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
+                    ELARA
+                    <span class="block text-primary mt-2">
+                        Embedding Linking & Retrieval Answering
+                    </span>
+                </h1>
+
+                <p class="text-base sm:text-lg opacity-80 max-w-2xl mx-auto lg:mx-0">
+                    Un motore RAG che indicizza i tuoi documenti,
+                    li trasforma in embedding vettoriali e ti permette di
+                    interrogarli in linguaggio naturale tramite un semplice
+                    endpoint <code class="kbd kbd-sm">POST /api/chat</code>.
+                </p>
+
+                <div class="flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-4">
+                    <a href="{{ path('app_ai_console') }}"
+                       class="btn btn-primary gap-2">
+                        <span class="material-symbols-rounded text-base">Almeno Chatbot</span>
+                    </a>
+
+                    <a href="#quickstart" class="btn btn-ghost">
+                        Quickstart CLI
+                    </a>
+
+                    <a href="#rag-pipeline" class="btn btn-outline">
+                        Come funziona il RAG
+                    </a>
+                </div>
+            </div>
+
+            <div class="w-full">
+                <div class="card bg-base-100 shadow-xl border border-base-300">
+                    <div class="card-body space-y-4">
+                        <h2 class="card-title">
+                            Chiedi qualcosa alla documentazione
+                        </h2>
+
+                        <p class="opacity-80">
+                            ELARA collega l’utente finale con i documenti indicizzati:
+                            manuali, PDF, markdown, DOCX, ODT e altro ancora.
+                        </p>
+
+                        <div class="mockup-code text-sm overflow-x-auto">
+                            <pre data-prefix="$"><code>curl -X POST http://localhost:8000/api/chat \</code></pre>
+                            <pre data-prefix=" "><code>  -H "Content-Type: application/json" \</code></pre>
+                            <pre data-prefix=" "><code>  -d '{"message":"Riassumi la pipeline di indicizzazione"}'</code></pre>
+                        </div>
+
+                        <p class="opacity-70">
+                            L’endpoint <code class="kbd kbd-xs">/api/chat</code> usa
+                            <span class="font-semibold">ChatbotService</span> per:
+                            embedding della domanda → ricerca vettoriale pgvector →
+                            costruzione contesto → chiamata al modello AI (Ollama/OpenAI). 
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {# STATS / OVERVIEW #}
+        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
+            <div class="stat bg-base-100 shadow-sm rounded-2xl border border-base-300">
+                <div class="stat-title text-base">Backend AI</div>
+                <div class="stat-value text-lg">Ollama · OpenAI</div>
+                <div class="stat-desc text-base opacity-70">
+                    Selezionabile via <code class="kbd kbd-base">AI_BACKEND</code>.
+                </div>
+            </div>
+
+            <div class="stat bg-base-100 shadow-sm rounded-2xl border border-base-300">
+                <div class="stat-title">Database</div>
+                <div class="stat-value text-lg">PostgreSQL + pgvector</div>
+                <div class="stat-desc text-xs opacity-70">
+                    Colonna <code class="kbd kbd-xs">vector(1024)</code> su <code>DocumentChunk</code>.
+                </div>
+            </div>
+
+            <div class="stat bg-base-100 shadow-sm rounded-2xl border border-base-300">
+                <div class="stat-title">Indice vettoriale</div>
+                <div class="stat-value text-lg">HNSW</div>
+                <div class="stat-desc text-xs opacity-70">
+                    Ricerca approssimata veloce con <code>vector_cosine_ops</code>.
+                </div>
+            </div>
+        </section>
+
+        {# PIPELINE RAG #}
+        <section id="rag-pipeline" class="space-y-4 lg:space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                <h2 class="text-xl sm:text-2xl font-bold">Pipeline RAG end-to-end</h2>
+                <span class="badge badge-outline self-start sm:self-auto">FILE → Risposta</span>
+            </div>
+
+            <p class="max-w-3xl opacity-80 text-sm">
+                ELARA implementa un flusso completo di Retrieval-Augmented Generation:
+                dal file grezzo alla risposta generata, passando per estrazione testo,
+                chunking, embedding, indicizzazione vettoriale e retrieval con cosine
+                similarity. 
+            </p>
+
+            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <div class="card bg-base-100 border border-base-300 h-full">
+                    <div class="card-body space-y-2">
+                        <h3 class="card-title text-base">1 · Indicizzazione</h3>
+                        <p class="text-xs opacity-80">
+                            I file in <code class="kbd kbd-xs">var/knowledge</code> vengono
+                            letti da <span class="font-semibold">DocumentTextExtractor</span>
+                            (PDF, MD, DOCX, ODT). Il testo viene ripulito, normalizzato e
+                            spezzato in chunk. 
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300 h-full">
+                    <div class="card-body space-y-2">
+                        <h3 class="card-title text-base">2 · Embedding</h3>
+                        <p class="text-xs opacity-80">
+                            Ogni chunk viene trasformato in un embedding vettoriale
+                            (attualmente 1024 dimensioni, modello <code>bge-m3</code> via
+                            Ollama) e memorizzato su PostgreSQL tramite pgvector. 
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300 h-full">
+                    <div class="card-body space-y-2">
+                        <h3 class="card-title text-base">3 · Retrieval</h3>
+                        <p class="text-xs opacity-80">
+                            La domanda dell’utente viene embeddizzata e confrontata con
+                            i chunk via cosine similarity. La query ordina per
+                            <code>embedding &lt;=&gt; :query_vec</code> e recupera i top-K
+                            più simili. 
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300 h-full">
+                    <div class="card-body space-y-2">
+                        <h3 class="card-title text-base">4 · Risposta AI</h3>
+                        <p class="text-xs opacity-80">
+                            <span class="font-semibold">ChatbotService</span> costruisce
+                            il contesto con i chunk trovati, aggiunge un prompt che
+                            impone “rispondi solo usando il contesto” e chiama il modello
+                            AI selezionato (Ollama/OpenAI), restituendo JSON pulito. 
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {# QUICKSTART / COMMANDS #}
+        <section id="quickstart" class="space-y-4 lg:space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                <h2 class="text-xl sm:text-2xl font-bold">Quickstart · indicizzazione & comandi</h2>
+                <span class="badge badge-secondary badge-outline self-start sm:self-auto">
+                    CLI · Symfony console
+                </span>
+            </div>
+
+            <div class="grid gap-6 lg:grid-cols-[minmax(0,1.1fr),minmax(0,0.9fr)]">
+                <div class="card bg-base-100 border border-base-300">
+                    <div class="card-body space-y-4">
+                        <h3 class="card-title text-base">1 · Setup & migrazioni</h3>
+                        <p class="text-xs opacity-80">
+                            Dipendenze principali (oltre a Symfony): 
+                            <code>smalot/pdfparser</code>,
+                            <code>phpoffice/phpword</code>,
+                            <code>openai-php/client</code>,
+                            <code>partitech/doctrine-pgvector</code>,
+                            <code>symfony/uid</code>,
+                            Tailwind + Typography + DaisyUI. 
+                        </p>
+
+                        <div class="mockup-code text-xs">
+                            <pre data-prefix="$"><code>composer install</code></pre>
+                            <pre data-prefix="$"><code>php bin/console doctrine:migrations:migrate</code></pre>
+                        </div>
+
+                        <p class="text-xs opacity-70">
+                            Assicurati di aver attivato l’estensione
+                            <code>vector</code> su PostgreSQL e creato l’indice
+                            HNSW su <code>document_chunk.embedding</code>.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300">
+                    <div class="card-body space-y-4">
+                        <h3 class="card-title text-base">2 · Indicizzare i documenti</h3>
+
+                        <div class="tabs tabs-boxed tabs-xs">
+                            <a class="tab tab-active">Index</a>
+                            <a class="tab">List</a>
+                            <a class="tab">Unindex</a>
+                        </div>
+
+                        <div class="space-y-3 text-xs">
+                            <p class="opacity-80">
+                                Indicizza tutti i file nuovi/modificati in
+                                <code>var/knowledge</code> usando hash:
+                            </p>
+                            <div class="mockup-code overflow-x-auto">
+                                <pre data-prefix="$"><code>php bin/console app:index-docs -v</code></pre>
+                            </div>
+
+                            <p class="opacity-80">
+                                Re-indicizza tutto ignorando gli hash:
+                            </p>
+                            <div class="mockup-code overflow-x-auto">
+                                <pre data-prefix="$"><code>php bin/console app:index-docs --force-reindex -v</code></pre>
+                            </div>
+
+                            <p class="opacity-80">
+                                Elenco dei file indicizzati:
+                            </p>
+                            <div class="mockup-code overflow-x-auto">
+                                <pre data-prefix="$"><code>php bin/console app:list-docs --limit=50</code></pre>
+                            </div>
+
+                            <p class="opacity-80">
+                                Rimuovere un file dall’indice:
+                            </p>
+                            <div class="mockup-code overflow-x-auto">
+                                <pre data-prefix="$"><code>php bin/console app:unindex-file "manuali/helix.md"</code></pre>
+                            </div>
+                        </div>
+
+                        <p class="text-[0.7rem] opacity-70">
+                            I comandi seguono la pipeline descritta nella
+                            documentazione: estrazione testo → chunking →
+                            embedding → salvataggio su PostgreSQL. 
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {# API SECTION #}
+        <section class="space-y-4 lg:space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                <h2 class="text-xl sm:text-2xl font-bold">API /api/chat</h2>
+                <span class="badge badge-accent badge-outline text-xs self-start sm:self-auto">
+                    JSON · RAG · Stateless
+                </span>
+            </div>
+
+            <div class="grid gap-6 md:grid-cols-2 items-start">
+                <div class="space-y-4">
+                    <p class="text-sm opacity-80">
+                        L’API principale espone un singolo endpoint:
+                        <code class="kbd kbd-xs">POST /api/chat</code> che accetta
+                        un corpo JSON minimale:
+                    </p>
+
+                    <div class="mockup-code text-xs">
+                        <pre data-prefix=" "><code>{</code></pre>
+                        <pre data-prefix=" "><code>  "message": "testo della domanda"</code></pre>
+                        <pre data-prefix=" "><code>}</code></pre>
+                    </div>
+
+                    <p class="text-xs opacity-80">
+                        In modalità test, il sistema restituisce estratti dai chunk
+                        senza chiamare il modello AI:
+                    </p>
+
+                    <div class="mockup-code text-xs overflow-x-auto">
+                        <pre data-prefix="$"><code>curl -X POST http://localhost:8000/api/chat \</code></pre>
+                        <pre data-prefix=" "><code>  -H "Content-Type: application/json" \</code></pre>
+                        <pre data-prefix=" "><code>  -d '{"message":"helix artefatto iuno"}'</code></pre>
+                    </div>
+
+                    <p class="text-[0.75rem] opacity-70">
+                        Modalità e backend sono controllati da variabili ambiente:
+                        <code>AI_BACKEND</code>,
+                        <code>APP_AI_TEST_MODE</code>,
+                        <code>APP_AI_OFFLINE_FALLBACK</code>. 
+                    </p>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300">
+                    <div class="card-body space-y-4">
+                        <h3 class="card-title text-base">Stato del motore RAG</h3>
+
+                        <ul class="timeline timeline-vertical text-xs">
+                            <li>
+                                <div class="timeline-start">Documenti</div>
+                                <div class="timeline-middle">
+                                    <span class="dot dot-primary"></span>
+                                </div>
+                                <div class="timeline-end timeline-box">
+                                    File caricati in <code>var/knowledge</code>
+                                    vengono indicizzati tramite <code>app:index-docs</code>.
+                                </div>
+                            </li>
+                            <li>
+                                <div class="timeline-start">Embedding</div>
+                                <div class="timeline-middle">
+                                    <span class="dot dot-secondary"></span>
+                                </div>
+                                <div class="timeline-end timeline-box">
+                                    Ogni chunk è associato a un vettore in
+                                    <code>document_chunk.embedding</code> (1024 dimensioni).
+                                </div>
+                            </li>
+                            <li>
+                                <div class="timeline-start">AI backend</div>
+                                <div class="timeline-middle">
+                                    <span class="dot dot-accent"></span>
+                                </div>
+                                <div class="timeline-end timeline-box">
+                                    <code>App\AI\AiClientFactory</code> istanzia
+                                    il client corretto (Ollama / OpenAI) in base
+                                    alla configurazione corrente. 
+                                </div>
+                            </li>
+                        </ul>
+
+                        <p class="text-[0.75rem] opacity-70">
+                            Qui puoi in futuro integrare una vista dinamica
+                            (Turbo Frame) con lo stato runtime: numero documenti
+                            indicizzati, ultimo job di indicizzazione, backend AI
+                            attivo, ecc.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div>
+{% endblock %}
