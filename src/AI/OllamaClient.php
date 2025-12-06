@@ -37,7 +37,7 @@ class OllamaClient implements AiClientInterface
             $this->host. '/api/embed',
             [
                 'json' => [
-                    'model' => $this->embedModel,   // es. 'nomic-embed-text'
+                    'model' => $this->embedModel,   // es. 'bge-m3'
                     'input' => [$text],             // singolo testo -> array con 1 elemento
                 ],
             ]
@@ -57,7 +57,7 @@ class OllamaClient implements AiClientInterface
             );
         }
 
-        // Ritorno il vettore singolo (array<float>, dim ~768)
+        // Ritorno il vettore singolo (array<float>, dim ~1024)
         return $data['embeddings'][0];
     }
 
@@ -91,13 +91,13 @@ TXT;
                     'model' => $this->chatModel,
                     'prompt' => $prompt,
                     'stream' => false,
-                    //'num_predict' => 300,
                 ]
             ]
         );
 
         $data = $response->toArray();
 
-        return $data['response'] . "\n\n" . $context ?? '';
+        //return $data['response'] . "\n\n" . $context ?? '';
+        return $data['response'] ?? '';
     }
 }

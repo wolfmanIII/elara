@@ -32,7 +32,7 @@ class DocumentChunkRepository extends ServiceEntityRepository
             ->join('c.file', 'f')
             ->where('c.embedding IS NOT NULL')
             ->orderBy('cosine_similarity(c.embedding, :vec)', 'DESC')
-            ->setMaxResults(5)
+            ->setMaxResults($k)
             ->setParameter('vec', $embedding, 'vector')
             ->getQuery()->getResult();
     }
@@ -49,7 +49,7 @@ class DocumentChunkRepository extends ServiceEntityRepository
      * @param int $k
      * @return array
      */
-    public function findTopKCosineSimilarity(array $embedding, int $k = 5): array
+    public function findTopKCosineSimilarity(array $embedding, int $k = 4): array
     {
         return $this->createQueryBuilder('c')
             ->select('c.id')

@@ -270,8 +270,8 @@ class IndexDocsCommand extends Command
                 $embedding = null;
 
                 if ($testMode) {
-                    // Embedding finto, niente AI (mantiene 768 per compatibilità col DB)
-                    $embedding = $this->fakeEmbeddingFromText($chunkText, 768);
+                    // Embedding finto, niente AI (mantiene 1024 per compatibilità col DB)
+                    $embedding = $this->fakeEmbeddingFromText($chunkText, 1024);
                 } else {
                     try {
                         // Uso il backend configurato (Ollama/OpenAI/altro)
@@ -279,13 +279,13 @@ class IndexDocsCommand extends Command
                     } catch (\Throwable $e) {
                         if ($offlineFallback) {
                             $output->writeln("  -> errore embedding, uso fallback locale: " . $e->getMessage());
-                            $embedding = $this->fakeEmbeddingFromText($chunkText, 768);
+                            $embedding = $this->fakeEmbeddingFromText($chunkText, 1024);
                         } else {
                             $output->writeln("  -> errore embedding: " . $e->getMessage());
                             // Si potrebbe anche saltare questo chunk:
                             // continue;
                             // Per ora continuo con embedding finto per non bucare l'indice:
-                            $embedding = $this->fakeEmbeddingFromText($chunkText, 768);
+                            $embedding = $this->fakeEmbeddingFromText($chunkText, 1024);
                         }
                     }
                 }

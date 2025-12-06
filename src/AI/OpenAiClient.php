@@ -19,7 +19,7 @@ class OpenAiClient implements AiClientInterface
         $resp = $client->embeddings()->create([
             'model' => $this->embedModel,
             'input' => $text,
-            'dimension' => 768,
+            'dimension' => 1024,
         ]);
 
         return $resp->embeddings[0]->embedding;

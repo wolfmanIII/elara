@@ -23,8 +23,8 @@ class DocumentChunk
     #[ORM\Column(type: 'text')]
     private string $content;
 
-    // colonna pgvector(768)
-    #[ORM\Column(type: 'vector', length: 768)]
+    // colonna pgvector(1024)
+    #[ORM\Column(type: 'vector', length: 1024)]
     private array $embedding = [];
 
     public function __construct()

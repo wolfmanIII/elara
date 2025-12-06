@@ -66,7 +66,7 @@ __pgvector__ è un’estensione per PostgreSQL che aggiunge:
 
 Nel nostro schema abbiamo:
 ```php
-#[ORM\Column(type: 'vector', length: 768)]
+#[ORM\Column(type: 'vector', length: 1024)]
 private array $embedding;
 ```
 questo campo su `DocumentChunk` è letteralmente:  
@@ -75,8 +75,8 @@ questo campo su `DocumentChunk` è letteralmente:
 
 Quando viene indicizzato un chunk:
 * viene preso il testo (__$chunkText__)
-* viene passato al modello `nomic-embed-text` di Ollama o `text-embedding-3-small` di OpenAI
-* il modello restituisce un array di 768 numeri tipo:
+* viene passato al modello `bge-m3` di Ollama
+* il modello restituisce un array di 1024 numeri tipo:
 ```json
 [-0.023, 0.114, ..., 0.002]
 ```
@@ -88,7 +88,7 @@ Testi “simili” sono “vicini”; testi diversi sono “lontani”.
 Postgres lo usa per memorizzare questi vettori e confrontarli.
 
 All'interno dell'applicativo:
-* quando indicizzi → salvi per ogni `DocumentChunk` il suo `embedding` (vector(768))
+* quando indicizzi → salvi per ogni `DocumentChunk` il suo `embedding` (vector(1024))
 * quando interroghi il chatbot → calcoli l’`embedding` della domanda e lo confronti con quelli salvati.
 ### Cos’è cosine_similarity e cosa fa nella query
 Ecco un esempio:
@@ -103,10 +103,10 @@ $qb = $this->em->createQueryBuilder()
     ->setParameter('vec', $queryVec);
 ```
 Qui accadono 2 cose molto importanti:
-1. `:vec` è l’embedding della domanda (array di 768 float).
+1. `:vec` è l’embedding della domanda (array di 1024 float).
 2. `cosine_similarity(c.embedding, :vec)` è una funzione di pgvector che calcola quanto sono simili i due vettori.
 ### Cos’è la cosine similarity in parole povere
-Immagina ogni embedding come una freccia in uno spazio a 768 dimensioni 😅
+Immagina ogni embedding come una freccia in uno spazio a 1024 dimensioni 😅
 
 La `cosine similarity` misura l’angolo tra le due frecce(domanda, chunk):
 * angolo piccolo → frecce “puntano” nella stessa direzione → `contenuti simili`
