@@ -10,16 +10,17 @@ class OpenAiClient implements AiClientInterface
         private string $apiKey,
         private string $chatModel = 'gpt-5.1-mini',
         private string $embedModel = 'text-embedding-3-small',
+        private int $dimension,
     ) {}
 
-    public function embed(string $text): array
+    public function embed(string $text): ?array
     {
         $client = OpenAI::client($this->apiKey);
 
         $resp = $client->embeddings()->create([
             'model' => $this->embedModel,
             'input' => $text,
-            'dimension' => 1024,
+            'dimension' => $this->dimension,
         ]);
 
         return $resp->embeddings[0]->embedding;
