@@ -13,10 +13,14 @@ class OllamaClient implements AiClientInterface
 {
     public function __construct(
         private HttpClientInterface $httpClient,
-        private string              $host = 'http://localhost:11434',
-        private string              $embedModel = 'nomic-embed-text',
-        private string              $chatModel = 'llama3.1:8b',
-    ) {}
+        private string              $host,
+        private string              $embedModel,
+        private string              $chatModel
+    ) {
+        $this->host = $_ENV["OLLAMA_HOST"];
+        $this->embedModel = $_ENV["OLLAMA_EMBED_MODEL"];
+        $this->chatModel = $_ENV["OLLAMA_CHAT_MODEL"];
+    }
 
     /**
      * @throws TransportExceptionInterface
