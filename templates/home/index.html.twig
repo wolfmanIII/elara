@@ -50,7 +50,7 @@
                             Chiedi qualcosa alla documentazione
                         </h2>
 
-                        <p class="opacity-80">
+                        <p class="text-base opacity-80">
                             ELARA collega l’utente finale con i documenti indicizzati:
                             manuali, PDF, markdown, DOCX, ODT e altro ancora.
                         </p>
@@ -61,8 +61,8 @@
                             <pre data-prefix=" "><code>  -d '{"message":"Riassumi la pipeline di indicizzazione"}'</code></pre>
                         </div>
 
-                        <p class="opacity-70">
-                            L’endpoint <code class="kbd kbd-xs">/api/chat</code> usa
+                        <p class="text-base opacity-70">
+                            L’endpoint <code class="kbd kbd-base">/api/chat</code> usa
                             <span class="font-semibold">ChatbotService</span> per:
                             embedding della domanda → ricerca vettoriale pgvector →
                             costruzione contesto → chiamata al modello AI (Ollama/OpenAI). 
@@ -77,23 +77,23 @@
             <div class="stat bg-base-100 shadow-sm rounded-2xl border border-base-300">
                 <div class="stat-title text-base">Backend AI</div>
                 <div class="stat-value text-lg">Ollama · OpenAI</div>
-                <div class="stat-desc text-base opacity-70">
+                <div class="stat-desc text-sm opacity-70">
                     Selezionabile via <code class="kbd kbd-base">AI_BACKEND</code>.
                 </div>
             </div>
 
             <div class="stat bg-base-100 shadow-sm rounded-2xl border border-base-300">
-                <div class="stat-title">Database</div>
+                <div class="stat-title text-base">Database</div>
                 <div class="stat-value text-lg">PostgreSQL + pgvector</div>
-                <div class="stat-desc text-xs opacity-70">
-                    Colonna <code class="kbd kbd-xs">vector(1024)</code> su <code>DocumentChunk</code>.
+                <div class="stat-desc text-sm opacity-70">
+                    Colonna <code class="kbd kbd-sm">vector(1024)</code> su <code>DocumentChunk</code>.
                 </div>
             </div>
 
             <div class="stat bg-base-100 shadow-sm rounded-2xl border border-base-300">
-                <div class="stat-title">Indice vettoriale</div>
+                <div class="stat-title text-base">Indice vettoriale</div>
                 <div class="stat-value text-lg">HNSW</div>
-                <div class="stat-desc text-xs opacity-70">
+                <div class="stat-desc text-sm opacity-70">
                     Ricerca approssimata veloce con <code>vector_cosine_ops</code>.
                 </div>
             </div>
@@ -106,7 +106,7 @@
                 <span class="badge badge-outline self-start sm:self-auto">FILE → Risposta</span>
             </div>
 
-            <p class="max-w-3xl opacity-80 text-sm">
+            <p class="max-w-7xl opacity-80 text-base">
                 ELARA implementa un flusso completo di Retrieval-Augmented Generation:
                 dal file grezzo alla risposta generata, passando per estrazione testo,
                 chunking, embedding, indicizzazione vettoriale e retrieval con cosine
@@ -116,9 +116,9 @@
             <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <div class="card bg-base-100 border border-base-300 h-full">
                     <div class="card-body space-y-2">
-                        <h3 class="card-title text-base">1 · Indicizzazione</h3>
-                        <p class="text-xs opacity-80">
-                            I file in <code class="kbd kbd-xs">var/knowledge</code> vengono
+                        <h3 class="card-title text-lg">1 · Indicizzazione</h3>
+                        <p class="text-sm opacity-80">
+                            I file in <code class="kbd kbd-sm">var/knowledge</code> vengono
                             letti da <span class="font-semibold">DocumentTextExtractor</span>
                             (PDF, MD, DOCX, ODT). Il testo viene ripulito, normalizzato e
                             spezzato in chunk. 
@@ -128,8 +128,8 @@
 
                 <div class="card bg-base-100 border border-base-300 h-full">
                     <div class="card-body space-y-2">
-                        <h3 class="card-title text-base">2 · Embedding</h3>
-                        <p class="text-xs opacity-80">
+                        <h3 class="card-title text-lg">2 · Embedding</h3>
+                        <p class="text-sm opacity-80">
                             Ogni chunk viene trasformato in un embedding vettoriale
                             (attualmente 1024 dimensioni, modello <code>bge-m3</code> via
                             Ollama) e memorizzato su PostgreSQL tramite pgvector. 
@@ -139,8 +139,8 @@
 
                 <div class="card bg-base-100 border border-base-300 h-full">
                     <div class="card-body space-y-2">
-                        <h3 class="card-title text-base">3 · Retrieval</h3>
-                        <p class="text-xs opacity-80">
+                        <h3 class="card-title text-lg">3 · Retrieval</h3>
+                        <p class="text-sm opacity-80">
                             La domanda dell’utente viene embeddizzata e confrontata con
                             i chunk via cosine similarity. La query ordina per
                             <code>embedding &lt;=&gt; :query_vec</code> e recupera i top-K
@@ -151,8 +151,8 @@
 
                 <div class="card bg-base-100 border border-base-300 h-full">
                     <div class="card-body space-y-2">
-                        <h3 class="card-title text-base">4 · Risposta AI</h3>
-                        <p class="text-xs opacity-80">
+                        <h3 class="card-title text-lg">4 · Risposta AI</h3>
+                        <p class="text-sm opacity-80">
                             <span class="font-semibold">ChatbotService</span> costruisce
                             il contesto con i chunk trovati, aggiunge un prompt che
                             impone “rispondi solo usando il contesto” e chiama il modello
@@ -175,23 +175,23 @@
             <div class="grid gap-6 lg:grid-cols-[minmax(0,1.1fr),minmax(0,0.9fr)]">
                 <div class="card bg-base-100 border border-base-300">
                     <div class="card-body space-y-4">
-                        <h3 class="card-title text-base">1 · Setup & migrazioni</h3>
-                        <p class="text-xs opacity-80">
+                        <h3 class="card-title text-lg">1 · Setup & migrazioni</h3>
+                        <ul class="text-base opacity-80">
                             Dipendenze principali (oltre a Symfony): 
-                            <code>smalot/pdfparser</code>,
-                            <code>phpoffice/phpword</code>,
-                            <code>openai-php/client</code>,
-                            <code>partitech/doctrine-pgvector</code>,
-                            <code>symfony/uid</code>,
-                            Tailwind + Typography + DaisyUI. 
-                        </p>
+                            <li><code>phpoffice/phpword</code></li>
+                            <li><code>smalot/pdfparser</code></li>
+                            <li><code>openai-php/client</code></li>
+                            <li><code>partitech/doctrine-pgvector</code></li>
+                            <li><code>symfony/uid</code></li>
+                        </ul>
+                        Tailwind + Typography + DaisyUI. 
 
-                        <div class="mockup-code text-xs">
+                        <div class="mockup-code text-sm">
                             <pre data-prefix="$"><code>composer install</code></pre>
                             <pre data-prefix="$"><code>php bin/console doctrine:migrations:migrate</code></pre>
                         </div>
 
-                        <p class="text-xs opacity-70">
+                        <p class="text-sm opacity-70">
                             Assicurati di aver attivato l’estensione
                             <code>vector</code> su PostgreSQL e creato l’indice
                             HNSW su <code>document_chunk.embedding</code>.
@@ -201,9 +201,9 @@
 
                 <div class="card bg-base-100 border border-base-300">
                     <div class="card-body space-y-4">
-                        <h3 class="card-title text-base">2 · Indicizzare i documenti</h3>
+                        <h3 class="card-title text-lg">2 · Indicizzare i documenti</h3>
 
-                        <div class="tabs tabs-boxed tabs-xs">
+                        <div class="tabs tabs-boxed tabs-base">
                             <a class="tab tab-active">Index</a>
                             <a class="tab">List</a>
                             <a class="tab">Unindex</a>
