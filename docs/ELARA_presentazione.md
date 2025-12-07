@@ -156,20 +156,6 @@ Quando fai una domanda:
 
 > ***Gli indici vettoriali IVF-FLAT e HNSW, sono da considerare mutualmente esclusivi***
 
-## Il flusso completo
-1. Indicizzazione (command app:index-docs)
-   * DocumentTextExtractor estrae il testo dai file (PDF, MD, DOCX, ODT)
-   * il testo viene ripulito e spezzato in chunk
-   * per ogni chunk chiamiamo l’AiClient per ottenere l’embedding
-   * Doctrine salva i chunk con il loro embedding in PostgreSQL
-   * l’indice IVF-FLAT viene creato/aggiornato
-2. Domanda utente (API /api/chat)
-   * ChatbotService crea l’embedding della domanda
-   * con il repository DocumentChunkRepository esegue una query “top K simili”
-   * la query ordina i chunk in base alla distanza vettoriale (cosine)
-   * i primi N chunk formano il contesto da passare al modello AI
-   * l’AI genera la risposta, che viene restituita in JSON
-
 # 5. L’operatore vettoriale <=> di Postgres/pgvector
 L’operatore <=> è una delle funzionalità che pgvector aggiunge a PostgreSQL.
 
@@ -201,6 +187,20 @@ Gli indici IVF-FLAT e HNSW accelerano proprio questa operazione per arrivare rap
 
 Nel codice di ELARA, quando usiamo la funzione cosine_similarity in DQL, sotto sotto Doctrine traduce in SQL usando gli operatori e le funzioni di pgvector; il concetto però è esattamente questo: ordinare i chunk dal più simile al meno simile in base a <=> / cosine.
 
+## Il flusso completo
+1. Indicizzazione (command app:index-docs)
+   * DocumentTextExtractor estrae il testo dai file (PDF, MD, DOCX, ODT)
+   * il testo viene ripulito e spezzato in chunk
+   * per ogni chunk chiamiamo l’AiClient per ottenere l’embedding
+   * Doctrine salva i chunk con il loro embedding in PostgreSQL
+   * l’indice IVF-FLAT viene creato/aggiornato
+2. Domanda utente (API /api/chat)
+   * ChatbotService crea l’embedding della domanda
+   * con il repository DocumentChunkRepository esegue una query “top K simili”
+   * la query ordina i chunk in base alla distanza vettoriale (cosine)
+   * i primi N chunk formano il contesto da passare al modello AI
+   * l’AI genera la risposta, che viene restituita in JSON
+
 ## Perché un embedding di 1536 dimensioni? Perché è così importante?
 Quando diciamo che un embedding è composto da 1536 numeri, può sembrare un dettaglio arbitrario o puramente tecnico.
 In realtà è una scelta fondamentale per la qualità delle risposte del motore RAG, e vale la pena spiegarlo in modo semplice.
@@ -222,6 +222,7 @@ Perché?
 * Con dimensioni molto superiori aumentano i costi, il peso su PostgreSQL e i tempi di ricerca, senza un grande miglioramento in qualità.
 
 1536 è, nella pratica, lo standard attuale per un embedding general-purpose ad alta qualità.
+
 ### 3. Garantisce recuperi molto più accurati
 
 Ricordiamo che lo scopo principale dell’embedding è trovare i pezzi di testo più simili alla domanda.  
@@ -240,7 +241,7 @@ Con 1536 dimensioni invece queste sfumature vengono mantenute e separate.
 ### 4. È la dimensione ideale per l’operatore vettoriale <=> e gli indici IVF-FLAT
 L’accuratezza del confronto vettoriale dipende molto dalla qualità degli embedding:
 * l’operatore <=> (cosine distance) funziona meglio su spazi ricchi e ben rappresentati
-* l’indice IVF-FLAT riesce a clusterizzare in modo efficace solo se i vettori hanno sufficiente dimensionalità
+* l’indice IVF-FLAT riesce a clusterizzare in modo efficace solo se i vettori hanno sufficiente dimensionalità.
 * Doctrine, pgvector e PostgreSQL lavorano in modo ottimale con questi vettori “densi” ad alta qualità
 
 In pratica:
@@ -253,45 +254,13 @@ Scegliere una dimensione standard come 1536 significa:
 * pieno supporto da parte delle librerie AI usate da ELARA (sia OpenAI che Ollama)
 In altre parole: è una scelta che protegge l’investimento tecnico e mantiene il sistema flessibile nel tempo.
 
-### In sintesi(cosa avrei voluto)
+### Pensiero e Desiderio
 
-Ecco una frase sintetica che puoi usare a voce:
-> *Abbiamo scelto embedding a 1536 dimensioni perché sono lo standard moderno per ottenere una rappresentazione molto precisa del significato del testo. Più dimensioni significano più sfumature, più accuratezza nella ricerca dei chunk e risposte migliori del chatbot. È una scelta che massimizza la qualità ma mantiene il sistema veloce, stabile e compatibile con i modelli attuali e futuri.*
+> *Avrei voluto avere la possibilità di usare embedding a 1536 dimensioni perché sono lo standard moderno per ottenere una rappresentazione molto precisa del significato del testo. Più dimensioni significano più sfumature, più accuratezza nella ricerca dei chunk e risposte migliori del chatbot. Una soluzione che massimizza la qualità ma mantiene il sistema veloce, stabile e compatibile con i modelli attuali e futuri.*
 
-# 6. Ordine di presentazione dei documenti
-1. ELARA_Flusso_Applicativo.md
-   * Per iniziare dal quadro generale: 
-  “FILE → Estrattore → Chunking → Embedding → DB → IVF-FLAT → Retrieval → Prompt → AI → Risposta”
-   * Qui spiego la pipeline end-to-end e i command principali (app:index-docs, app:list-docs, app:unindex-file).
+# 6. Conclusioni: perché conviene un motore RAG interno
 
-2. ELARA_Flusso_Servizi_Dettagliato.md
-   * Secondo step: zoom sui servizi core, soprattutto ChatbotService e DocumentTextExtractor.
-   * Qui posso far vedere come la domanda passa attraverso ask(), come viene costruito il contesto e come funziona la modalità test/offline.
-
-3. ELARA_Analisi_Tecnica.md
-   * Terzo step: entra nell’architettura applicativa:
-     * directory src/AI, Service, Repository, Middleware
-     * configurazioni Doctrine/pgvector, tipi vector, middleware IVF-FLAT
-     * entity DocumentFile e DocumentChunk
-   * È il pezzo “da sviluppatori”.
-
-4. ELARA_API_Guide_curl.md
-   * Quarto step: la parte “pratica” per chi deve integrare ELARA:
-     * endpoint /api/chat
-     * esempi curl
-     * gestione degli errori e variabili ENV per test mode / fallback.
-   * Qui faccio quanto è semplice utilizzare il servizio dal punto di vista di un’app esterna.
-
-5. README.md
-   * Alla fine, come “landing page” e riepilogo:
-     * definizione di ELARA
-     * dipendenze principali
-     * setup PostgreSQL + pgvector + indice ivfflat
-     * comandi per indicizzare, elencare e rimuovere file
-   * Ciò che chi vuole provarlo deve seguire.
-# 7. Conclusioni: perché conviene un motore RAG interno
-
-Chiudo con qualche punto che puoi usare nelle conclusioni:
+Chiudo con qualche punto:
 1. Conoscenza accumulata davvero sfruttata
     I documenti non restano “morti” in una cartella o in un wiki: diventano una base di conoscenza a cui si accede in linguaggio naturale, via chatbot.
 2. Risposte contestualizzate e aggiornabili
@@ -303,7 +272,7 @@ Chiudo con qualche punto che puoi usare nelle conclusioni:
 5. Integrazione con lo stack esistente
     ELARA è scritto in Symfony, usa Doctrine e PostgreSQL: si integra bene con applicazioni già esistenti.
 6. Scalabilità graduale
-    Si parte da pochi documenti, cresce nel tempo; gli indici vettoriali come IVF-FLAT e le sonde configurabili permettono di bilanciare prestazioni e qualità senza stravolgere l’architettura.
+    Si parte da pochi documenti, cresce nel tempo; gli indici vettoriali come IVF-FLAT e le sonde configurabili, oppure HNSW se si ha un numero di chunk che super il milione, permettono di bilanciare prestazioni e qualità senza stravolgere l’architettura.
 
 In sintesi:  
 un motore RAG interno come ELARA trasforma la documentazione in un assistente consultabile in linguaggio naturale, mantenendo però controllo, trasparenza e integrazione con l’infrastruttura esistente.
