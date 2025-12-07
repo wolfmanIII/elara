@@ -83,13 +83,15 @@ Nel nostro caso:
   * chiediamo al database: “Quali chunk hanno un embedding più vicino a questo?”
  
  In pratica, embedding del testo = “tradurre le frasi in numeri in modo che la distanza tra i numeri rispecchi la vicinanza di significato tra i testi”.
-# 4. Come lavorano insieme PostgreSQL, pgvector, IVF-FLAT e Doctrine
+# 4. Come lavorano insieme PostgreSQL, pgvector, IVF-FLAT, HNSW e Doctrine
 Qui entriamo un po’ più nel tecnico, ma sempre a livello concettuale.
 
 ## PostgreSQL
 È il nostro database relazionale “classico”: tabelle, righe, colonne.
 
-pgvector [Neon Docs](https://neon.com/docs/extensions/pgvector)
+## pgvector   
+[Github](https://github.com/pgvector/pgvector)  
+[Neon Docs](https://neon.com/docs/extensions/pgvector)
 
 È un’estensione di PostgreSQL che aggiunge:
 * un tipo di colonna vector(N), cioè un array di N numeri
@@ -107,7 +109,16 @@ Per ELARA:
 * configuriamo il tipo custom vector per pgvector
 * registriamo funzioni DQL come cosine_similarity per poter scrivere query “ad alto livello” che sotto si traducono in SQL con gli operatori vettoriali di pgvector
 
-**IVF-FLAT** [Google Cloud](https://cloud.google.com/blog/products/databases/faster-similarity-search-performance-with-pgvector-indexes)
+## Idici
+### IVF-FLAT e HNSW
+Indici per velocizzare le operazioni di retrieve degli embedding sul database.
+### **IVF-FLAT**  
+[Github](https://github.com/pgvector/pgvector#ivfflat)  
+[Google Cloud](https://cloud.google.com/blog/products/databases/faster-similarity-search-performance-with-pgvector-indexes)
+
+Viene usato un algoritmo di k-means semplificato e molto più leggero, se volete saperne di più:  
+[K-means](https://it.wikipedia.org/wiki/K-means)  
+Tutto sommato è solo un po di matematica 🤣🤣🤣
 
 IVF-FLAT è un tipo di indice per ricerche “per somiglianza” su vettori:
 * invece di confrontare ogni vettore con tutti gli altri (lentissimo su tante righe)
@@ -122,7 +133,30 @@ Nel nostro progetto:
 * creiamo un indice IVF-FLAT sulla colonna embedding della tabella document_chunk
 * usiamo un middleware (PgvectorIvfflatMiddleware) per impostare il numero di “sonde” (quanti cluster visitare), bilanciando velocità e precisione
 
-Il flusso completo
+### **HSWM**  
+[Github](https://github.com/pgvector/pgvector#hnsw)  
+HNSW significa Hierarchical Navigable Small World.
+È un tipo di indice per cercare velocemente i vettori (embedding) salvati in PostgreSQL tramite l’estensione pgvector.
+
+L’indice HNSW costruisce una sorta di mappa a livelli dove:
+* in alto ci sono pochi vettori “generali”
+* più scendi, più la mappa è dettagliata
+* i collegamenti sono pensati per arrivare velocemente ai vettori più simili
+
+Quando fai una domanda:
+* si parte dal livello più alto della “mappa”
+* si scende collezionando i nodi più promettenti
+* alla fine si ottengono rapidamente i vettori più simili
+
+È come cercare un libro in una biblioteca già ordinata, invece che sfogliare ogni libro uno per uno.
+
+> HNSW è un indice che permette a pgvector di trovare rapidamente gli embedding più simili alla tua domanda, rendendo il motore RAG veloce, preciso e scalabile(il tutto è sempre relativo al hardware che si ha a disposizione).
+
+***Attenzione, non è utile avere due indici vettoriali diversi sullo stesso campo, è solo uno spreco di spazio e di tempo in scrittura.***
+
+> ***Gli indici vettoriali IVF-FLAT e HNSW, sono da considerare mutualmente esclusivi***
+
+## Il flusso completo
 1. Indicizzazione (command app:index-docs)
    * DocumentTextExtractor estrae il testo dai file (PDF, MD, DOCX, ODT)
    * il testo viene ripulito e spezzato in chunk
@@ -135,8 +169,9 @@ Il flusso completo
    * la query ordina i chunk in base alla distanza vettoriale (cosine)
    * i primi N chunk formano il contesto da passare al modello AI
    * l’AI genera la risposta, che viene restituita in JSON
+
 # 5. L’operatore vettoriale <=> di Postgres/pgvector
-L’operatore <=> è una delle “magie” che pgvector aggiunge a PostgreSQL.
+L’operatore <=> è una delle funzionalità che pgvector aggiunge a PostgreSQL.
 
 In pratica:
 * prende due vettori come input (ad esempio: embedding del chunk, embedding della domanda)
@@ -162,9 +197,10 @@ Questa query dice al database:
 
 > “Dammi i 5 pezzi di testo il cui significato è più vicino al significato della domanda.”
 
-L’indice IVF-FLAT accelera proprio questa operazione: invece di confrontare la domanda con tutti i chunk, usa una struttura a cluster per arrivare rapidamente ai vettori più vicini. 
+Gli indici IVF-FLAT e HNSW accelerano proprio questa operazione per arrivare rapidamente ai vettori più vicini. 
 
 Nel codice di ELARA, quando usiamo la funzione cosine_similarity in DQL, sotto sotto Doctrine traduce in SQL usando gli operatori e le funzioni di pgvector; il concetto però è esattamente questo: ordinare i chunk dal più simile al meno simile in base a <=> / cosine.
+
 ## Perché un embedding di 1536 dimensioni? Perché è così importante?
 Quando diciamo che un embedding è composto da 1536 numeri, può sembrare un dettaglio arbitrario o puramente tecnico.
 In realtà è una scelta fondamentale per la qualità delle risposte del motore RAG, e vale la pena spiegarlo in modo semplice.
@@ -200,6 +236,7 @@ Un embedding piccolo, invece, tenderebbe a confondere concetti diversi:
 * “attivazione API” sarebbe confusa con “attivazione operatore”
 * “utente amministratore” risulterebbe simile a “utente generico”
 Con 1536 dimensioni invece queste sfumature vengono mantenute e separate.
+
 ### 4. È la dimensione ideale per l’operatore vettoriale <=> e gli indici IVF-FLAT
 L’accuratezza del confronto vettoriale dipende molto dalla qualità degli embedding:
 * l’operatore <=> (cosine distance) funziona meglio su spazi ricchi e ben rappresentati

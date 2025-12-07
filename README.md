@@ -7,6 +7,7 @@ ELARA (Embedding Linking & Retrieval Answering) è un motore RAG progettato per 
 * generazione e formulazione delle risposte (Answering)
 
 Il tutto con un flusso semplice, trasparente e controllabile.
+
 ## 2. Dipendenze aggiuntive che verranno installate con il comando:
 ```bash
 composer install
@@ -52,12 +53,23 @@ Sono necessari i permessi relativi
 ```bash
 php bin/console doctrine:migrations:migrate
 ```
-### Creare indice hnsw per velocizzare le ricerche(tabella document_chunk)
+### Creare indice HNSW per velocizzare le ricerche(tabella document_chunk)
 ```sql
 CREATE INDEX document_chunk_embedding_hnsw
 ON document_chunk
 USING hnsw (embedding vector_cosine_ops);
 ```
+### Creare indice IVF-FLAT per velocizzare le ricerche(tabella ducument_chunk)
+```sql
+CREATE INDEX document_chunk_embedding_ivfflat
+ON document_chunk
+USING ivfflat (embedding vector_cosine_ops)
+WITH (lists = 100);
+```
+***Attenzione, non è utile avere due indici vettoriali diversi sullo stesso campo, è solo uno spreco di spazio e di tempo in scrittura.***
+
+> ***Gli indici vettoriali IVF-FLAT e HNSW, sono da considerare mutualmente esclusivi***
+
 ### Cos'è pgvector
 __pgvector__ è un’estensione per PostgreSQL che aggiunge:
 * un tipo di colonna: vector(N) → un array di N numeri (float)
@@ -144,23 +156,6 @@ doctrine:
         cosine_similarity: Partitech\DoctrinePgVector\Query\CosineSimilarity
         distance: Partitech\DoctrinePgVector\Query\Distance
 ```
-### Cos’è IVF-Flat in pgvector
-## **Alla fine ho deciso utilizzare solo indici hnsw(non ha bisogno di clustering, e nessun tuning per le sonde da fare)**
-## **Lascio comunque per informazione**
-IVF-Flat è un tipo di indice approximate (ANN):  
-non garantisce risultati 100% identici alla ricerca esatta, ma è molto più veloce e la differenza è spesso irrilevante per casi RAG.  
-È composto da due elementi:
-#### 1. Centroidi (cluster)
-L’indice divide tutti i vettori in liste (inverted lists), ognuna associata a un centroide. Quindi raggruppa i vettori in cluster tramite una forma di K-means “light”(più leggera).  
-Per avere più informazioni su che cos'è una forma K-means, fate riferimento a questo link:  
-[K-means](https://it.wikipedia.org/wiki/K-means)  
-tutto sommato è solo un pò di matematica 🤣🤣🤣
-#### 2. Ricerca dentro pochi cluster
-Quando cerchi i vettori più simili:
-* pgvector individua i cluster più vicini al vettore di query
-* esegue una ricerca flat (lineare) solo dentro quei cluster
-
-Questo riduce drasticamente la quantità di vettori da confrontare.
 ## 4. Backend AI Ollama | OpenAI
 ### Variabili d'ambiente, nel file .env.local
 ```env
@@ -186,7 +181,7 @@ APP_AI_OFFLINE_FALLBACK=false
 # Postgres pgvector - sonde per indice ivfflat
 # APP_IVFFLAT_PROBES=10
 ```
-### Configurazione AI_BACKEND, PDF parser, Ivfflat Probes, nel file services.yaml
+### Configurazione AI_BACKEND, PDF parser, IVF-FLAT Probes, nel file services.yaml
 ```yaml
 parameters:
   # ...
@@ -214,6 +209,9 @@ Tramite la variabile di ambiente `APP_IVFFLAT_PROBES`, impostiamo il rapporto qu
 * 5–10 = super veloce(si ok, ma dipende dal hardware)
 * 20–30 = molto preciso
 * 50–100 = qualità altissima (RAG più consistente, più lento)
+
+***Alla fine ho deciso di utilizzare solo indici HNSW***
+
 ## 5. Command per indicizzare i file
 ### Esempi di utilizzo
 I file da indicizzare devono essere caricati nella cartella var/knowledge
