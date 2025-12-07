@@ -64,7 +64,7 @@ I valori nella colonna *target* sono quelli consigliati come default pratici.
 
 ---
 
-# 🧩 4. Parametri di chunking consigliati per un sistema (WSL2 + 16GB RAM)
+# 🧩 4. Parametri di chunking consigliati per un sistema (16GB RAM senza GPU)
 
 Con embedding **768** + modello chat 8B:
 
@@ -148,8 +148,6 @@ VACUUM ANALYZE document_chunk;
 Di seguito un algoritmo di chunking che evita chunk troppo corti e include overlap:
 
 ```php
-<?php
-
 declare(strict_types=1);
 
 namespace App\Service;
