@@ -29,7 +29,7 @@ Per evitare chunk inutili ad una sola parola (es. nomi come *Malen Trast*), si c
 
 # 📏 2. Tabella riassuntiva (valori consigliati)
 
-| Dimensione Vettore | Chunk max (caratteri) | Chunk target | Chunk min | top_k consigliato |
+| Dimensione Vettore | Chunk max (caratteri)  | Chunk target | Chunk min | top_k consigliato |
 |--------------------|------------------------|--------------|-----------|-------------------|
 | **384**            | 800–1200               | ~1000        | 400       | **6**             |
 | **768**            | 900–1400               | ~1200        | 400       | **5**             |
@@ -76,7 +76,7 @@ Con embedding **768** + modello chat 8B:
 - **token totali contesto**: ~1200–1500 token
 
 Questo bilancia qualità del retrieval e performance, evitando timeout e surriscaldamenti.  
->*per problemi di Ollama 0.13.1(latest) [`GitHub`]("https://github.com/ollama/ollama/issues/13340"), sul modello nomic-text_embed, sono stato costretto ad usare il modello bge-m3 che utilizza vettori a 1024*
+>*Per problemi di Ollama 0.13.1(latest) [`GitHub`]("https://github.com/ollama/ollama/issues/13340") sul modello nomic-text_embed, sono stato costretto ad usare il modello bge-m3 che utilizza vettori a 1024*
 
 ---
 # 🛠️ 5. Considerazioni aggiuntive
@@ -131,7 +131,7 @@ ON document_chunk USING hnsw (embedding vector_cosine_ops);
 - HNSW è molto più veloce dell’IVF-Flat, specialmente su dataset medi (< 500k chunk).
 
 ### Quando usare IVF-Flat
-- Solo se hanno **milioni** di chunk.
+- Solo se si hanno **milioni** di chunk.
 - Richiede `REINDEX` quando si aggiungono molti dati.
 - Va calibrato con `lists = 100–200`.
 
@@ -143,7 +143,7 @@ VACUUM ANALYZE document_chunk;
 
 ---
 
-# 🧰 8. Algoritmo di chunking utilizzata(Servizio Symfony)
+# 🧰 8. Algoritmo di chunking utilizzato(Servizio Symfony)
 
 Di seguito un algoritmo di chunking che evita chunk troppo corti e include overlap:
 
@@ -653,7 +653,7 @@ Rispondi in modo chiaro e sintetico nella lingua dell'utente.
 
 ---
 
-# 🗄️ 11. È utile usare **IVFFlat + HNSW insieme?**
+# 🗄️ 11. È utile usare **IV-FFlat + HNSW insieme?**
 
 ## ❌ Risposta breve
 Per un sistema RAG **self‑hosted**, con **16 GB di RAM** e dataset di dimensioni medio‑piccole (documentazione, lore, manuali), **NO**: usare **entrambi gli indici** sulla stessa colonna di embedding **non è né necessario né utile**.
@@ -662,7 +662,7 @@ Un solo indice — **HNSW** — è la scelta corretta nel 99% dei casi.
 
 ---
 
-# 🧩 11.1. Differenze tra IVFFlat e HNSW
+# 🧩 11.1. Differenze tra IVF-Flat e HNSW
 
 ## 🔹 HNSW
 **Ideale per:** dataset piccoli/medi (fino a milioni moderati), contesti RAG.
@@ -678,7 +678,7 @@ Un solo indice — **HNSW** — è la scelta corretta nel 99% dei casi.
 
 ---
 
-## 🔹 IVFFlat
+## 🔹 IVF-Flat
 **Ideale per:** dataset **molto grandi** (milioni di embedding).
 
 **Pro:**
@@ -701,19 +701,19 @@ Avere **due indici** (HNSW + IVFFlat) sulla stessa colonna comporta:
 - **Planner meno prevedibile** (Postgres può scegliere l'indice peggiore)
 - **Build più lente**
 - **Manutenzione raddoppiata**
-- **Recall instabile** se IVFFlat non è configurato bene
+- **Recall instabile** se IVF-Flat non è configurato bene
 
 ### 👍 In questo contesto
 - Dataset non enorme
-- Self‑hosting in WSL2
+- Self‑hosting 16GB RAM senza GPU
 - Performance già buone con HNSW
-- Nessuna necessità di clusterizzazione (IVFFlat)
+- Nessuna necessità di clusterizzazione (IV-FFlat)
 
 👉 **Conclusione:** usare entrambi è overkill e rischia di peggiorare la qualità.
 
 ---
 
-# 🟢 11.3. Raccomandazione ufficiale per il tuo progetto
+# 🟢 11.3. Raccomandazione generali
 
 ### Usa **solo HNSW**:
 ```sql
@@ -722,7 +722,7 @@ ON document_chunk
 USING hnsw (embedding vector_cosine_ops);
 ```
 
-### Quando considerare IVFFlat?
+### Quando considerare IVF-Flat?
 Solo se:
 - superi **1–2 milioni di chunk**
 - e hai problemi di latenza sulla similarity
@@ -735,7 +735,7 @@ In qualunque altro caso → **HNSW è migliore, più semplice e più affidabile*
 
 ---
 
-# 🧪 11.4. Come verificare che Postgres sta davvero HNSW
+# 🧪 11.4. Come verificare che Postgres sta davvero usando HNSW
 
 ```sql
 EXPLAIN ANALYZE
@@ -750,8 +750,4 @@ Si dovrebbe vedere qualcosa come:
 Index Scan using document_chunk_embedding_hnsw on document_chunk
 ```
 Se invece si vede "Seq Scan" → manca l'indice o Postgres non lo ritiene conveniente.
-
----
-
-# 🔚 Fine documento
 

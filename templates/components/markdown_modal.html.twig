@@ -1,0 +1,35 @@
+{# templates/components/markdown_modal.html.twig #}
+{# Component: markdown_modal
+   Proprietà (public nel PHP component):
+   - id: string
+   - title: string
+   - markdown: ?string
+   - markdownFile: ?string
+#}
+
+<dialog id="{{ this.id }}" class="modal">
+    <div class="modal-box max-w-4xl">
+        <div class="flex items-start justify-between gap-4 mb-4">
+            <h3 class="font-bold text-lg">
+                {{ this.title }}
+            </h3>
+
+            <form method="dialog">
+                <button class="btn btn-ghost btn-sm btn-circle">
+                    ✕
+                </button>
+            </form>
+        </div>
+
+        {# Viewer markdown: usa Tailwind Typography (prose) #}
+        <article class="prose prose-sm sm:prose-base max-w-none">
+            {{ this.content()|daisy_table|raw }}
+        </article>
+
+        <div class="modal-action mt-6">
+            <form method="dialog">
+                <button class="btn">Chiudi</button>
+            </form>
+        </div>
+    </div>
+</dialog>

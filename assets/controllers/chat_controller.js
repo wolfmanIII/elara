@@ -161,7 +161,7 @@ export default class extends Controller {
                 ELARA
             </div>
             <div class="chat-bubble chat-bubble-primary">
-                ${this.escapeHtml(text)}
+                ${this.escapeHtml(text).replace(/\n/g, "<br>")}<br>
             </div>
         `;
 

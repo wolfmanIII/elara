@@ -18,6 +18,8 @@ composer install
 * partitech/doctrine-pgvector
 * symfony/uid
 * symfonycasts/tailwind-bundle
+* league/commonmark
+* symfony/ux-twig-component
 ### Interfaccia grafica, Tailwind, Tipography e DaisyUI
 #### Installare nvm (nodejs version manager)
 ```bash
@@ -164,13 +166,13 @@ DATABASE_URL="postgresql://app:!ChangeMe!@127.0.0.1:5432/app?serverVersion=16&ch
 # Ollama
 AI_BACKEND=ollama
 OLLAMA_HOST=http://localhost:11434
-OLLAMA_CHAT_MODEL=llama3.2
-OLLAMA_EMBED_MODEL=nomic-embed-text
+OLLAMA_CHAT_MODEL=llama3.1:8b
+OLLAMA_EMBED_MODEL=bge-m3
 
 # OpenAI
 #AI_BACKEND=openai
 #OPENAI_API_KEY=sk-...
-#OPENAI_CHAT_MODEL=gpt-5.1-mini
+#OPENAI_CHAT_MODEL=gpt-4.1-mini
 #OPENAI_EMBED_MODEL=text-embedding-3-small
 
 ## RAG Test Mode e Fallback

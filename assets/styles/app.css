@@ -4,6 +4,7 @@
     themes: all;
 }
 
+
 .inner-bordered-table th,
 .inner-bordered-table td {
     @apply border border-base-content/4;
@@ -27,4 +28,26 @@
 
 .inner-bordered-table tbody tr:last-child td {
     @apply border-b-0;
+}
+
+
+.prose table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+
+.prose thead tr {
+    background-color: hsl(var(--b2));
+}
+
+.prose th,
+.prose td {
+    border: 1px solid hsl(var(--b3));
+    padding: 0.4rem 0.6rem;
+    text-align: left;
+}
+
+.prose tbody tr:nth-child(even) {
+    background-color: hsl(var(--b1));
 }
