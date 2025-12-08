@@ -29,9 +29,9 @@ final class ChatController extends BaseController
         $status = [
             'ok' => true,
             'model' => $_ENV["OLLAMA_CHAT_MODEL"],
-            'source' => "Ollama",
-            'test_mode'   => $_ENV['APP_AI_TEST_MODE'],
-            'offline_fallback' => $_ENV['APP_AI_OFFLINE_FALLBACK'],
+            'source' => ucfirst($_ENV["AI_BACKEND"]),
+            'test_mode'   => $_ENV['APP_AI_TEST_MODE'] ? "Attivo" : "Disabilitato",
+            'offline_fallback' => $_ENV['APP_AI_OFFLINE_FALLBACK'] ? "Attivo" : "Disabilitato",
         ];
         return $this->json($status);
     }

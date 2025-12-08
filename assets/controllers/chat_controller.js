@@ -54,7 +54,7 @@ export default class extends Controller {
                 }
                 if (text) {
                     text.textContent = data.source
-                        ? `Backend: ${data.source}`
+                        ? `Backend: ${data.source}\nTest mode: ${data.test_mode}\nOffline fallback: ${data.offline_fallback}`
                         : 'Motore attivo e raggiungibile.';
                 }
             } else {
