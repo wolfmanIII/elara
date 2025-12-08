@@ -1,0 +1,271 @@
+# ELARA — Flusso dei Servizi (Versione Completa e Aggiornata)
+
+L’obiettivo è descrivere **in modo chiaro, esaustivo e moderno** il funzionamento dei servizi core dell’applicazione.
+
+---
+
+# 📚 Indice
+1. [Panoramica dei Servizi](#panoramica-dei-servizi)
+2. [AiClientInterface e Implementazioni](#aiclientinterface-e-implementazioni)
+3. [DocumentTextExtractor](#documenttextextractor)
+4. [ChunkingService](#chunkingservice)
+5. [DocumentChunkRepository](#documentchunkrepository)
+6. [PgvectorIvfflatMiddleware](#pgvectorivfflatmiddleware)
+7. [ChatbotService](#chatbotservice)
+8. [Servizi ausiliari e pipeline di supporto](#servizi-ausiliari-e-pipeline-di-supporto)
+9. [Diagramma dei servizi](#diagramma-dei-servizi)
+10. [Conclusione](#conclusione)
+
+---
+
+# 1. Panoramica dei Servizi
+I servizi in ELARA sono organizzati per responsabilità verticali e indipendenti. Ogni servizio è progettato per essere:
+- **autonomo**,
+- **testabile**,
+- **coerente** con una singola responsabilità.
+
+I principali macro-servizi sono:
+- AI (embedding + chat),
+- estrazione,
+- chunking,
+- repository vettoriali,
+- middleware database,
+- generazione risposte.
+
+---
+
+# 2. AiClientInterface e Implementazioni
+L’interfaccia **AiClientInterface** definisce due funzioni fondamentali:
+
+```
+embed(string|array $text): array
+chat(array $messages, string $model): string
+```
+
+## 2.1 Implementazioni
+### **OpenAiClient**
+- usa l’API OpenAI ufficiale,
+- altissima qualità nelle risposte,
+- embedding fino a 1536 dimensioni,
+- costo a consumo.
+
+### **OllamaClient**
+- gira in locale tramite Ollama,
+- nessun costo,
+- embedding tipicamente 768 o 1024 (bge-m3),
+- utile per ambienti self-hosted.
+
+Il backend è configurabile tramite:
+```
+AI_BACKEND=ollama|openai
+```
+
+---
+
+# 3. DocumentTextExtractor
+Servizio responsabile della fase di estrazione e pulizia del testo.
+
+## 3.1 Funzionalità principali
+- Identificazione tipo file.
+- Estrazione testo da PDF, ODT, DOCX, MD.
+- Normalizzazione avanzata del contenuto.
+
+## 3.2 Normalizzazioni applicate
+- trim globale,
+- rimozione multipli whitespace,
+- rimozione caratteri invisibili Unicode,
+- rimozione emoji e simboli grafici,
+- correzione automatica degli spazi mancanti,
+- correzione di MAIUSCOLO+Capitalized.
+
+## 3.3 Obiettivo
+Produrre un testo coerente, lineare e adatto al chunking.
+
+---
+
+# 4. ChunkingService
+Elemento centrale del flusso.
+
+## 4.1 Funzioni chiave
+- split per paragrafi (2+ newline),
+- split in frasi e parole,
+- merge chunk corti,
+- overlap intelligente basato su numero di caratteri,
+- limite assoluto HARD_MAX_CHARS.
+
+## 4.2 Parametri di default consigliati
+- `min = 400–500`,
+- `target = 1200–1600`,
+- `max = 1500–1800`,
+- `overlap = 200–300`,
+- `HARD_MAX_CHARS = 1500`.
+
+## 4.3 Obiettivo
+Creare chunk omogenei, semanticamente coerenti, adatti a creare embedding di alta qualità.
+
+---
+
+# 5. DocumentChunkRepository
+Repository Doctrine che gestisce la ricerca vettoriale.
+
+## 5.1 Ricerca per similarità
+La query chiave è:
+```
+ORDER BY embedding <=> :vec
+```
+Usa la **cosine distance** per confrontare embedding.
+
+## 5.2 Parametri essenziali
+- **top_k**: numero di chunk da recuperare (3–6),
+- **soglia** di similarità (es. > 0.55),
+- eventuale filtro per documento.
+
+## 5.3 Obiettivo
+Restituire solo i chunk più rilevanti, che saranno poi forniti al modello LLM.
+
+---
+
+# 6. PgvectorIvfflatMiddleware
+Middleware opzionale che gestisce la ricostruzione dell’indice vettoriale.
+
+## 6.1 Funzioni
+- gestione `REINDEX` automatico in caso di indicizzazione massiva,
+- parametrizzazione `lists` e `probes` (solo IVF-FLAT),
+- creazione indici personalizzati.
+
+## 6.2 Indici disponibili
+- **HNSW** → raccomandato,
+- **IVF-FLAT** → solo dataset molto grandi.
+
+## 6.3 Best practice
+**Mai usare entrambi gli indici sulla stessa colonna**, per motivi di:
+- performance,
+- coerenza,
+- recall instabile.
+
+---
+
+# 7. ChatbotService
+Il cuore della fase runtime.
+
+## 7.1 Costruttore
+```
+ChatbotService(
+    EntityManagerInterface  $em,
+    DocumentChunkRepository $chunkRepository,
+    AiClientInterface       $ai
+)
+```
+
+## 7.2 Metodo ask() — Flusso dettagliato
+1. **Lettura configurazioni ENV** (test mode, fallback).  
+2. **Embedding domanda** tramite AiClientInterface.  
+3. **Ricerca vettoriale** via DocumentChunkRepository.  
+4. **Costruzione contesto RAG** concatenando i chunk.  
+5. **Costruzione prompt** con system + user.  
+6. **Chiamata backend AI**.  
+7. **Gestione eccezioni**.  
+8. **Fallback** (modalità offline).
+
+## 7.3 Metodi speciali
+### `answerInTestMode()`
+- Nessun uso AI.
+- Ricerca testuale LIKE.
+- Utile per verificare la bontà della domanda.
+
+### `answerInOfflineFallback()`
+- Attivo quando il backend AI non è raggiungibile.
+- Restituisce estratti.
+
+## 7.4 Obiettivo
+Produrre risposte basate sui documenti indicizzati, senza allucinazioni.
+
+---
+
+# 8. Servizi ausiliari e pipeline di supporto
+ELARA include servizi supplementari che completano il flusso.
+
+## 8.1 Sistema di hashing DocumentFile
+- SHA1 per identificare versioni diverse dello stesso file.
+- Consistenza tra versioni.
+
+## 8.2 IndexDocsCommand
+Esegue l’intera pipeline di indicizzazione:
+1. hashing,
+2. estrazione,
+3. normalizzazione,
+4. chunking,
+5. embedding,
+6. persistenza,
+7. creazione indici.
+
+## 8.3 ListDocsCommand
+Mostra:
+- documenti indicizzati,
+- hash,
+- numero di chunk,
+- data indicizzazione.
+
+## 8.4 UnindexFileCommand
+Rimuove:
+- DocumentFile,
+- chunk associati (cascade Doctrine).
+
+---
+
+# 9. Diagramma dei servizi
+
+```
+               ┌────────────────────────┐
+               │        API /api/chat   │
+               └──────────────┬─────────┘
+                              │
+                        ChatbotService
+                              │
+         ┌────────────────────┼────────────────────┐
+         │                    │                    │
+ DocumentChunkRepository   Prompt Engine        AiClientInterface
+ (ricerca vettoriale)     (system+user)      (OpenAI/Ollama)
+         │                    │                    │
+         └───────────────┬────┴────────────────────┘
+                         │
+                    PostgreSQL
+                + pgvector (HNSW)
+
+──────────────────────────────────────────────────────────────
+
+         Indicizzazione (offline, tramite command)
+
+ app:index-docs
+      │
+      ▼
+ DocumentTextExtractor
+      │
+ ChunkingService
+      │
+ AiClientInterface (embedding)
+      │
+ PostgreSQL + pgvector
+      │
+ PgvectorIvfflatMiddleware (opz.)
+```
+
+---
+
+# 10. Conclusione
+Questo documento rappresenta la **visione completa e moderna** del flusso dei servizi core in ELARA.
+
+La struttura modulare garantisce:
+- affidabilità,
+- scalabilità,
+- estendibilità,
+- controllo completo sul retrieval,
+- qualità prevedibile delle risposte.
+
+Il motore ELARA è quindi pronto per:
+- integrazioni avanzate,
+- UI dedicate,
+- autenticazione e ruoli,
+- scaling orizzontale e verticale.
+
+---

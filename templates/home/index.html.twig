@@ -79,8 +79,8 @@
         <div class="w-full text-xs">
             Documenti di riferimento:
             <button class="btn btn-xs btn-outline"
-                    onclick="document.getElementById('modal-elara-presentazione').showModal()">
-                <code>ElaRA - Presentazione</code>
+                    onclick="document.getElementById('modal-elara-definizione').showModal()">
+                <code>ElaRA - Definizione</code>
             </button>
         </div>
 
@@ -181,8 +181,8 @@
         <div class="w-full text-xs">
             Documenti di riferimento:
             <button class="btn btn-xs btn-outline"
-                    onclick="document.getElementById('modal-elara-presentazione').showModal()">
-                <code>ElaRA - Presentazione</code>
+                    onclick="document.getElementById('modal-elara-definizione').showModal()">
+                <code>ElaRA - Definizione</code>
             </button>
             <button class="btn btn-xs btn-outline"
                     onclick="document.getElementById('modal-elara-analisi').showModal()">
@@ -282,7 +282,7 @@
             </button>
             <button class="btn btn-xs btn-outline"
                     onclick="document.getElementById('modal-elara-chunking-embedding').showModal()">
-                <code>ElaRA - Chunking & Embedding Guidelines</code>
+                <code>ElaRA - Guida - Chunking & Embedding</code>
             </button>
         </div>
 
@@ -364,7 +364,7 @@
             </button>
             <button class="btn btn-xs btn-outline"
                     onclick="document.getElementById('modal-elara-chunking-embedding').showModal()">
-                <code>ElaRA - Chunking & Embedding Guidelines</code>
+                <code>ElaRA - Guida - Chunking & Embedding</code>
             </button>
         </div>
 
@@ -579,7 +579,7 @@
             </button>
             <button class="btn btn-xs btn-outline"
                     onclick="document.getElementById('modal-elara-api-guide').showModal()">
-                <code>ElaRA - API Guide</code>
+                <code>ElaRA - Guida API</code>
             </button>
         </div>
 
@@ -709,8 +709,8 @@
         <div class="w-full text-xs">
             Documenti di riferimento:
             <button class="btn btn-xs btn-outline"
-                    onclick="document.getElementById('modal-elara-presentazione').showModal()">
-                <code>ElaRA - Presentazione</code>
+                    onclick="document.getElementById('modal-elara-definizione').showModal()">
+                <code>ElaRA - Definizione</code>
             </button>
             <button class="btn btn-xs btn-outline"
                     onclick="document.getElementById('modal-elara-readme').showModal()">
@@ -719,6 +719,10 @@
             <button class="btn btn-xs btn-outline"
                     onclick="document.getElementById('modal-elara-chunking-embedding').showModal()">
                 <code>ElaRA - Chunking & Embedding Guidelines</code>
+            </button>
+            <button class="btn btn-xs btn-outline"
+                    onclick="document.getElementById('modal-elara-parametri-risposte').showModal()">
+                <code>ElaRA - Parametri Qualità Risposte</code>
             </button>
         </div>
 
@@ -770,33 +774,39 @@
 
 
 {{ component('markdown_modal', {
-    id: 'modal-elara-presentazione',
-    title: 'ELaRA — Presentazione',
-    markdownFile: 'docs/ELARA_presentazione.md'
+    id: 'modal-elara-definizione',
+    title: 'ELaRA — Definizione',
+    markdownFile: 'docs/elara_definizione.md'
 }) }}
 
 {{ component('markdown_modal', {
     id: 'modal-elara-analisi',
     title: 'ELaRA — Analisi Tecnica',
-    markdownFile: 'docs/ELARA_Analisi_Tecnica.md'
+    markdownFile: 'docs/elara_analisi_tecnica.md'
 }) }}
 
 {{ component('markdown_modal', {
     id: 'modal-elara-flusso-applicativo',
     title: 'ELaRA — Flusso Applicativo',
-    markdownFile: 'docs/ELARA_Flusso_Applicativo.md'
+    markdownFile: 'docs/elara_flusso_applicativo.md'
 }) }}
 
 {{ component('markdown_modal', {
     id: 'modal-elara-flusso-servizi',
     title: 'ELaRA — Flusso Servizi',
-    markdownFile: 'docs/ELARA_Flusso_Servizi_Dettagliato.md'
+    markdownFile: 'docs/elara_flusso_servizi_dettagliato.md'
 }) }}
 
 {{ component('markdown_modal', {
     id: 'modal-elara-chunking-embedding',
     title: 'ELaRA — Chunking & Embedding Guideline',
-    markdownFile: 'docs/rag_chunking_embedding_guidelines.md'
+    markdownFile: 'docs/guida_rag_chunking_embedding.md'
+}) }}
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-parametri-risposte',
+    title: 'ELaRA — Parametri e Qualità delle Risposte',
+    markdownFile: 'docs/elara_parametri_qualita_risposte.md'
 }) }}
 
 {{ component('markdown_modal', {
@@ -809,6 +819,14 @@
     id: 'modal-elara-prompt',
     title: 'ELaRA — Guida al Prompt',
     markdownFile: 'docs/elara_guida_utente_prompt.md'
+}) }}
+
+modal-elara-api-guide
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-api-guide',
+    title: 'ELaRA — Guida API',
+    markdownFile: 'docs/elara_api_guide_curl_completa.md'
 }) }}
 
 {% endblock %}

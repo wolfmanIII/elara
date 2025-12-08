@@ -1,6 +1,6 @@
 # ELARA — Analisi Tecnica Completa
 
-Questo documento fornisce una **visione tecnica completa, aggiornata ed esaustiva** del motore RAG ELARA, integrando e consolidando tutte le informazioni presenti negli altri documenti tecnici allegati.
+Questo documento fornisce una **visione tecnica completa, aggiornata ed esaustiva** del motore RAG ELARA
 
 L’obiettivo è offrire una panoramica chiara, strutturata e dettagliata dell’intera architettura: estrazione documenti, chunking, embedding, persistenza, ricerca vettoriale, pipeline di retrieval, prompt engineering, configurazioni AI e API.
 
