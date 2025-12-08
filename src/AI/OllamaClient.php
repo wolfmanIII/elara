@@ -217,7 +217,7 @@ TXT;
 
         $data = $response->toArray();
 
-        //return $data['response'] . "\n\n" . $context ?? '';
-        return $data['response'] ?? '';
+        return $data['response'] . "\n\n" . $context ?? '';
+        //return $data['response'] ?? '';
     }
 }

@@ -272,7 +272,7 @@ Chiudo con qualche punto:
 5. Integrazione con lo stack esistente
     ELARA è scritto in Symfony, usa Doctrine e PostgreSQL: si integra bene con applicazioni già esistenti.
 6. Scalabilità graduale
-    Si parte da pochi documenti, cresce nel tempo; gli indici vettoriali come IVF-FLAT e le sonde configurabili, oppure HNSW se si ha un numero di chunk che super il milione, permettono di bilanciare prestazioni e qualità senza stravolgere l’architettura.
+    Si parte da pochi documenti, cresce nel tempo; gli indici vettoriali come HNSW, oppure IVF-FLAT e le sonde configurabili se si ha un numero di chunk che super il milione, permettono di bilanciare prestazioni e qualità senza stravolgere l’architettura.
 
 In sintesi:  
 un motore RAG interno come ELARA trasforma la documentazione in un assistente consultabile in linguaggio naturale, mantenendo però controllo, trasparenza e integrazione con l’infrastruttura esistente.
