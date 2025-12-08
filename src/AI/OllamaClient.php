@@ -19,11 +19,13 @@ class OllamaClient implements AiClientInterface
         private string              $host,
         private string              $embedModel,
         private string              $chatModel,
+        private string              $chatModelDeep,
         private string              $dimension
     ) {
         $this->host = $_ENV["OLLAMA_HOST"];
         $this->embedModel = $_ENV["OLLAMA_EMBED_MODEL"];
         $this->chatModel = $_ENV["OLLAMA_CHAT_MODEL"];
+        $this->chatModelDeep = $_ENV["OLLAMA_CHAT_MODEL_DEEP"];
         $this->dimension = $_ENV["OLLAMA_EMBED_DIMENSION"];
     }
 
