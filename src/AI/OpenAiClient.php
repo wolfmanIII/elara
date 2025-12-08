@@ -29,7 +29,8 @@ class OpenAiClient implements AiClientInterface
     public function chat(string $question, string $context): string
     {
         $system = <<<TXT
-Rispondi solo basandoti sul contesto fornito.
+Sei un assistente e DEVI rispondere esclusivamente usando il contesto sotto.
+Se la risposta non è presente nel contesto, di' che non è disponibile.
 TXT;
 
         $user = <<<TXT
@@ -38,6 +39,8 @@ $context
 
 DOMANDA:
 $question
+
+Rispondi in modo chiaro e nella lingua dell'utente.
 TXT;
 
         $client = OpenAI::client($this->apiKey);

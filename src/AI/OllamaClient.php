@@ -202,7 +202,7 @@ $context
 DOMANDA:
 $question
 
-Rispondi in modo chiaro nella lingua dell'utente.
+Rispondi in modo chiaro e nella lingua dell'utente.
 TXT;
 
         $response = $this->httpClient->request(
