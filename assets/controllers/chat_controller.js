@@ -136,7 +136,7 @@ export default class extends Controller {
                 </div>
             </div>
             <div class="chat-header">
-                Utente
+                <code><b><em>Utente</em></b></code>
             </div>
             <div class="chat-bubble chat-bubble-secondary">
                 ${this.escapeHtml(text)}
@@ -154,11 +154,11 @@ export default class extends Controller {
         wrapper.innerHTML = `
             <div class="chat-image avatar">
                 <div class="w-8 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2 flex items-center justify-center text-xs font-bold">
-                    <span>AI</span>
+                    <span>Al</span>
                 </div>
             </div>
             <div class="chat-header">
-                ELARA
+                <code><b><em>Almeno</em></b></code>
             </div>
             <div class="chat-bubble chat-bubble-primary">
                 ${this.escapeHtml(text).replace(/\n/g, "<br>")}<br>

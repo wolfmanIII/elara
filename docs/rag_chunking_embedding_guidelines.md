@@ -52,7 +52,7 @@ I valori nella colonna *target* sono quelli consigliati come default pratici.
 - Chunk più robusti: **1200 caratteri**.
 - top_k ideale: **5**.
 
-## 🔹 Embedding **1024** (es. mxbai‑embed‑large)
+## 🔹 Embedding **1024** (es. mxbai‑embed‑large) attualmente usato in ELARA
 - Ottima qualità, costo computazionale maggiore.
 - Chunk un po’ più ampi (1300–1400).
 - top_k ridotto a **4**.
@@ -76,7 +76,7 @@ Con embedding **768** + modello chat 8B:
 - **token totali contesto**: ~1200–1500 token
 
 Questo bilancia qualità del retrieval e performance, evitando timeout e surriscaldamenti.  
->*Per problemi di Ollama 0.13.1(latest) [`GitHub`]("https://github.com/ollama/ollama/issues/13340") sul modello nomic-text_embed, sono stato costretto ad usare il modello bge-m3 che utilizza vettori a 1024*
+>*Nell'implementazione di ELARA, per problemi di Ollama 0.13.1(latest) [`GitHub`]("https://github.com/ollama/ollama/issues/13340") sul modello nomic-text_embed, sono stato costretto ad usare il modello bge-m3, che utilizza vettori a 1024*
 
 ---
 # 🛠️ 5. Considerazioni aggiuntive
