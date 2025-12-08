@@ -28,7 +28,7 @@ In pratica RAG significa: “AI che risponde, ma con il naso dentro i tuoi docum
 ELARA è il nome che abbiamo dato al motore RAG interno:
 E.L.A.R.A. — Embedding Linking & Retrieval Answering.
 
-Il suo Scopo è molto chiara:
+Il suo Scopo è molto chiaro:
 
 *Permettere a chiunque, senza competenze tecniche, di interrogare la documentazione disponibile semplicemente parlando con un chatbot.*
 

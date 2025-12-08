@@ -4,7 +4,7 @@
 
 {% block pageContent %}
 <div class="bg-base-200 text-base-content">
-    <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-10 space-y-10 lg:space-y-12">
+    <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-10 space-y-10 lg:space-12">
 
         {# HERO #}
         <section class="grid gap-8 xl:gap-10 lg:grid-cols-[minmax(0,1.4fr),minmax(0,1fr)] items-start">
@@ -29,7 +29,7 @@
                     <a href="{{ path('app_ai_console') }}"
                        class="btn btn-primary gap-2">
                         <span class="pt-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" 
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                             </svg>
@@ -69,8 +69,9 @@
                             L’endpoint <code class="kbd kbd-base">/api/chat</code> usa
                             <span class="font-semibold">ChatbotService</span> per:
                             embedding della domanda → ricerca vettoriale pgvector →
-                            costruzione contesto → chiamata al modello AI (Ollama/OpenAI). 
+                            costruzione contesto → chiamata al modello AI (Ollama/OpenAI).
                         </p>
+
                     </div>
                 </div>
             </div>
@@ -88,12 +89,15 @@
         <section class="sticky top-16 z-10 bg-base-200/90 backdrop-blur border-y border-base-300 py-3">
             <div class="flex flex-wrap gap-2 sm:gap-3 text-sm justify-center lg:justify-start">
                 <a href="#overview" class="btn btn-xs sm:btn-sm btn-outline">Overview</a>
+                <a href="#value-prop" class="btn btn-xs sm:btn-sm btn-outline">Perché ELaRA</a>
                 <a href="#architecture" class="btn btn-xs sm:btn-sm btn-outline">Architettura</a>
                 <a href="#rag-pipeline" class="btn btn-xs sm:btn-sm btn-outline">Pipeline RAG</a>
                 <a href="#quickstart" class="btn btn-xs sm:btn-sm btn-outline">CLI & Indice</a>
                 <a href="#api-chat" class="btn btn-xs sm:btn-sm btn-outline">API /api/chat</a>
+                <a href="#config-env" class="btn btn-xs sm:btn-sm btn-outline">Config & ENV</a>
                 <a href="#user-guide" class="btn btn-xs sm:btn-sm btn-outline">Guida Utente</a>
                 <a href="#rag-tuning" class="btn btn-xs sm:btn-sm btn-outline">Tuning RAG</a>
+                <a href="#demo-script" class="btn btn-xs sm:btn-sm btn-outline">Demo live</a>
                 <a href="#roadmap" class="btn btn-xs sm:btn-sm btn-outline">Roadmap</a>
             </div>
         </section>
@@ -143,6 +147,52 @@
             </div>
         </section>
 
+        {# VALUE PROP / PERSONE #}
+        <section id="value-prop" class="space-y-4 lg:space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                <h2 class="text-xl sm:text-2xl font-bold">Perché ELaRA · Valore per i diversi attori</h2>
+                <span class="badge badge-info badge-outline self-start sm:self-auto">
+                    Vista business & tecnica
+                </span>
+            </div>
+
+            <div class="grid gap-4 md:grid-cols-3">
+                <div class="card bg-base-100 border border-base-300 h-full">
+                    <div class="card-body space-y-2">
+                        <h3 class="card-title text-base">Responsabili IT</h3>
+                        <ul class="list-disc list-inside text-sm opacity-80 space-y-1">
+                            <li>Dati sempre on-premise / nel proprio cluster.</li>
+                            <li>Stack standard: Symfony, PostgreSQL, PHP.</li>
+                            <li>Configurabile via ENV, senza lock-in di vendor.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300 h-full">
+                    <div class="card-body space-y-2">
+                        <h3 class="card-title text-base">Referenti funzionali</h3>
+                        <ul class="list-disc list-inside text-sm opacity-80 space-y-1">
+                            <li>Riduce il tempo di ricerca nelle norme/procedure.</li>
+                            <li>Risposte uniformi basate sulla documentazione ufficiale.</li>
+                            <li>Facile da usare: una casella di testo, italiano naturale.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300 h-full">
+                    <div class="card-body space-y-2">
+                        <h3 class="card-title text-base">Team di sviluppo</h3>
+                        <ul class="list-disc list-inside text-sm opacity-80 space-y-1">
+                            <li>Un solo endpoint REST, JSON pulito.</li>
+                            <li>Servizi PHP separati e testabili (SRP).</li>
+                            <li>Estensibile: nuovi comandi, nuovi backend AI, nuovi formati.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
         {# STATS / OVERVIEW TECNICA #}
         <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6">
             <div class="stat bg-base-100 shadow-sm rounded-2xl border border-base-300">
@@ -173,7 +223,7 @@
                 <div class="stat-title text-base">Documenti & Chunk</div>
                 <div class="stat-value text-lg">File - Chunk</div>
                 <div class="text-sm opacity-70">
-                    Modello Entity(DucumentFile + DocumentChunk) dedicato a file, hash, chunk e embedding
+                    Modello Entity(DocumentFile + DocumentChunk) dedicato a file, hash, chunk e embedding
                 </div>
             </div>
         </section>
@@ -265,6 +315,11 @@
                                 </div>
                             </li>
                         </ul>
+
+                        <p class="text-sm opacity-70">
+                            Ogni servizio è pensato per essere sostituibile (es. nuovo modello embedding,
+                            nuovo backend AI) senza toccare il resto del sistema.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -371,7 +426,7 @@
         {# QUICKSTART / COMMANDS #}
         <section id="quickstart" class="space-y-4 lg:space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
-                <h2 class="text-xl sm:text-2xl font-bold">Quickstart · indicizzazione & comandi</h2>
+                <h2 class="text-xl sm:text-2xl font-bold">Quickstart · indicizzazione &amp; comandi</h2>
                 <span class="badge badge-secondary badge-outline self-start sm:self-auto">
                     CLI · Symfony console
                 </span>
@@ -380,7 +435,7 @@
             <div class="grid gap-6 lg:grid-cols-[minmax(0,1.1fr),minmax(0,0.9fr)]">
                 <div class="card bg-base-100 border border-base-300">
                     <div class="card-body space-y-4">
-                        <h3 class="card-title text-lg">1 · Setup & migrazioni</h3>
+                        <h3 class="card-title text-lg">1 · Setup &amp; migrazioni</h3>
                         <p class="text-sm opacity-80">
                             Dipendenze principali (oltre a Symfony):
                         </p>
@@ -515,11 +570,11 @@
                         <pre data-prefix=" "><code>{ "error": "Messaggio vuoto" }</code></pre>
                     </div>
 
-                    <p class="text-sm] opacity-70">
+                    <p class="text-sm opacity-70">
                         Modalità e backend sono controllati da variabili ambiente:
                         <code>AI_BACKEND</code>,
                         <code>APP_AI_TEST_MODE</code>,
-                        <code>APP_AI_OFFLINE_FALLBACK</code>. 
+                        <code>APP_AI_OFFLINE_FALLBACK</code>.
                     </p>
                 </div>
 
@@ -580,6 +635,109 @@
             <button class="btn btn-xs btn-outline"
                     onclick="document.getElementById('modal-elara-api-guide').showModal()">
                 <code>ElaRA - Guida API</code>
+            </button>
+        </div>
+
+        {# CONFIG & ENV #}
+        <section id="config-env" class="space-y-4 lg:space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                <h2 class="text-xl sm:text-2xl font-bold">Configurazione &amp; variabili ambiente</h2>
+                <span class="badge badge-outline self-start sm:self-auto">
+                    Deploy · Tuning · Sicurezza
+                </span>
+            </div>
+
+            <div class="grid gap-6 lg:grid-cols-[minmax(0,1.15fr),minmax(0,0.85fr)]">
+                <div class="card bg-base-100 border border-base-300">
+                    <div class="card-body space-y-3 text-sm">
+                        <h3 class="card-title text-base">Variabili chiave (.env.local)</h3>
+                        <div class="overflow-x-auto">
+                            <table class="table table-xs sm:table-sm">
+                                <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Descrizione</th>
+                                    <th>Esempio</th>
+                                </tr>
+                                </thead>
+                                <tbody class="align-top">
+                                <tr>
+                                    <td><code>AI_BACKEND</code></td>
+                                    <td>Seleziona il backend AI da usare per le risposte.</td>
+                                    <td><code>ollama</code> · <code>openai</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>OLLAMA_CHAT_MODEL | OPENAI_CHAT_MODEL</code></td>
+                                    <td>Modello di chat principale.</td>
+                                    <td><code>llama3.1:8b</code> | <code>gpt-4.1-mini</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>OLLAMA_EMBED_MODEL | OPENAI_EMBED_MODEL</code></td>
+                                    <td>Modello usato per generare gli embedding dei chunk.</td>
+                                    <td><code>bge-m3</code> | <code>text-embedding-3-small</code> (1024 | 1536 dim)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>APP_AI_TEST_MODE</code></td>
+                                    <td>Se <code>true</code>, restituisce direttamente i chunk invece di chiamare l’AI.</td>
+                                    <td><code>0</code> / <code>1</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>APP_AI_OFFLINE_FALLBACK</code></td>
+                                    <td>Abilita risposta basata solo sui chunk in caso di errore del backend.</td>
+                                    <td><code>0</code> / <code>1</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>DATABASE_URL</code></td>
+                                    <td>Connessione PostgreSQL con estensione <code>vector</code> attiva.</td>
+                                    <td><code>postgresql://...</code></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="w-full text-xs">
+                            Documenti di riferimento:
+                            <button class="btn btn-xs btn-outline"
+                                    onclick="document.getElementById('modal-elara-analisi').showModal()">
+                                <code>ElaRA - Analisi Tecnica</code>
+                            </button>
+                            <button class="btn btn-xs btn-outline"
+                                    onclick="document.getElementById('modal-elara-chunking-embedding').showModal()">
+                                <code>ElaRA - Guida Chunking Embedding</code>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300">
+                    <div class="card-body space-y-3 text-sm">
+                        <h3 class="card-title text-base">Profili di esecuzione</h3>
+                        <ul class="list-disc list-inside opacity-80 space-y-1">
+                            <li><strong>Profilo sviluppo:</strong> backend AI locale (Ollama),
+                                <code>APP_AI_TEST_MODE=1</code> per validare retrieval.</li>
+                            <li><strong>Profilo demo:</strong> backend AI stabile (OpenAI o modello Ollama “veloce”),
+                                logging verbose per la pipeline.</li>
+                            <li><strong>Profilo produzione:</strong> autenticazione su <code>/api/chat</code>,
+                                monitoraggio indice pgvector e scheduler di re-indicizzazione.</li>
+                        </ul>
+
+                        <div class="alert alert-warning text-xs">
+                            <span class="font-semibold">Nota:</span>
+                            <div>
+                                cambiare modello di embedding richiede coerenza con la dimensione della colonna 
+                                <code><b><i>vector</i></b></code> e, se necessario, una re-indicizzazione.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="w-full text-xs">
+            Documenti di riferimento:
+            <button class="btn btn-xs btn-outline"
+                    onclick="document.getElementById('modal-elara-parametri-risposte').showModal()">
+                <code>ElaRA - Parametri Qualità Risposte</code>
             </button>
         </div>
 
@@ -659,7 +817,7 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
                 <h2 class="text-xl sm:text-2xl font-bold">Linee guida RAG · Chunk, top_k, embedding</h2>
                 <span class="badge badge-outline self-start sm:self-auto">
-                    Performance & Qualità
+                    Performance &amp; Qualità
                 </span>
             </div>
 
@@ -687,7 +845,7 @@
 
                 <div class="card bg-base-100 border border-base-300">
                     <div class="card-body space-y-3">
-                        <h3 class="card-title text-base">pgvector & indici vettoriali</h3>
+                        <h3 class="card-title text-base">pgvector &amp; indici vettoriali</h3>
                         <ul class="text-sm opacity-80 list-disc list-inside space-y-1">
                             <li><strong>HNSW</strong>: scelta raccomandata per dataset medio/piccoli.</li>
                             <li><strong>IVF-FLAT</strong>: utile solo su milioni di chunk
@@ -718,7 +876,7 @@
             </button>
             <button class="btn btn-xs btn-outline"
                     onclick="document.getElementById('modal-elara-chunking-embedding').showModal()">
-                <code>ElaRA - Chunking & Embedding Guidelines</code>
+                <code>ElaRA - Guida Chunking Embedding</code>
             </button>
             <button class="btn btn-xs btn-outline"
                     onclick="document.getElementById('modal-elara-parametri-risposte').showModal()">
@@ -727,9 +885,9 @@
         </div>
 
         {# ROADMAP / STATO PROGETTO #}
-        <section id="roadmap" class="space-y-4 lg:space-y-6 pb-4">
+        <section id="roadmap" class="space-y-4 lg:space-6 pb-4">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
-                <h2 class="text-xl sm:text-2xl font-bold">Stato del progetto & Roadmap</h2>
+                <h2 class="text-xl sm:text-2xl font-bold">Stato del progetto &amp; Roadmap</h2>
                 <span class="badge badge-warning badge-outline self-start sm:self-auto">
                     Work in progress
                 </span>
@@ -744,6 +902,8 @@
                             <li>Command Symfony per indicizzare, elencare e rimuovere documenti.</li>
                             <li>Supporto backend AI multipli (Ollama / OpenAI) configurabili da ENV.</li>
                             <li>Integrazione PostgreSQL + pgvector con indice HNSW su embedding.</li>
+                            <li>Landing page per la presentazione del progetto.</li>
+                            <li>Interfaccia grafica minimale per il chatbot (UI web dedicata).</li>
                             <li>Documentazione tecnica, guida RAG e guida utente prompt.</li>
                         </ul>
                     </div>
@@ -757,13 +917,8 @@
                             <li>Interfaccia grafica avanzata per il chatbot (UI web dedicata).</li>
                             <li>Backoffice / Admin (es. EasyAdmin) per upload e gestione file.</li>
                             <li>Scheduler per automatizzare indicizzazione documenti caricati.</li>
-                            <li>Dashboard runtime (Turbo Frame) con stato indice e backend AI.</li>
+                            <li>Dashboard runtime per monitoraggio stato indice e AI Backend.</li>
                         </ul>
-                        <p class="text-xs opacity-70">
-                            Questa pagina funge da “landing tecnica” per presentare ELaRA
-                            a sviluppatori e stakeholder, mantenendo allineata documentazione
-                            e implementazione.
-                        </p>
                     </div>
                 </div>
             </div>
@@ -799,7 +954,7 @@
 
 {{ component('markdown_modal', {
     id: 'modal-elara-chunking-embedding',
-    title: 'ELaRA — Chunking & Embedding Guideline',
+    title: 'ELaRA — Guida Chunking Embedding',
     markdownFile: 'docs/guida_rag_chunking_embedding.md'
 }) }}
 
@@ -820,8 +975,6 @@
     title: 'ELaRA — Guida al Prompt',
     markdownFile: 'docs/elara_guida_utente_prompt.md'
 }) }}
-
-modal-elara-api-guide
 
 {{ component('markdown_modal', {
     id: 'modal-elara-api-guide',

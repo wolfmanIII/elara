@@ -6,50 +6,6 @@ L’obiettivo è offrire una panoramica chiara, strutturata e dettagliata dell�
 
 ---
 
-# 📚 Indice
-- [ELARA — Analisi Tecnica Completa](#elara--analisi-tecnica-completa)
-- [📚 Indice](#-indice)
-- [1. Panoramica Generale](#1-panoramica-generale)
-- [2. Architettura del Progetto](#2-architettura-del-progetto)
-- [3. Pipeline di Indicizzazione](#3-pipeline-di-indicizzazione)
-    - [Passi dettagliati](#passi-dettagliati)
-- [4. DocumentTextExtractor](#4-documenttextextractor)
-    - [Formati supportati](#formati-supportati)
-    - [Normalizzazione applicata](#normalizzazione-applicata)
-    - [Obiettivo](#obiettivo)
-- [5. Chunking: Strategia e Implementazione](#5-chunking-strategia-e-implementazione)
-    - [Parametri consigliati](#parametri-consigliati)
-- [6. Modelli di Embedding](#6-modelli-di-embedding)
-    - [Dimensionalità tipiche](#dimensionalità-tipiche)
-    - [Motivazione della scelta 1024](#motivazione-della-scelta-1024)
-- [7. Persistenza con PostgreSQL e pgvector](#7-persistenza-con-postgresql-e-pgvector)
-  - [DocumentFile](#documentfile)
-  - [DocumentChunk](#documentchunk)
-- [8. Indici Vettoriali: HNSW e IVF-FLAT](#8-indici-vettoriali-hnsw-e-ivf-flat)
-  - [HNSW (consigliato)](#hnsw-consigliato)
-  - [IVF-FLAT (solo per dataset enormi)](#ivf-flat-solo-per-dataset-enormi)
-- [9. Ricerca Vettoriale e Retrieval](#9-ricerca-vettoriale-e-retrieval)
-    - [Configurazioni](#configurazioni)
-- [10. ChatbotService: Flusso di Generazione Risposte](#10-chatbotservice-flusso-di-generazione-risposte)
-    - [Modalità speciali](#modalità-speciali)
-- [11. Prompt Engineering](#11-prompt-engineering)
-- [12. Backend AI: Ollama e OpenAI](#12-backend-ai-ollama-e-openai)
-    - [Ollama](#ollama)
-    - [OpenAI](#openai)
-- [13. Controller API e Flussi REST](#13-controller-api-e-flussi-rest)
-- [14. Parametri che Influenzano la Qualità delle Risposte](#14-parametri-che-influenzano-la-qualità-delle-risposte)
-- [15. Command Disponibili](#15-command-disponibili)
-    - [`app:index-docs`](#appindex-docs)
-    - [`app:list-docs`](#applist-docs)
-    - [`app:unindex-file`](#appunindex-file)
-- [16. Considerazioni su Performance e Scalabilità](#16-considerazioni-su-performance-e-scalabilità)
-    - [Per dataset piccoli/medi](#per-dataset-piccolimedi)
-    - [Per dataset enormi (\>1M chunk)](#per-dataset-enormi-1m-chunk)
-    - [Hardware](#hardware)
-- [17. Conclusione Tecnica](#17-conclusione-tecnica)
-
----
-
 # 1. Panoramica Generale
 ELARA è un **motore RAG (Retrieval-Augmented Generation)** scritto in Symfony 7.3, che consente di:
 

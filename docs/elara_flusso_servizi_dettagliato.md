@@ -4,20 +4,6 @@ L’obiettivo è descrivere **in modo chiaro, esaustivo e moderno** il funzionam
 
 ---
 
-# 📚 Indice
-1. [Panoramica dei Servizi](#panoramica-dei-servizi)
-2. [AiClientInterface e Implementazioni](#aiclientinterface-e-implementazioni)
-3. [DocumentTextExtractor](#documenttextextractor)
-4. [ChunkingService](#chunkingservice)
-5. [DocumentChunkRepository](#documentchunkrepository)
-6. [PgvectorIvfflatMiddleware](#pgvectorivfflatmiddleware)
-7. [ChatbotService](#chatbotservice)
-8. [Servizi ausiliari e pipeline di supporto](#servizi-ausiliari-e-pipeline-di-supporto)
-9. [Diagramma dei servizi](#diagramma-dei-servizi)
-10. [Conclusione](#conclusione)
-
----
-
 # 1. Panoramica dei Servizi
 I servizi in ELARA sono organizzati per responsabilità verticali e indipendenti. Ogni servizio è progettato per essere:
 - **autonomo**,

@@ -4,37 +4,6 @@ L’obiettivo è offrire una descrizione chiara, completa e strutturata del **fl
 
 ---
 
-# 📚 Indice
-- [ELARA — Flusso Applicativo Completo e Aggiornato](#elara--flusso-applicativo-completo-e-aggiornato)
-- [📚 Indice](#-indice)
-- [1. Panoramica generale](#1-panoramica-generale)
-- [2. Schema del flusso applicativo](#2-schema-del-flusso-applicativo)
-- [3. Fase 1 — Acquisizione e gestione dei file](#3-fase-1--acquisizione-e-gestione-dei-file)
-- [4. Fase 2 — Estrazione e normalizzazione del testo](#4-fase-2--estrazione-e-normalizzazione-del-testo)
-  - [Formati supportati](#formati-supportati)
-  - [Normalizzazioni applicate](#normalizzazioni-applicate)
-- [5. Fase 3 — Chunking avanzato](#5-fase-3--chunking-avanzato)
-    - [Caratteristiche principali](#caratteristiche-principali)
-    - [Parametri consigliati](#parametri-consigliati)
-- [6. Fase 4 — Generazione embedding](#6-fase-4--generazione-embedding)
-- [7. Fase 5 — Persistenza e struttura dati](#7-fase-5--persistenza-e-struttura-dati)
-  - [DocumentFile](#documentfile)
-  - [DocumentChunk](#documentchunk)
-- [8. Fase 6 — Costruzione o aggiornamento dell’indice vettoriale](#8-fase-6--costruzione-o-aggiornamento-dellindice-vettoriale)
-  - [✔ HNSW (consigliato)](#-hnsw-consigliato)
-  - [✔ IVF-FLAT (solo dataset enormi)](#-ivf-flat-solo-dataset-enormi)
-- [9. Fase 7 — Workflow API /api/chat](#9-fase-7--workflow-api-apichat)
-- [10. Fase 8 — Retrieval e costruzione del contesto](#10-fase-8--retrieval-e-costruzione-del-contesto)
-    - [Obiettivo](#obiettivo)
-- [11. Fase 9 — Generazione della risposta tramite LLM](#11-fase-9--generazione-della-risposta-tramite-llm)
-- [12. Fallback: Test mode \& Offline mode](#12-fallback-test-mode--offline-mode)
-  - [Test mode](#test-mode)
-  - [Offline fallback](#offline-fallback)
-- [13. Flusso completo riassunto](#13-flusso-completo-riassunto)
-- [14. Conclusione](#14-conclusione)
-
----
-
 # 1. Panoramica generale
 ELARA implementa un sistema completo di **Retrieval-Augmented Generation (RAG)**, in cui:
 - i documenti vengono indicizzati in forma strutturata,

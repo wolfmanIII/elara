@@ -4,17 +4,6 @@ Questo documento raccoglie in un'unica sede tutti i parametri di configurazione 
 
 ---
 
-# 📚 Indice
-1. [Introduzione](#introduzione)
-2. [Parametri del Backend AI](#parametri-del-backend-ai)
-3. [Parametri di Chunking](#parametri-di-chunking)
-4. [Parametri della Ricerca Vettoriale (Retrieval)](#parametri-della-ricerca-vettoriale-retrieval)
-5. [Parametri del Prompt e del ChatbotService](#parametri-del-prompt-e-del-chatbotservice)
-6. [Parametri di Qualità dei Documenti Indicizzati](#parametri-di-qualità-dei-documenti-indicizzati)
-7. [Riepilogo finale](#riepilogo-finale)
-
----
-
 # 1. Introduzione
 La qualità della risposta generata da un motore RAG dipende dall’interazione di più componenti: il modello AI, il chunking, l’indice vettoriale, la pipeline del retrieval e la qualità dell’estrazione del testo.
 
