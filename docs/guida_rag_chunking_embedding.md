@@ -6,7 +6,7 @@ Questo documento riassume in forma ordinata e chiara le raccomandazioni per:
 - **numero massimo di risultati (top_k)** nella query di cosine similarity
 - valori consigliati per differenti **dimensioni del vettore embedding**: 384, 768, 1024, 1536.
 
-Include inoltre note operative utili per il tuo setup self‑hosted (WSL2 + 16GB RAM + pgvector + Ollama).
+Include inoltre note operative utili per il setup self‑hosted (16GB RAM no GPU + pgvector + Ollama).
 
 ---
 
@@ -76,7 +76,7 @@ Con embedding **768** + modello chat 8B:
 - **token totali contesto**: ~1200–1500 token
 
 Questo bilancia qualità del retrieval e performance, evitando timeout e surriscaldamenti.  
->*Nell'implementazione di ELARA, per problemi di Ollama 0.13.1(latest) [`GitHub`]("https://github.com/ollama/ollama/issues/13340") sul modello nomic-text_embed, sono stato costretto ad usare il modello bge-m3, che utilizza vettori a 1024*
+>*Nell'implementazione di ELARA, per problemi di Ollama 0.13.1(latest) [`GitHub`]("https://github.com/ollama/ollama/issues/13340") sul modello nomic-text-embed, sono stato costretto ad usare il modello bge-m3, che utilizza vettori a 1024*
 
 ---
 # 🛠️ 5. Considerazioni aggiuntive
@@ -653,7 +653,7 @@ Rispondi in modo chiaro e sintetico nella lingua dell'utente.
 
 ---
 
-# 🗄️ 11. È utile usare **IV-FFlat + HNSW insieme?**
+# 🗄️ 11. È utile usare **IVF-FLAT + HNSW insieme?**
 
 ## ❌ Risposta breve
 Per un sistema RAG **self‑hosted**, con **16 GB di RAM** e dataset di dimensioni medio‑piccole (documentazione, lore, manuali), **NO**: usare **entrambi gli indici** sulla stessa colonna di embedding **non è né necessario né utile**.
@@ -662,7 +662,7 @@ Un solo indice — **HNSW** — è la scelta corretta nel 99% dei casi.
 
 ---
 
-# 🧩 11.1. Differenze tra IVF-Flat e HNSW
+# 🧩 11.1. Differenze tra IVF-FLAT e HNSW
 
 ## 🔹 HNSW
 **Ideale per:** dataset piccoli/medi (fino a milioni moderati), contesti RAG.
@@ -678,7 +678,7 @@ Un solo indice — **HNSW** — è la scelta corretta nel 99% dei casi.
 
 ---
 
-## 🔹 IVF-Flat
+## 🔹 IVF-FLAT
 **Ideale per:** dataset **molto grandi** (milioni di embedding).
 
 **Pro:**
@@ -694,20 +694,20 @@ Un solo indice — **HNSW** — è la scelta corretta nel 99% dei casi.
 
 # 🧠 11.2. Perché NON usarli insieme
 
-Avere **due indici** (HNSW + IVFFlat) sulla stessa colonna comporta:
+Avere **due indici** (HNSW + IVF-FLAT) sulla stessa colonna comporta:
 
 ### ❗ Problemi
 - **Più spazio su disco**
 - **Planner meno prevedibile** (Postgres può scegliere l'indice peggiore)
 - **Build più lente**
 - **Manutenzione raddoppiata**
-- **Recall instabile** se IVF-Flat non è configurato bene
+- **Recall instabile** se IVF-FLAT non è configurato bene
 
 ### 👍 In questo contesto
 - Dataset non enorme
 - Self‑hosting 16GB RAM senza GPU
 - Performance già buone con HNSW
-- Nessuna necessità di clusterizzazione (IV-FFlat)
+- Nessuna necessità di clusterizzazione (IV-FFLAT)
 
 👉 **Conclusione:** usare entrambi è overkill e rischia di peggiorare la qualità.
 
@@ -722,7 +722,7 @@ ON document_chunk
 USING hnsw (embedding vector_cosine_ops);
 ```
 
-### Quando considerare IVF-Flat?
+### Quando considerare IVF-FLAT?
 Solo se:
 - superi **1–2 milioni di chunk**
 - e hai problemi di latenza sulla similarity

@@ -27,7 +27,7 @@ L’obiettivo principale è quello di:
 
 - confrontare testi tra loro  
 - misurare similarità semantica  
-- alimentare indici vettoriali (come FAISS, HNSW, pgvector)  
+- alimentare indici vettoriali (come IVF-FLAT, HNSW, pgvector)  
 - supportare pipeline di **Retrieval-Augmented Generation (RAG)**  
 
 ## 1.2 Caratteristiche dei modelli di embedding
