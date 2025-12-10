@@ -141,17 +141,17 @@ I chunk vengono memorizzati in due tabelle:
 # 8. Indici Vettoriali: HNSW e IVF-FLAT
 Due possibili indici vettoriali, entrambi supportati da pgvector.
 
-## HNSW (consigliato)
+## HNSW (ideale per dataset di piccole medie dimensioni)
 - Alta precisione
 - Ottime performance
 - Zero tuning
 
-## IVF-FLAT (solo per dataset enormi)
+## IVF-FLAT (solo per dataset di grandi dimensioni)
 - Richiede tuning (lists/probes)
 - Necessita REINDEX dopo grandi batch
 - Recall più bassa se configurato male
 
-ELARA supporta entrambi ma **sconsiglia vivamente l’uso simultaneo**.
+ELARA supporta entrambi ma **si sconsiglia vivamente l’uso simultaneo**.
 
 ---
 

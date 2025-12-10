@@ -131,11 +131,11 @@ ON document_chunk USING hnsw (embedding vector_cosine_ops);
 - HNSW è molto più veloce dell’IVF-Flat, specialmente su dataset medi (< 500k chunk).
 
 ### Quando usare IVF-Flat
-- Solo se si hanno **milioni** di chunk.
+- Solo se si hanno **milioni** di chunk, dataset di grandi dimensioni.
 - Richiede `REINDEX` quando si aggiungono molti dati.
 - Va calibrato con `lists = 100–200`.
 
-### Vacuum & manutenzione
+### Vacuum & manutenzione(IVF-Flat)
 ```sql
 VACUUM ANALYZE document_chunk;
 ```

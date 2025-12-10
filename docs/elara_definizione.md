@@ -44,7 +44,7 @@ Dietro le quinte ELARA fa un lavoro piuttosto sofisticato, ma nascosto all’ute
 * Indicizza i documenti che mettiamo in una cartella dedicata (/var/knowledge)
 * Li converte in testo pulito, rimuovendo formattazioni strane, emoji e rumore
 * Li spezza in “chunk” e genera per ognuno l’embedding, cioè la rappresentazione numerica del significato
-* Salva tutto in PostgreSQL, usando l’estensione pgvector e un indice IVF-FLAT | **HNSW** per mantenere le ricerche veloci anche con molti documenti
+* Salva tutto in PostgreSQL, usando l’estensione pgvector e un indice **HNSW** | IVF-FLAT per mantenere le ricerche veloci anche con molti documenti
 * Quando arriva una domanda via API /api/chat, la passa al ChatbotService, che:
 * crea l’embedding della domanda
 * cerca i chunk più simili
@@ -133,6 +133,8 @@ Nel nostro progetto:
 * creiamo un indice IVF-FLAT sulla colonna embedding della tabella document_chunk
 * usiamo un middleware (PgvectorIvfflatMiddleware) per impostare il numero di “sonde” (quanti cluster visitare), bilanciando velocità e precisione
 
+In generale l'indice IVF-FLAT è ideale per dataset di grandi dimensioni, ma richiede tuning e più manutenzione.
+
 ### **HSWM**  
 [Github](https://github.com/pgvector/pgvector#hnsw)  
 HNSW significa Hierarchical Navigable Small World.
@@ -151,6 +153,8 @@ Quando fai una domanda:
 È come cercare un libro in una biblioteca già ordinata, invece che sfogliare ogni libro uno per uno.
 
 > HNSW è un indice che permette a pgvector di trovare rapidamente gli embedding più simili alla tua domanda, rendendo il motore RAG veloce, preciso e scalabile(il tutto è sempre relativo al hardware che si ha a disposizione).
+
+In generale l'indice HMSW è ideale per data set di piccole e medie dimensioni, non richiede nessun tuning.
 
 ***Attenzione, non è utile avere due indici vettoriali diversi sullo stesso campo, è solo uno spreco di spazio e di tempo in scrittura.***
 
@@ -194,7 +198,7 @@ Nel codice di ELARA, quando usiamo la funzione cosine_similarity in DQL, sotto s
    * il testo viene ripulito e spezzato in chunk
    * per ogni chunk chiamiamo l’AiClient per ottenere l’embedding
    * Doctrine salva i chunk con il loro embedding in PostgreSQL
-   * l’indice IVF-FLAT | **HNSW** viene creato/aggiornato
+   * l’indice **HNSW** | IVF-FLAT viene creato/aggiornato
 2. Domanda utente (API /api/chat)
    * ChatbotService crea l’embedding della domanda
    * con il repository DocumentChunkRepository esegue una query “top K simili”
