@@ -44,6 +44,8 @@ final class IndexDocsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $startedAt = microtime(true);
+
         $forceReindex    = (bool) $input->getOption('force-reindex');
         $dryRun          = (bool) $input->getOption('dry-run');
         $testMode        = (bool) $input->getOption('test-mode');
@@ -59,10 +61,10 @@ final class IndexDocsCommand extends Command
 
         $output->writeln(sprintf(
             '  force-reindex: %s, dry-run: %s, test-mode: %s, offline-fallback: %s',
-            $forceReindex ? 'yes' : 'no',
-            $dryRun ? 'yes' : 'no',
-            $testMode ? 'yes' : 'no',
-            $offlineFallback ? 'yes' : 'no',
+            $forceReindex ? 'si' : 'no',
+            $dryRun ? 'si' : 'no',
+            $testMode ? 'si' : 'no',
+            $offlineFallback ? 'si' : 'no',
         ));
 
         if ($pathsFilter !== []) {
@@ -117,17 +119,24 @@ final class IndexDocsCommand extends Command
         }
 
         // Riepilogo finale
+        $elapsedSeconds = microtime(true) - $startedAt;
+
         $output->writeln(sprintf(
-            '<comment>Trovati: %d file | Processati: %d | Indicizzati: %d | Skippati: %d | Falliti: %d</comment>',
+            '<comment>Trovati: %d file | Processati: %d | Indicizzati: %d | Skippati: %d | Falliti: %d | Tempo: %.2fs</comment>',
             $summary->totalFilesFound,
             $summary->totalProcessed,
             $summary->totalIndexed,
             $summary->totalSkipped,
             $summary->totalFailed,
+            $elapsedSeconds,
         ));
 
         // Dettaglio per file in modalità verbose
         if ($output->isVerbose()) {
+            $output->writeln(sprintf(
+                '<info>Durata totale:</info> %s',
+                $this->formatDuration($elapsedSeconds)
+            ));
             foreach ($summary->files as $fileResult) {
                 $statusLabel = match ($fileResult->status) {
                     FileIndexStatus::INDEXED_OK          => '<info>INDEXED</info>',
@@ -152,5 +161,14 @@ final class IndexDocsCommand extends Command
         return $summary->totalFailed > 0
             ? Command::FAILURE
             : Command::SUCCESS;
+    }
+
+    private function formatDuration(float $seconds): string
+    {
+        $hours = (int) floor($seconds / 3600);
+        $minutes = (int) floor(($seconds % 3600) / 60);
+        $secs = $seconds - ($hours * 3600) - ($minutes * 60);
+
+        return sprintf('%02d:%02d:%05.2f', $hours, $minutes, $secs);
     }
 }

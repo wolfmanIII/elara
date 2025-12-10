@@ -20,7 +20,7 @@ class AiClientFactory
                 embedModel: $_ENV['OLLAMA_EMBED_MODEL'] ?? 'bge-m3',
                 chatModel: $_ENV['OLLAMA_CHAT_MODEL'] ?? 'qwen2.5:3b-instruct-q4_K_M',
                 chatModelDeep: $_ENV['OLLAMA_EMBED_MODEL_DEEP'] ?? 'llama3.1:8b',
-                dimension: $_ENV["OLLAMA_EMBED_DIMENSION"] ?? "1024"
+                dimension: $_ENV["OLLAMA_EMBED_DIMENSION"] ?? 1024
             ),
 
             'openai' => new OpenAiClient(

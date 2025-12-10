@@ -8,7 +8,7 @@ class OpenAiClient implements AiClientInterface
 {
     public function __construct(
         private string $apiKey,
-        private string $chatModel = 'gpt-5.1-mini',
+        private string $chatModel = 'gpt-4.1-mini',
         private string $embedModel = 'text-embedding-3-small',
         private int $dimension,
     ) {}

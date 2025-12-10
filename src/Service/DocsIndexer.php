@@ -20,7 +20,6 @@ use App\AI\AiClientInterface;
  * - calcolare embedding
  * - salvare DocumentFile + DocumentChunk
  *
- * NON conosce Console, OutputInterface o ProgressBar.
  */
 final class DocsIndexer
 {
@@ -195,6 +194,20 @@ final class DocsIndexer
         // Estrzione testo
         try {
             $text = $this->extractor->extract($absolutePath);
+
+            // Formato non supportato o non leggibile: lo segno come skip esplicito
+            if ($text === null) {
+                return new IndexedFileResult(
+                    $absolutePath,
+                    $relativePath,
+                    $extension,
+                    FileIndexStatus::SKIPPED_EXCLUDED,
+                    wasReindexed: $wasReindexed,
+                    wasNew: $wasNew,
+                    chunksCount: 0,
+                    errorMessage: 'Formato non supportato o file non leggibile',
+                );
+            }
         } catch (\Throwable $e) {
             return new IndexedFileResult(
                 $absolutePath,
@@ -204,7 +217,7 @@ final class DocsIndexer
                 wasReindexed: $wasReindexed,
                 wasNew: $wasNew,
                 chunksCount: 0,
-                errorMessage: 'Text extraction failed: ' . $e->getMessage(),
+                errorMessage: 'Estrazione del testo fallita ' . $e->getMessage(),
             );
         }
 
@@ -254,8 +267,8 @@ final class DocsIndexer
             $embedding = null;
 
             if ($testMode) {
-                // In testMode potresti decidere di non generare embedding,
-                // o generarne uno fake, o altro.
+                // In testMode potrei decidere di non generare embedding,
+                // o generarne uno fake, o altro, per adesso non genero nessun embedding.
                 $embedding = null;
             } else {
                 try {
@@ -273,7 +286,7 @@ final class DocsIndexer
                             wasReindexed: $wasReindexed,
                             wasNew: $wasNew,
                             chunksCount: $index,
-                            errorMessage: 'Embedding failed: ' . $e->getMessage(),
+                            errorMessage: 'Embedding fallito: ' . $e->getMessage(),
                         );
                     }
                 }
@@ -299,7 +312,7 @@ final class DocsIndexer
             wasReindexed: $wasReindexed,
             wasNew: $wasNew,
             chunksCount: $chunksCount,
-            errorMessage: $hadErrors ? 'Some chunks used offline fallback embedding' : null,
+            errorMessage: $hadErrors ? 'Su alcuni file, per gli embedding è stata usata la modolità offline fallback' : null,
         );
     }
 
@@ -372,7 +385,7 @@ final class DocsIndexer
     private function fakeEmbeddingFromText(string $text): array
     {
         // TODO: adatta la dimensione al tuo modello (es. 384 / 768 / 1024 / 1536 ecc.)
-        $dimension = 384;
+        $dimension = 1024;
 
         return array_fill(0, $dimension, 0.0);
     }

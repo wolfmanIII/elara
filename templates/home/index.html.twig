@@ -77,14 +77,6 @@
             </div>
         </section>
 
-        <div class="w-full text-xs">
-            Documenti di riferimento:
-            <button class="btn btn-xs btn-outline"
-                    onclick="document.getElementById('modal-elara-definizione').showModal()">
-                <code>ElaRA - Definizione</code>
-            </button>
-        </div>
-
         {# NAV INTERNA ALLA PAGINA #}
         <section class="sticky top-16 z-10 bg-base-200/90 backdrop-blur border-y border-base-300 py-3">
             <div class="flex flex-wrap gap-2 sm:gap-3 text-sm justify-center lg:justify-start">
@@ -146,6 +138,13 @@
                 </div>
             </div>
         </section>
+
+        <div class="w-full text-xs">
+            <button class="btn btn-xs btn-outline"
+                    onclick="document.getElementById('modal-elara-definizione').showModal()">
+                <code>ElaRA - Definizione</code>
+            </button>
+        </div>
 
         {# VALUE PROP / PERSONE #}
         <section id="value-prop" class="space-y-4 lg:space-y-6">
@@ -889,6 +888,31 @@
                     onclick="document.getElementById('modal-elara-parametri-risposte').showModal()">
                 <code>ElaRA - Parametri Qualità Risposte</code>
             </button>
+
+            <div class="w-full text-xs mt-10">
+                <div class="mt-3 w-full text-sm mb-5">
+                    <div class="card bg-base-100 border border-base-300 shadow-sm">
+                        <div class="card-body p-4 space-y-2">
+                            <div class="flex items-center gap-2">
+                                <span class="badge badge-info badge-sm">Ollama</span>
+                                <span class="font-semibold text-sm">Guida Ubuntu 22 | 24 (servizio + GPU)</span>
+                            </div>
+                            <ul class="list-disc list-inside space-y-1 text-xs sm:text-sm opacity-80">
+                                <li>Installazione come servizio systemd (`curl -fsSL https://ollama.com/install.sh | sh`).</li>
+                                <li>Abilitare Vulkan o CUDA via override `systemctl edit ollama` con variabili `OLLAMA_BACKEND`.</li>
+                                <li>Pull e run modelli: `ollama pull llama3.1:8b`, `ollama pull bge-m3`, `ollama run ...`.</li>
+                                <li>Log e troubleshooting: `journalctl -u ollama -f` e override verificato con `systemctl show ollama | grep OLLAMA`.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                Documenti di riferimento:
+                <button class="btn btn-xs btn-outline"
+                        onclick="document.getElementById('modal-ollama').showModal()">
+                    <code>Guida Ollama Backend</code>
+                </button>
+            </div>
+
         </div>
 
         {# ROADMAP / STATO PROGETTO #}
@@ -939,6 +963,12 @@
     id: 'modal-elara-definizione',
     title: 'ELaRA — Definizione',
     markdownFile: 'docs/elara_definizione.md'
+}) }}
+
+{{ component('markdown_modal', {
+    id: 'modal-ollama',
+    title: 'ELaRA — Guida Ollama Backend',
+    markdownFile: 'docs/ollama_ubuntu_24_04_guida.md'
 }) }}
 
 {{ component('markdown_modal', {
