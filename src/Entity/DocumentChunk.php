@@ -27,6 +27,9 @@ class DocumentChunk
     #[ORM\Column(type: 'vector', length: 1024)]
     private array $embedding = [];
 
+    #[ORM\Column(type: 'boolean', options: ['default' => true])]
+    private bool $searchable = true;
+
     public function __construct()
     {
         $this->id = Uuid::v7();
@@ -78,6 +81,17 @@ class DocumentChunk
     public function setEmbedding(array $embedding): self
     {
         $this->embedding = $embedding;
+        return $this;
+    }
+
+    public function isSearchable(): bool
+    {
+        return $this->searchable;
+    }
+
+    public function setIsSearchable(bool $searchable): self
+    {
+        $this->searchable = $searchable;
         return $this;
     }
 }

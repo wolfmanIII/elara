@@ -217,4 +217,9 @@ TXT;
         //return $data['response'] . "\n\n" . $context ?? '';
         return $data['response'] ?? '';
     }
+
+    public function getEmbeddingDimension(): int
+    {
+        return $this->dimension;
+    }
 }

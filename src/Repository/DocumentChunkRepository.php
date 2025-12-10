@@ -59,6 +59,7 @@ class DocumentChunkRepository extends ServiceEntityRepository
             ->addSelect('cosine_similarity(c.embedding, :vec) AS similarity')
             ->join('c.file', 'f')
             ->where('c.embedding IS NOT NULL')
+            ->andWhere('c.searchable = true')
             ->andWhere('cosine_similarity(c.embedding, :vec) > :minScore')
             ->orderBy('similarity', 'DESC')
             ->setMaxResults($k)

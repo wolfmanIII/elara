@@ -56,4 +56,9 @@ TXT;
 
         return $resp->choices[0]->message->content ?? '';
     }
+
+    public function getEmbeddingDimension(): int
+    {
+        return $this->dimension;
+    }
 }

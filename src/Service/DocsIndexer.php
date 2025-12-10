@@ -23,12 +23,17 @@ use App\AI\AiClientInterface;
  */
 final class DocsIndexer
 {
+    private const HASH_NORMALIZER = 4294967295;
+
+    private int $embeddingDimension;
+
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly DocumentTextExtractor $extractor,
         private readonly ChunkingService $chunking,
         private readonly AiClientInterface $embeddingClient,
     ) {
+        $this->embeddingDimension = $this->embeddingClient->getEmbeddingDimension();
     }
 
     /**
@@ -264,18 +269,21 @@ final class DocsIndexer
         $hadErrors = false;
 
         foreach ($chunks as $index => $chunkText) {
-            $embedding = null;
-
+            $isPlaceholder = false;
             if ($testMode) {
-                // In testMode potrei decidere di non generare embedding,
-                // o generarne uno fake, o altro, per adesso non genero nessun embedding.
-                $embedding = null;
+                $embedding = $this->normalizeEmbedding(
+                    embedding: null,
+                    chunkText: $chunkText,
+                    hadErrors: $hadErrors,
+                    markAsError: false,
+                    isPlaceholder: $isPlaceholder
+                );
             } else {
                 try {
-                    $embedding = $this->embeddingClient->embed($chunkText);
+                    $rawEmbedding = $this->embeddingClient->embed($chunkText);
                 } catch (\Throwable $e) {
                     if ($offlineFallback) {
-                        $embedding = $this->fakeEmbeddingFromText($chunkText);
+                        $rawEmbedding = null;
                         $hadErrors = true;
                     } else {
                         return new IndexedFileResult(
@@ -290,6 +298,14 @@ final class DocsIndexer
                         );
                     }
                 }
+
+                $embedding = $this->normalizeEmbedding(
+                    embedding: $rawEmbedding,
+                    chunkText: $chunkText,
+                    hadErrors: $hadErrors,
+                    markAsError: true,
+                    isPlaceholder: $isPlaceholder
+                );
             }
 
             $chunk = new DocumentChunk();
@@ -297,6 +313,7 @@ final class DocsIndexer
             $chunk->setChunkIndex($index);
             $chunk->setContent($chunkText);
             $chunk->setEmbedding($embedding);
+            $chunk->setIsSearchable(!$isPlaceholder);
 
             $this->em->persist($chunk);
         }
@@ -380,13 +397,47 @@ final class DocsIndexer
     }
 
     /**
-     * @return float[]
+     * Garantisce che ogni embedding salvato abbia la dimensione corretta. Se il backend non restituisce un vettore valido,
+     * genera un placeholder deterministico (che non impatta la ricerca) per mantenere consistente la colonna pgvector.
+     */
+    private function normalizeEmbedding(
+        ?array $embedding,
+        string $chunkText,
+        bool &$hadErrors,
+        bool $markAsError,
+        bool &$isPlaceholder
+    ): array {
+        // Accetto solo vettori corretti e della dimensione attesa, forzando i valori a float
+        if (is_array($embedding) && count($embedding) === $this->embeddingDimension) {
+            $isPlaceholder = false;
+            return array_map(static fn($value) => (float) $value, $embedding);
+        }
+
+        if ($markAsError) {
+            $hadErrors = true;
+        }
+
+        $isPlaceholder = true;
+
+        return $this->fakeEmbeddingFromText($chunkText);
+    }
+
+    /**
+     * Genera un embedding deterministico (placeholder) con la stessa dimensione del modello configurato.
      */
     private function fakeEmbeddingFromText(string $text): array
     {
-        // TODO: adatta la dimensione al tuo modello (es. 384 / 768 / 1024 / 1536 ecc.)
-        $dimension = 1024;
+        $vector = [];
 
-        return array_fill(0, $dimension, 0.0);
+        for ($i = 0; $i < $this->embeddingDimension; $i++) {
+            $seed = $text . '|' . $i;
+            $hash = md5($seed);
+            $chunk = substr($hash, 0, 8);
+            $int = hexdec($chunk);
+            $normalized = ($int / self::HASH_NORMALIZER) * 2 - 1;
+            $vector[] = (float) $normalized;
+        }
+
+        return $vector;
     }
 }
