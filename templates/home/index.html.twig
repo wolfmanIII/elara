@@ -711,22 +711,11 @@
                                     onclick="document.getElementById('modal-elara-chunking-embedding').showModal()">
                                 <code>ElaRA - Guida Chunking Embedding</code>
                             </button>
+                            <button class="btn btn-xs btn-outline"
+                                    onclick="document.getElementById('modal-elara-parametri-risposte').showModal()">
+                                <code>ElaRA - Parametri Qualità Risposte</code>
+                            </button>
                         </div>
-                    </div>
-                </div>
-
-                <div class="card bg-base-100 border border-base-300">
-                    <div class="card-body space-y-3 text-sm">
-                        <h3 class="card-title text-base">Profili di esecuzione</h3>
-                        <ul class="list-disc list-inside opacity-80 space-y-1">
-                            <li><strong>Profilo sviluppo:</strong> backend AI locale (Ollama),
-                                <code>APP_AI_TEST_MODE=1</code> per validare retrieval.</li>
-                            <li><strong>Profilo demo:</strong> backend AI stabile (OpenAI o modello Ollama “veloce”),
-                                logging verbose per la pipeline.</li>
-                            <li><strong>Profilo produzione:</strong> autenticazione su <code>/api/chat</code>,
-                                monitoraggio indice pgvector e scheduler di re-indicizzazione.</li>
-                        </ul>
-
                         <div class="alert alert-warning text-sm">
                             <span class="font-semibold">Nota:</span>
                             <div>
@@ -739,13 +728,6 @@
             </div>
         </section>
 
-        <div class="w-full text-xs">
-            Documenti di riferimento:
-            <button class="btn btn-xs btn-outline"
-                    onclick="document.getElementById('modal-elara-parametri-risposte').showModal()">
-                <code>ElaRA - Parametri Qualità Risposte</code>
-            </button>
-        </div>
 
         {# GUIDA UTENTE — COME FARE LE DOMANDE #}
         <section id="user-guide" class="space-y-4 lg:space-y-6">

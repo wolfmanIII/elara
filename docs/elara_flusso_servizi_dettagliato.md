@@ -272,11 +272,13 @@ Rimuove:
 
 ──────────────────────────────────────────────────────────────
 
-         Indicizzazione (offline, tramite command)
+         Indicizzazione (tramite command)
 
  app:index-docs
       │
       ▼
+ DocsIndexer
+      |
  DocumentTextExtractor
       │
  ChunkingService
