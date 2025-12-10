@@ -9,7 +9,7 @@ Il flusso, semplificando, è questo:
 Carichiamo file, manuali, PDF, documentazione interna. Il sistema li legge, li pulisce, li spezzetta in piccoli pezzi di testo gestibili (i “chunk”).
 
 2. Indicizzazione intelligente  
-Ogni pezzo di testo viene trasformato in una rappresentazione numerica che ne cattura il significato (gli embedding, ci torno tra poco). Questi numeri vengono salvati in un database speciale, che permette di confrontare “quanto due testi si somigliano” invece di limitarsi alle parole esatte.
+Ogni pezzo di testo viene trasformato in una rappresentazione numerica che ne cattura il significato (gli embedding, ci torno tra poco). Questi numeri vengono salvati in un database che gestisce un tipo ti campo particolare(vector), che permette di confrontare “quanto due testi si somigliano” invece di limitarsi alle parole esatte.
 
 3. Quando l’utente fa una domanda  
 Anche la domanda viene trasformata nello stesso tipo di numeri. Il sistema cerca, tra tutti i pezzi di testo indicizzati, quelli che “somigliano di più” alla domanda, cioè che parlano più o meno delle stesse cose.
@@ -44,7 +44,7 @@ Dietro le quinte ELARA fa un lavoro piuttosto sofisticato, ma nascosto all’ute
 * Indicizza i documenti che mettiamo in una cartella dedicata (/var/knowledge)
 * Li converte in testo pulito, rimuovendo formattazioni strane, emoji e rumore
 * Li spezza in “chunk” e genera per ognuno l’embedding, cioè la rappresentazione numerica del significato
-* Salva tutto in PostgreSQL, usando l’estensione pgvector e un indice IVF-FLAT per mantenere le ricerche veloci anche con molti documenti
+* Salva tutto in PostgreSQL, usando l’estensione pgvector e un indice IVF-FLAT | **HNSW** per mantenere le ricerche veloci anche con molti documenti
 * Quando arriva una domanda via API /api/chat, la passa al ChatbotService, che:
 * crea l’embedding della domanda
 * cerca i chunk più simili
@@ -189,11 +189,12 @@ Nel codice di ELARA, quando usiamo la funzione cosine_similarity in DQL, sotto s
 
 ## Il flusso completo
 1. Indicizzazione (command app:index-docs)
+   * DocsIndexer guida tutta la pipeline di indicizzazione
    * DocumentTextExtractor estrae il testo dai file (PDF, MD, DOCX, ODT)
    * il testo viene ripulito e spezzato in chunk
    * per ogni chunk chiamiamo l’AiClient per ottenere l’embedding
    * Doctrine salva i chunk con il loro embedding in PostgreSQL
-   * l’indice IVF-FLAT viene creato/aggiornato
+   * l’indice IVF-FLAT | **HNSW** viene creato/aggiornato
 2. Domanda utente (API /api/chat)
    * ChatbotService crea l’embedding della domanda
    * con il repository DocumentChunkRepository esegue una query “top K simili”
@@ -253,10 +254,6 @@ Scegliere una dimensione standard come 1536 significa:
 * stabilità dell’indice pgvector/IVF-FLAT
 * pieno supporto da parte delle librerie AI usate da ELARA (sia OpenAI che Ollama)
 In altre parole: è una scelta che protegge l’investimento tecnico e mantiene il sistema flessibile nel tempo.
-
-### Pensiero e Desiderio
-
-> *Avrei voluto avere la possibilità di usare embedding a 1536 dimensioni perché sono lo standard moderno per ottenere una rappresentazione molto precisa del significato del testo. Più dimensioni significano più sfumature, più accuratezza nella ricerca dei chunk e risposte migliori del chatbot. Una soluzione che massimizza la qualità ma mantiene il sistema veloce, stabile e compatibile con i modelli attuali e futuri.*
 
 # 6. Conclusioni: perché conviene un motore RAG interno
 

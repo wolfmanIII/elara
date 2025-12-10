@@ -27,6 +27,7 @@ FILE → Estrattore → Chunking → Embedding → PostgreSQL
 ```
 
 Componenti principali:
+- DocsIndexer
 - DocumentTextExtractor
 - ChunkingService
 - AiClientInterface

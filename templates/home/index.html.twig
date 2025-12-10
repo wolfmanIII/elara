@@ -247,7 +247,7 @@
         {# ARCHITETTURA & COMPONENTI #}
         <section id="architecture" class="space-y-4 lg:space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
-                <h2 class="text-xl sm:text-2xl font-bold">Architettura & Componenti Core</h2>
+                <h2 class="text-xl sm:text-2xl font-bold">Architettura e Componenti Core</h2>
                 <span class="badge badge-secondary badge-outline self-start sm:self-auto">
                     Symfony 7.3 · Servizi dedicati
                 </span>
@@ -262,7 +262,7 @@
                                 <p class="font-semibold mb-1">Core</p>
                                 <ul class="space-y-1 opacity-80">
                                     <li><code>AI/</code> — client OpenAI/Ollama + factory</li>
-                                    <li><code>Service/</code> — ChatbotService, DocumentTextExtractor, ChunkingService</li>
+                                    <li><code>Service/</code> — DocsIndexer, DocumentTextExtractor, ChunkingService, ChatbotService</li>
                                     <li><code>Repository/</code> — ricerca vettoriale DocumentChunkRepository</li>
                                 </ul>
                             </div>
@@ -289,6 +289,13 @@
                     <div class="card-body space-y-3">
                         <h3 class="card-title text-lg">Servizi fondamentali</h3>
                         <ul class="timeline timeline-vertical text-sm">
+                            <li>
+                                <div class="timeline-start">DocsIndexer</div>
+                                <div class="timeline-middle"><span class="dot dot-primary"></span></div>
+                                <div class="timeline-end timeline-box text-sm">
+                                    Gestisce tutta la pipeline per l'indicizzazione dei documenti
+                                </div>
+                            </li>
                             <li>
                                 <div class="timeline-start">DocumentTextExtractor</div>
                                 <div class="timeline-middle"><span class="dot dot-primary"></span></div>
@@ -487,14 +494,14 @@
                                 <code>var/knowledge</code> usando hash:
                             </p>
                             <div class="mockup-code overflow-x-auto">
-                                <pre data-prefix="$"><code>php bin/console app:index-docs -v</code></pre>
+                                <pre data-prefix="$"><code>php bin/console app:index-docs</code></pre>
                             </div>
 
                             <p class="opacity-80">
                                 Re-indicizza tutto ignorando gli hash:
                             </p>
                             <div class="mockup-code overflow-x-auto">
-                                <pre data-prefix="$"><code>php bin/console app:index-docs --force-reindex -v</code></pre>
+                                <pre data-prefix="$"><code>php bin/console app:index-docs --force-reindex</code></pre>
                             </div>
 
                             <p class="opacity-80">

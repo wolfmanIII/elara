@@ -221,24 +221,24 @@ Tramite la variabile di ambiente `APP_IVFFLAT_PROBES`, impostiamo il rapporto qu
 I file da indicizzare devono essere caricati nella cartella var/knowledge
 ### 1. Full index, sfruttando hash (solo file nuovi/modificati)
 ```bash
-php bin/console app:index-docs -v
+php bin/console app:index-docs
 ```
 ### 2. Reindicizza TUTTO ignorando hash
 ```bash
-php bin/console app:index-docs --force-reindex -v
+php bin/console app:index-docs --force-reindex
 ```
 ### 3. Solo la sotto-cartella manuali/
 ```bash
-php bin/console app:index-docs --path=manuali --path=log/2025 -v
+php bin/console app:index-docs --path=manuali --path=log/2025
 ```
 ### 4. Simulazione pura (solo vedere cosa succederebbe)
 ```bash
-php bin/console app:index-docs --dry-run -v
+php bin/console app:index-docs --dry-run
 ```
 ### 5. Indicizzare davvero, ma con embeddings finti (test locale)
 ```bash
-php bin/console app:index-docs --test-mode -v
-# oppure: APP_AI_TEST_MODE=true php bin/console app:index-docs -v
+php bin/console app:index-docs --test-mode
+# oppure: APP_AI_TEST_MODE=true php bin/console app:index-docs
 ```
 ## 6. Command per vedere l'elenco dei file indicizzati
 ### Esempi di utilizzo

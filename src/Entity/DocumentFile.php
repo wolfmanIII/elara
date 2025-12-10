@@ -40,6 +40,9 @@ class DocumentFile
     )]
     private Collection $chunks;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $size = null;
+
     public function __construct()
     {
         $this->id = Uuid::v7();
@@ -120,6 +123,18 @@ class DocumentFile
                 $chunk->setFile(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSize(): ?int
+    {
+        return $this->size;
+    }
+
+    public function setSize(?int $size): static
+    {
+        $this->size = $size;
 
         return $this;
     }

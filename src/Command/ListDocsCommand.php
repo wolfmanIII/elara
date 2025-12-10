@@ -69,7 +69,7 @@ class ListDocsCommand extends Command
         }
 
         $table = new Table($output);
-        $table->setHeaders(['ID', 'Path', 'Ext', 'Hash', 'Indexed At', 'Chunks']);
+        $table->setHeaders(['ID', 'Path', 'Ext', 'Hash', 'Size(Byte)', 'Indexed At', 'Chunks']);
 
         foreach ($files as $file) {
             $hash = $file->getHash() ?? '';
@@ -90,6 +90,7 @@ class ListDocsCommand extends Command
                 $file->getPath(),
                 $file->getExtension(),
                 $hash,
+                $file->getSize(),
                 $indexedStr,
                 $chunksCount,
             ]);

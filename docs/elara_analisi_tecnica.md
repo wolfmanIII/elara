@@ -35,7 +35,7 @@ src/
   Entity/          # DocumentFile, DocumentChunk
   Middleware/      # ricostruzione indici vettoriali
   Repository/      # ricerca vettoriale+
-  Service/         # ChatbotService, DocumentTextExtractor, ChunkingService
+  Service/         # ChatbotService, DocumentTextExtractor, ChunkingService, DocsIndexer
 ```
 
 Principi chiave:
@@ -125,7 +125,8 @@ I chunk vengono memorizzati in due tabelle:
 - UUID
 - path
 - hash
-- createdAt
+- size
+- indexedAt
 - relazione OneToMany verso chunk
 
 ## DocumentChunk

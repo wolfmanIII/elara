@@ -16,7 +16,8 @@ I principali macro-servizi sono:
 - chunking,
 - repository vettoriali,
 - middleware database,
-- generazione risposte.
+- generazione risposte,
+- **orchestrazione dell’indicizzazione (DocsIndexer)**.
 
 ---
 
@@ -175,15 +176,66 @@ ELARA include servizi supplementari che completano il flusso.
 - SHA1 per identificare versioni diverse dello stesso file.
 - Consistenza tra versioni.
 
+---
+
+## **8.1.1 DocsIndexer**
+
+Il servizio **DocsIndexer** è il nuovo orchestratore dell’intera pipeline di indicizzazione.  
+È pensato per sostituire la logica prima contenuta dentro `IndexDocsCommand`, lasciando ai Command solo il ruolo di “interfaccia utente CLI”.
+
+### **Funzionalità principali**
+1. **Scansione directory**
+   - Individua i file sotto `var/knowledge/`.
+   - Supporta più path (opzione `--path` del command).
+   - Applica filtri su estensioni e file ignorati.
+
+2. **Gestione hash SHA1**
+   - Calcola l’hash del file.
+   - Salta quelli non modificati.
+   - Supporta la modalità `forceReindex`.
+
+3. **Pipeline completa di indicizzazione**
+   - Estrazione testo → `DocumentTextExtractor`.
+   - Normalizzazione.
+   - Chunking → `ChunkingService`.
+   - Embedding → tramite `AiClientInterface`.
+   - Persistenza → Entity `DocumentFile` e `DocumentChunk`.
+
+4. **Modalità speciali**
+   - `dryRun`: nessuna scrittura, nessun embedding.
+   - `testMode`: embedding finti, veloci.
+   - Probes/parametri pgvector (se presenti).
+
+5. **Callback verso i Command**
+   - Notifica inizio (`onStart`).
+   - Notifica avanzamento (`onFileProcessed`).
+   - Produce un oggetto `IndexedFileResult` per ogni file.
+
+### **Obiettivo**
+- Centralizzare la logica.
+- Aumentare testabilità.
+- Rendere i Command minimalisti.
+
+---
+
 ## 8.2 IndexDocsCommand
 Esegue l’intera pipeline di indicizzazione:
-1. hashing,
-2. estrazione,
-3. normalizzazione,
-4. chunking,
-5. embedding,
-6. persistenza,
+1. hashing,  
+2. estrazione,  
+3. normalizzazione,  
+4. chunking,  
+5. embedding,  
+6. persistenza,  
 7. creazione indici.
+
+### **(AGGIORNAMENTO)**
+Dopo l’introduzione di **DocsIndexer**, il command:
+- non esegue più direttamente la pipeline;
+- prepara solo parametri (path, flags);
+- crea ProgressBar e stampa output;
+- delega tutto a `DocsIndexer::indexDirectory()`.
+
+---
 
 ## 8.3 ListDocsCommand
 Mostra:
@@ -235,23 +287,3 @@ Rimuove:
       │
  PgvectorIvfflatMiddleware (opz.)
 ```
-
----
-
-# 10. Conclusione
-Questo documento rappresenta la **visione completa e moderna** del flusso dei servizi core in ELARA.
-
-La struttura modulare garantisce:
-- affidabilità,
-- scalabilità,
-- estendibilità,
-- controllo completo sul retrieval,
-- qualità prevedibile delle risposte.
-
-Il motore ELARA è quindi pronto per:
-- integrazioni avanzate,
-- UI dedicate,
-- autenticazione e ruoli,
-- scaling orizzontale e verticale.
-
----
