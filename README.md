@@ -158,7 +158,7 @@ doctrine:
         cosine_similarity: Partitech\DoctrinePgVector\Query\CosineSimilarity
         distance: Partitech\DoctrinePgVector\Query\Distance
 ```
-## 4. Backend AI Ollama | OpenAI
+## 4. Backend AI Ollama | OpenAI | Gemini
 ### Variabili d'ambiente, nel file .env.local
 ```env
 DATABASE_URL="postgresql://app:!ChangeMe!@127.0.0.1:5432/app?serverVersion=16&charset=utf8"
@@ -166,7 +166,7 @@ DATABASE_URL="postgresql://app:!ChangeMe!@127.0.0.1:5432/app?serverVersion=16&ch
 # Ollama
 AI_BACKEND=ollama
 OLLAMA_HOST=http://localhost:11434
-OLLAMA_CHAT_MODEL=llama3.1:8b
+OLLAMA_CHAT_MODEL=llama3.2
 OLLAMA_EMBED_MODEL=bge-m3
 OLLAMA_CHAT_MODEL_DEEP=none
 OLLAMA_EMBED_DIMENSION=1024
@@ -176,6 +176,13 @@ OLLAMA_EMBED_DIMENSION=1024
 #OPENAI_API_KEY=sk-...
 #OPENAI_CHAT_MODEL=gpt-4.1-mini
 #OPENAI_EMBED_MODEL=text-embedding-3-small
+
+# Gemini
+#AI_BACKEND=gemini
+#GEMINI_API_KEY=...
+#GEMINI_CHAT_MODEL=gemini-1.5-flash
+#GEMINI_EMBED_MODEL=text-embedding-004
+#GEMINI_EMBED_DIMENSION=768
 
 ## RAG Test Mode e Fallback
 APP_AI_TEST_MODE=true
@@ -190,7 +197,7 @@ APP_AI_OFFLINE_FALLBACK=false
 parameters:
   # ...
 
-  ai.backend: '%env(AI_BACKEND)%' # ollama | openai
+  ai.backend: '%env(AI_BACKEND)%' # ollama | openai | gemini
 
 services:
   # ...
@@ -204,7 +211,7 @@ services:
   #    arguments:
   #        $probes: '%env(int:APP_IVFFLAT_PROBES)%'
 
-  # AiClientInterface per gestire il backend Ollama | OpenAi
+  # AiClientInterface per gestire il backend Ollama | OpenAi | Gemini
   App\AI\AiClientInterface:
       factory: [ '@App\AI\AiClientFactory', 'create' ]
       arguments: [ '%ai.backend%' ]

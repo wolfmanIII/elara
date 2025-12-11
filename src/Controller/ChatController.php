@@ -26,12 +26,19 @@ final class ChatController extends BaseController
     #[Route('/engine/status', name: 'app_engine_status', methods: ['GET'])]
     public function engineStatus(): JsonResponse
     {
+        $backend = $_ENV['AI_BACKEND'] ?? 'ollama';
+        $modelMap = [
+            'ollama' => $_ENV['OLLAMA_CHAT_MODEL'] ?? 'llama3.1:8b',
+            'openai' => $_ENV['OPENAI_CHAT_MODEL'] ?? 'gpt-5.1-mini',
+            'gemini' => $_ENV['GEMINI_CHAT_MODEL'] ?? 'gemini-1.5-flash',
+        ];
+
         $status = [
             'ok' => true,
-            'model' => $_ENV["OLLAMA_CHAT_MODEL"],
-            'source' => ucfirst($_ENV["AI_BACKEND"]),
-            'test_mode'   => $_ENV['APP_AI_TEST_MODE'] === "true" ? "Attivo" : "Disabilitato",
-            'offline_fallback' => $_ENV['APP_AI_OFFLINE_FALLBACK'] === "true" ? "Attivo" : "Disabilitato",
+            'model' => $modelMap[$backend] ?? 'n/d',
+            'source' => ucfirst($backend),
+            'test_mode'   => ($_ENV['APP_AI_TEST_MODE'] ?? 'false') === "true" ? "Attivo" : "Disabilitato",
+            'offline_fallback' => ($_ENV['APP_AI_OFFLINE_FALLBACK'] ?? 'false') === "true" ? "Attivo" : "Disabilitato",
         ];
         return $this->json($status);
     }

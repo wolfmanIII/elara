@@ -19,7 +19,6 @@ class OllamaClient implements AiClientInterface
         private string              $host,
         private string              $embedModel,
         private string              $chatModel,
-        private string              $chatModelDeep,
         private int                 $dimension
     ) {
     }
