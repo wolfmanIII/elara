@@ -19,13 +19,13 @@ class AiClientFactory
                 $this->httpClient,
                 host: $_ENV['OLLAMA_HOST'] ?? 'http://localhost:11434',
                 embedModel: $_ENV['OLLAMA_EMBED_MODEL'] ?? 'bge-m3',
-                chatModel: $_ENV['OLLAMA_CHAT_MODEL'] ?? 'qwen2.5:3b-instruct-q4_K_M',
+                chatModel: $_ENV['OLLAMA_CHAT_MODEL'] ?? 'llama3.2',
                 dimension: $_ENV["OLLAMA_EMBED_DIMENSION"] ?? 1024
             ),
 
             'openai' => new OpenAiClient(
                 apiKey: $this->openaiKey ?? $_ENV['OPENAI_API_KEY'],
-                chatModel: $_ENV['OPENAI_CHAT_MODEL'] ?? 'gpt-5.1-mini',
+                chatModel: $_ENV['OPENAI_CHAT_MODEL'] ?? 'gpt-4.1-mini',
                 embedModel: $_ENV['OPENAI_EMBED_MODEL'] ?? 'text-embedding-3-small',
                 dimension: (int) ($_ENV['OPENAI_EMBED_DIMENSION'] ?? 1024)
             ),
