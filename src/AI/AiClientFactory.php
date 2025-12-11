@@ -33,7 +33,7 @@ class AiClientFactory
             'gemini' => new GeminiClient(
                 httpClient: $this->httpClient,
                 apiKey: $this->geminiKey ?? ($_ENV['GEMINI_API_KEY'] ?? ''),
-                chatModel: $_ENV['GEMINI_CHAT_MODEL'] ?? 'gemini-1.5-flash',
+                chatModel: $_ENV['GEMINI_CHAT_MODEL'] ?? 'gemini-2.5-flash',
                 embedModel: $_ENV['GEMINI_EMBED_MODEL'] ?? 'gemini-embedding-001',
                 dimension: (int) ($_ENV['GEMINI_EMBED_DIMENSION'] ?? 768),
             ),
