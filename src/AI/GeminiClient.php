@@ -102,7 +102,7 @@ TXT;
                         ],
                     ],
                     'generationConfig' => [
-                        'maxOutputTokens' => 400,
+                        'maxOutputTokens' => 1024,
                     ],
                 ],
                 'timeout' => 120,
