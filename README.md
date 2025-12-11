@@ -163,8 +163,10 @@ doctrine:
 ```env
 DATABASE_URL="postgresql://app:!ChangeMe!@127.0.0.1:5432/app?serverVersion=16&charset=utf8"
 
-# Ollama
 AI_BACKEND=ollama
+SHOW_SOURCES=false
+
+# Ollama
 OLLAMA_HOST=http://localhost:11434
 OLLAMA_CHAT_MODEL=llama3.2
 OLLAMA_EMBED_MODEL=bge-m3

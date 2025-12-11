@@ -66,7 +66,7 @@ class GeminiClient implements AiClientInterface
 
     }
 
-    public function chat(string $question, string $context): string
+    public function chat(string $question, string $context, string $source): string
     {
         $system = <<<TXT
 Sei un assistente e DEVI rispondere esclusivamente usando il contesto sotto.
@@ -113,7 +113,10 @@ TXT;
 
         $firstCandidate = $data['candidates'][0]['content']['parts'][0]['text'] ?? '';
 
-        return is_string($firstCandidate) ? $firstCandidate : '';
+        //return is_string($firstCandidate) ? $firstCandidate : '';
+        $result = is_string($firstCandidate) ? $firstCandidate : '';
+        return $result . '\n\n' . $source;
+        
     }
 
     public function getEmbeddingDimension(): int

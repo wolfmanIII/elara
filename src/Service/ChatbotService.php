@@ -41,15 +41,18 @@ class ChatbotService
 
             // 3) Costruisco il contesto per il modello
             $context = '';
+            $source = '';
             foreach ($chunks as $chunk) {
                 $similarity = number_format((float)$chunk["similarity"], 2, ',', '.');
                 $context .= "Fonte: " . $chunk['file_path'] . " - chunk ". $chunk["chunk_index"] . 
+                " - similarity " . $similarity . "\n";
+                $source .= "Fonte: " . $chunk['file_path'] . " - chunk ". $chunk["chunk_index"] . 
                 " - similarity " . $similarity . "\n";
                 $context .= $chunk["chunk_content"] . "\n\n";
             }
 
             // 4) Lascio che il backend AI generi la risposta usando contesto + domanda
-            $answer = $this->ai->chat($question, $context);
+            $answer = $this->ai->chat($question, $context, $source);
 
             return $answer !== '' ? $answer : 'Non sono riuscito a generare una risposta.';
         } catch (\Throwable $e) {

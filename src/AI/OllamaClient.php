@@ -184,7 +184,7 @@ class OllamaClient implements AiClientInterface
      * @throws DecodingExceptionInterface
      * @throws ClientExceptionInterface
      */
-    public function chat(string $question, string $context): string
+    public function chat(string $question, string $context, string $source): string
     {
         $prompt = <<<TXT
 Sei un assistente e DEVI rispondere esclusivamente usando il contesto sotto.
@@ -213,8 +213,9 @@ TXT;
 
         $data = $response->toArray();
 
-        //return $data['response'] . "\n\n" . $context ?? '';
-        return $data['response'] ?? '';
+        $source = $_ENV['SHOW_SOURCES'] === "true" ? $source : '';
+        return $data['response'] . "\n\n" . $source ?? '';
+        //return $data['response'] ?? '';
     }
 
     public function getEmbeddingDimension(): int

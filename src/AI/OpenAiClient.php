@@ -26,7 +26,7 @@ class OpenAiClient implements AiClientInterface
         return $resp->embeddings[0]->embedding;
     }
 
-    public function chat(string $question, string $context): string
+    public function chat(string $question, string $context, string $source): string
     {
         $system = <<<TXT
 Sei un assistente e DEVI rispondere esclusivamente usando il contesto sotto.
@@ -54,7 +54,8 @@ TXT;
             'max_tokens' => 400,
         ]);
 
-        return $resp->choices[0]->message->content ?? '';
+        //return $resp->choices[0]->message->content ?? '';
+        return $resp->choices[0]->message->content . "\n\n" . $source ?? '';
     }
 
     public function getEmbeddingDimension(): int
