@@ -6,6 +6,7 @@ use App\Service\ChatbotService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class ChatController extends BaseController
@@ -75,5 +76,50 @@ final class ChatController extends BaseController
             'question' => $question,
             'answer'   => $answer,
         ]);
+    }
+
+    #[Route('/api/chat/stream', name: 'app_api_chat_stream', methods: ['POST'])]
+    public function apiChatStream(Request $request, ChatbotService $bot): Response
+    {
+        $payload = json_decode($request->getContent() ?? '', true);
+        $question = null;
+
+        if (is_array($payload) && array_key_exists('question', $payload)) {
+            $question = $payload['question'];
+        } else {
+            $question = $request->request->get('question', '');
+        }
+
+        $question = trim((string) $question);
+
+        if ($question === '') {
+            return $this->json([
+                'error' => 'Messaggio vuoto',
+            ], 400);
+        }
+
+        $response = new StreamedResponse(function () use ($bot, $question) {
+            $flush = static function () {
+                if (function_exists('ob_flush')) {
+                    @ob_flush();
+                }
+                flush();
+            };
+
+            $bot->askStream($question, static function (string $chunk) use ($flush) {
+                $payload = json_encode(['chunk' => $chunk], JSON_UNESCAPED_UNICODE);
+                echo "data: " . $payload . "\n\n";
+                $flush();
+            });
+
+            echo "data: " . json_encode(['done' => true]) . "\n\n";
+            $flush();
+        });
+
+        $response->headers->set('Content-Type', 'text/event-stream');
+        $response->headers->set('Cache-Control', 'no-cache');
+        $response->headers->set('Connection', 'keep-alive');
+
+        return $response;
     }
 }

@@ -67,6 +67,57 @@ class ChatbotService
     }
 
     /**
+     * Versione streaming: inoltra ogni chunk di risposta al callback fornito.
+     *
+     * @param callable(string $chunk): void $onChunk
+     */
+    public function askStream(string $question, callable $onChunk): void
+    {
+        $testMode = ($_ENV['APP_AI_TEST_MODE'] ?? 'false') === 'true';
+        $offlineFallbackEnabled =
+            ($_ENV['APP_AI_OFFLINE_FALLBACK'] ?? 'true') === 'true';
+
+        if ($testMode) {
+            $onChunk($this->answerInTestMode($question));
+            return;
+        }
+
+        try {
+            $queryVec = $this->ai->embed($question);
+            $chunks = $this->em->getRepository(DocumentChunk::class)->findTopKCosineSimilarity($queryVec, 5);
+
+            if (!$chunks) {
+                $onChunk('Non trovo informazioni rilevanti nei documenti indicizzati.');
+                return;
+            }
+
+            $context = '';
+            $source = null;
+            foreach ($chunks as $chunk) {
+                $similarity = number_format((float)$chunk["similarity"], 2, ',', '.');
+                $context .= "Fonte: " . $chunk['file_path'] . " - chunk ". $chunk["chunk_index"] . 
+                    " - similarity " . $similarity . "\n";
+
+                if (($_ENV["SHOW_SOURCES"] ?? 'false') === 'true') {
+                    $source .= "Fonte: " . $chunk['file_path'] . " - chunk ". $chunk["chunk_index"] .
+                        " - similarity " . $similarity . "\n";
+                }
+
+                $context .= $chunk["chunk_content"] . "\n\n";
+            }
+
+            $this->ai->chatStream($question, $context, $source, $onChunk);
+        } catch (\Throwable $e) {
+            if ($offlineFallbackEnabled) {
+                $onChunk($this->answerInOfflineFallback($question, $e));
+                return;
+            }
+
+            $onChunk('Errore nella chiamata al servizio AI: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Modalità test: non chiama alcun modello AI.
      * Usa solo query LIKE sul contenuto dei chunk per estrarre estratti rilevanti.
      */

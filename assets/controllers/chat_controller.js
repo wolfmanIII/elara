@@ -5,6 +5,7 @@ export default class extends Controller {
     static targets = ['form', 'input', 'submitButton', 'submitLabel', 'spinner'];
     static values = {
         endpoint: String,
+        streamEndpoint: String,
         engineStatusUrl: String,
     };
 
@@ -93,15 +94,18 @@ export default class extends Controller {
             return;
         }
 
-        // Bolla utente
         this.appendUserMessage(question);
-
-        // Pulisco textarea
         this.inputTarget.value = '';
 
-        // Loading
-        this.toggleLoading(true);
+        if (this.hasStreamEndpointValue) {
+            await this.submitStream(question);
+        } else {
+            await this.submitClassic(question);
+        }
+    }
 
+    async submitClassic(question) {
+        this.toggleLoading(true);
         try {
             const resp = await fetch(this.endpointValue, {
                 method: 'POST',
@@ -111,9 +115,7 @@ export default class extends Controller {
                 },
                 body: JSON.stringify({ question }),
             });
-
             const data = await resp.json();
-
             if (!resp.ok || data.error) {
                 this.appendSystemMessage(data.error || 'Errore dal server.');
             } else {
@@ -121,6 +123,94 @@ export default class extends Controller {
             }
         } catch (e) {
             this.appendSystemMessage('Errore di rete, riprova più tardi.');
+        } finally {
+            this.toggleLoading(false);
+            this.scrollToBottom();
+        }
+    }
+
+    async submitStream(question) {
+        this.toggleLoading(true);
+
+        const assistantBubble = this.startAssistantMessage();
+
+        try {
+            const resp = await fetch(this.streamEndpointValue, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({ question }),
+            });
+
+            if (!resp.ok || !resp.body) {
+                const data = await resp.json().catch(() => ({}));
+                this.updateAssistantMessage(
+                    assistantBubble,
+                    data.error || data.answer || 'Impossibile ottenere una risposta.'
+                );
+                this.finishAssistantMessage();
+                return;
+            }
+
+            const reader = resp.body.getReader();
+            const decoder = new TextDecoder('utf-8');
+            let buffer = '';
+
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) {
+                    break;
+                }
+                buffer += decoder.decode(value, { stream: true });
+                let delimiterIndex;
+                while ((delimiterIndex = buffer.indexOf('\n\n')) !== -1) {
+                    const event = buffer.slice(0, delimiterIndex);
+                    buffer = buffer.slice(delimiterIndex + 2);
+
+                    const dataLine = event
+                        .split('\n')
+                        .filter((line) => line.startsWith('data:'))
+                        .map((line) => line.slice(5).trim())
+                        .join('\n');
+
+                    if (!dataLine) {
+                        continue;
+                    }
+
+                    let payload;
+                    try {
+                        payload = JSON.parse(dataLine);
+                    } catch {
+                        continue;
+                    }
+
+                    if (payload.chunk) {
+                        this.updateAssistantMessage(assistantBubble, payload.chunk);
+                    }
+
+                    if (payload.error) {
+                        this.updateAssistantMessage(assistantBubble, payload.error);
+                        this.finishAssistantMessage();
+                        this.toggleLoading(false);
+                        this.scrollToBottom();
+                        return;
+                    }
+
+                    if (payload.done) {
+                        this.finishAssistantMessage();
+                        this.toggleLoading(false);
+                        this.scrollToBottom();
+                        return;
+                    }
+                }
+            }
+
+            this.finishAssistantMessage();
+        } catch (e) {
+            this.updateAssistantMessage(assistantBubble, 'Errore di rete, riprova più tardi.');
+            this.finishAssistantMessage();
         } finally {
             this.toggleLoading(false);
             this.scrollToBottom();
@@ -150,6 +240,12 @@ export default class extends Controller {
     }
 
     appendAssistantMessage(text) {
+        const bubble = this.startAssistantMessage();
+        this.updateAssistantMessage(bubble, text);
+        this.finishAssistantMessage();
+    }
+
+    startAssistantMessage() {
         const wrapper = document.createElement('div');
         wrapper.className = 'chat chat-start';
 
@@ -162,12 +258,23 @@ export default class extends Controller {
             <div class="chat-header">
                 <code><b><em>Almeno</em></b></code>
             </div>
-            <div class="chat-bubble chat-bubble-primary">
-                ${this.escapeHtml(text).replace(/\n/g, "<br>")}<br>
-            </div>
+            <div class="chat-bubble chat-bubble-primary"></div>
         `;
 
         this.chatLog.appendChild(wrapper);
+        const bubble = wrapper.querySelector('.chat-bubble');
+        return bubble;
+    }
+
+    updateAssistantMessage(bubble, text) {
+        if (!bubble || !text) {
+            return;
+        }
+        bubble.innerHTML += `${this.escapeHtml(text).replace(/\n/g, '<br>')}`;
+        this.scrollToBottom();
+    }
+
+    finishAssistantMessage() {
         this.scrollToBottom();
     }
 

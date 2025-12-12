@@ -119,6 +119,105 @@ TXT;
         
     }
 
+    public function chatStream(
+        string $question,
+        string $context,
+        ?string $source,
+        callable $onChunk
+    ): void {
+        $system = <<<TXT
+Sei un assistente e DEVI rispondere esclusivamente usando il contesto sotto.
+Se la risposta non è presente nel contesto, di' che non è disponibile.
+TXT;
+
+        $user = <<<TXT
+CONTESTO:
+$context
+
+DOMANDA:
+$question
+
+Rispondi in modo chiaro e nella lingua dell'utente.
+TXT;
+
+        $response = $this->httpClient->request(
+            'POST',
+            sprintf('%s/models/%s:streamGenerateContent?key=%s', self::BASE_URL, $this->chatModel, $this->apiKey),
+            [
+                'headers' => [
+                    'Accept' => 'text/event-stream',
+                ],
+                'json' => [
+                    'system_instruction' => [
+                        'parts' => [
+                            ['text' => $system],
+                        ],
+                    ],
+                    'contents' => [
+                        [
+                            'role' => 'user',
+                            'parts' => [
+                                ['text' => $user],
+                            ],
+                        ],
+                    ],
+                    'generationConfig' => [
+                        'maxOutputTokens' => 1024,
+                    ],
+                ],
+                'timeout' => 5,
+            ],
+        );
+
+        $buffer = '';
+
+        foreach ($this->httpClient->stream($response) as $chunk) {
+            if ($chunk->isTimeout()) {
+                continue;
+            }
+
+            $buffer .= $chunk->getContent();
+
+            while (($pos = strpos($buffer, "\n\n")) !== false) {
+                $event = substr($buffer, 0, $pos);
+                $buffer = substr($buffer, $pos + 2);
+
+                $dataLines = array_filter(
+                    array_map('trim', explode("\n", $event)),
+                    static fn($line) => str_starts_with($line, 'data:')
+                );
+
+                foreach ($dataLines as $line) {
+                    $payloadRaw = trim(substr($line, 5));
+                    if ($payloadRaw === '' || $payloadRaw === '[DONE]') {
+                        continue;
+                    }
+
+                    $payload = json_decode($payloadRaw, true);
+                    if (!is_array($payload)) {
+                        continue;
+                    }
+
+                    $parts = $payload['candidates'][0]['content']['parts'] ?? null;
+                    if (!is_array($parts)) {
+                        continue;
+                    }
+
+                    foreach ($parts as $part) {
+                        $text = $part['text'] ?? null;
+                        if (is_string($text) && $text !== '') {
+                            $onChunk($text);
+                        }
+                    }
+                }
+            }
+        }
+
+        if ($source !== null) {
+            $onChunk("\n\n" . $source);
+        }
+    }
+
     public function getEmbeddingDimension(): int
     {
         return $this->dimension;
