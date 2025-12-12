@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Monitor indice documenti - ELaRA{% endblock %}
+
+{% block pageContent %}
+<div class="space-y-6">
+    <div class="flex flex-col gap-2">
+        <h1 class="text-2xl font-bold">Monitor indice documenti</h1>
+        <p class="opacity-70 text-sm">
+            Stato dei file indicizzati e statistiche aggregate.
+        </p>
+    </div>
+
+    <twig:MonitorIndex />
+
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+        <div class="card-body">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+                <div>
+                    <h2 class="card-title text-lg">Documenti indicizzati</h2>
+                    <p class="text-xs opacity-70">Elenco completo con metadati e numero di chunk.</p>
+                </div>
+                <span class="badge badge-outline">{{ filesData|length }} elementi</span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="table table-zebra">
+                    <thead>
+                        <tr class="text-xs uppercase opacity-70">
+                            <th>Path</th>
+                            <th>Estensione</th>
+                            <th>Dimensione</th>
+                            <th>Hash</th>
+                            <th>Indexed At</th>
+                            <th>Chunk</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in filesData %}
+                        {% set file = row[0] ?? row %}
+                        <tr>
+                            <td class="font-mono text-xs">{{ file.path }}</td>
+                            <td>{{ file.extension|upper }}</td>
+                            <td>{{ file.size ? (file.size/1024)|number_format(1, ',', '.') ~ ' KB' : 'n/d' }}</td>
+                            <td class="font-mono text-xs">
+                                {{ file.hash ? file.hash[:12] ~ '…' : '-' }}
+                            </td>
+                            <td>
+                                {{ file.indexedAt ? file.indexedAt|date('d/m/Y H:i') : 'n/d' }}
+                            </td>
+                            <td>
+                                {{ (row.chunk_count ?? 0)|number_format(0, ',', '.') }}
+                                <span class="text-xs opacity-70 block">
+                                    Non ricercabili: {{ (row.non_searchable_count ?? 0)|number_format(0, ',', '.') }}
+                                </span>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center opacity-70">Nessun documento indicizzato.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="flex items-center justify-between mt-4">
+    <div class="text-sm opacity-70">
+        Mostrando {{ filesData|length }} di {{ pagination.total_items }} documenti
+    </div>
+    <div class="join">
+        <a class="btn btn-sm join-item{% if pagination.current_page <= 1 %} btn-disabled{% endif %}"
+           href="{{ path('app_index_monitor', {page: pagination.current_page - 1}) }}">
+            «
+        </a>
+        <span class="btn btn-sm join-item btn-disabled">
+            Pagina {{ pagination.current_page }} / {{ pagination.total_pages }}
+        </span>
+        <a class="btn btn-sm join-item{% if pagination.current_page >= pagination.total_pages %} btn-disabled{% endif %}"
+           href="{{ path('app_index_monitor', {page: pagination.current_page + 1}) }}">
+            »
+        </a>
+    </div>
+</div>
+{% endblock %}

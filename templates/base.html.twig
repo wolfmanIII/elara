@@ -98,6 +98,18 @@
                             <span>Homepage</span>
                         </a>
 
+                        <a href="{{ path('app_index_monitor') }}"
+                           class="{% if controller_name == constant('App\\Controller\\IndexMonitorController::CONTROLLER_NAME') %}menu-active{% endif %}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="4 14 10 14 10 20"></polyline>
+                                <path d="M4 20h16"></path>
+                                <path d="M20 10V4H4v6"></path>
+                                <path d="M4 10c4.29-3 8.29-3 12.57 0c1.48 1.036 2.48 1.451 3.43 1.543"></path>
+                            </svg>
+                            <span>Indice documenti</span>
+                        </a>
+
                         <a href="{{ path('app_ai_console') }}"
                             class="{% if controller_name == constant('App\\Controller\\ChatController::CONTROLLER_NAME') %}menu-active{% endif %}">
                             {# icona "sparkles" #}
