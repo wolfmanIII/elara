@@ -23,6 +23,7 @@
                     Un motore RAG che indicizza i tuoi documenti, li trasforma in embedding vettoriali
                     e ti permette di interrogarli in linguaggio naturale tramite un semplice
                     endpoint <code class="kbd kbd-base">POST /api/chat</code>
+                    (streaming disponibile su <code class="kbd kbd-base">/api/chat/stream</code>)
                 </p>
 
                 <div class="flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-4">
@@ -242,6 +243,13 @@
                 <code>ElaRA - Flusso Applicativo</code>
             </button>
         </div>
+
+        <section id="index-monitor" class="space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+            </div>
+
+            <twig:MonitorIndex />
+        </section>
 
         {# ARCHITETTURA & COMPONENTI #}
         <section id="architecture" class="space-y-4 lg:space-y-6">

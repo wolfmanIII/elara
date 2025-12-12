@@ -1,0 +1,68 @@
+{% set stats = this.stats %}
+<div{{ attributes.defaults({'data-poll': 'interval'}) }} class="card bg-base-100 shadow-xl border border-base-300">
+    <div class="card-body gap-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <h3 class="card-title text-base">Stato indice documenti</h3>
+                <p class="text-xs opacity-60">
+                    Aggiornamento automatico ogni 30s
+                </p>
+            </div>
+            <span class="badge badge-outline">Live</span>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="stat">
+                <div class="stat-title text-xs uppercase tracking-wide opacity-70">Documenti</div>
+                <div class="stat-value text-2xl">{{ stats.total_files|number_format(0, ',', '.') }}</div>
+                <div class="stat-desc text-xs opacity-70">Totale file indicizzati</div>
+            </div>
+            <div class="stat">
+                <div class="stat-title text-xs uppercase tracking-wide opacity-70">Chunk</div>
+                <div class="stat-value text-2xl">{{ stats.total_chunks|number_format(0, ',', '.') }}</div>
+                <div class="stat-desc text-xs opacity-70">Frammenti disponibili</div>
+            </div>
+            <div class="stat">
+                <div class="stat-title text-xs uppercase tracking-wide opacity-70">Dimensione</div>
+                <div class="stat-value text-2xl">{{ stats.total_size_human }}</div>
+                <div class="stat-desc text-xs opacity-70">Dimensione totale documenti</div>
+            </div>
+            <div class="stat">
+                <div class="stat-title text-xs uppercase tracking-wide opacity-70">Ultimo aggiornamento</div>
+                <div class="stat-value text-lg">
+                    {% if stats.last_indexed_at %}
+                        {{ stats.last_indexed_at|date('d/m H:i') }}
+                    {% else %}
+                        n/d
+                    {% endif %}
+                </div>
+                <div class="stat-desc text-xs opacity-70">
+                    {% if stats.last_indexed_path %}
+                        {{ stats.last_indexed_path }}
+                    {% else %}
+                        Nessun file indicizzato
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+            <div class="stat">
+                <div class="stat-title text-xs uppercase tracking-wide opacity-70">Chunk non ricercabili</div>
+                <div class="stat-value text-2xl">{{ stats.non_searchable_chunks|number_format(0, ',', '.') }}</div>
+                <div class="stat-desc text-xs opacity-70">
+                    Embedding placeholder usati durante fallback o test
+                </div>
+            </div>
+            <div class="stat">
+                <div class="stat-title text-xs uppercase tracking-wide opacity-70">Placeholder ratio</div>
+                <div class="stat-value text-2xl">
+                    {{ stats.placeholder_ratio|number_format(1, ',', '.') }}%
+                </div>
+                <div class="stat-desc text-xs opacity-70">
+                    Percentuale chunk con embedding non reali
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
