@@ -12,7 +12,7 @@ interface AiClientInterface
     /**
      * Risponde alla domanda usando un certo contesto.
      */
-    public function chat(string $question, string $context, string $source): string;
+    public function chat(string $question, string $context, ?string $source): string;
 
     /**
      * Restituisce la dimensionalità degli embedding generati dal client.

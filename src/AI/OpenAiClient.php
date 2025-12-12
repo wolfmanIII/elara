@@ -26,7 +26,7 @@ class OpenAiClient implements AiClientInterface
         return $resp->embeddings[0]->embedding;
     }
 
-    public function chat(string $question, string $context, string $source): string
+    public function chat(string $question, string $context, ?string $source): string
     {
         $system = <<<TXT
 Sei un assistente e DEVI rispondere esclusivamente usando il contesto sotto.

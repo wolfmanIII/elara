@@ -11,7 +11,6 @@ use App\Model\Index\IndexSummary;
 use App\Model\Index\IndexedFileResult;
 use Doctrine\ORM\EntityManagerInterface;
 use App\AI\AiClientInterface;
-use App\AI\GeminiClient;
 
 /**
  * Service “puro” che si occupa di:
@@ -244,18 +243,12 @@ final class DocsIndexer
         }
 
         // Aggiorna metadati file
-        if ($fileHash !== null && method_exists($docFile, 'setHash')) {
+        if ($fileHash !== null) {
             $docFile->setHash($fileHash);
         }
-        if (method_exists($docFile, 'setSize')) {
-            $docFile->setSize($fileSize);
-        }
-        if (method_exists($docFile, 'setExtension')) {
-            $docFile->setExtension($extension);
-        }
-        if (method_exists($docFile, 'setIndexedAt')) {
-            $docFile->setIndexedAt(new \DateTimeImmutable());
-        }
+        $docFile->setSize($fileSize);
+        $docFile->setExtension($extension);
+        $docFile->setIndexedAt(new \DateTimeImmutable());
 
         // Cancella chunk esistenti
         $this->em->createQueryBuilder()

@@ -41,13 +41,15 @@ class ChatbotService
 
             // 3) Costruisco il contesto per il modello
             $context = '';
-            $source = '';
+            $source = null;
             foreach ($chunks as $chunk) {
                 $similarity = number_format((float)$chunk["similarity"], 2, ',', '.');
                 $context .= "Fonte: " . $chunk['file_path'] . " - chunk ". $chunk["chunk_index"] . 
                 " - similarity " . $similarity . "\n";
-                $source .= "Fonte: " . $chunk['file_path'] . " - chunk ". $chunk["chunk_index"] . 
-                " - similarity " . $similarity . "\n";
+                if ($_ENV["SHOW_SOURCES"] === 'true') {
+                    $source .= "Fonte: " . $chunk['file_path'] . " - chunk ". $chunk["chunk_index"] . 
+                    " - similarity " . $similarity . "\n";
+                }
                 $context .= $chunk["chunk_content"] . "\n\n";
             }
 

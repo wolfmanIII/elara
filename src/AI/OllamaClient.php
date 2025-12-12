@@ -8,6 +8,7 @@ use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Twig\Source;
 
 class OllamaClient implements AiClientInterface
 {
@@ -184,7 +185,7 @@ class OllamaClient implements AiClientInterface
      * @throws DecodingExceptionInterface
      * @throws ClientExceptionInterface
      */
-    public function chat(string $question, string $context, string $source): string
+    public function chat(string $question, string $context, ?string $source): string
     {
         $prompt = <<<TXT
 Sei un assistente e DEVI rispondere esclusivamente usando il contesto sotto.
@@ -213,8 +214,8 @@ TXT;
 
         $data = $response->toArray();
 
-        $source = $_ENV['SHOW_SOURCES'] === "true" ? $source : '';
-        return $data['response'] . "\n\n" . $source ?? '';
+       
+        return $data['response'] . "\n\n" . $source ?? ''; 
         //return $data['response'] ?? '';
     }
 
