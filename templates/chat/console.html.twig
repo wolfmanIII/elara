@@ -4,8 +4,8 @@
 {% block title %}ELARA Console{% endblock %}
 
 {% block pageContent %}
-<div class="w-full min-h-[calc(100vh-4rem)] flex items-center justify-center bg-base-200">
-    <div class="w-full max-w-5xl mx-auto px-4">
+<div class="w-full flex items-center justify-center bg-base-200">
+    <div class="w-full max-w-10xl mx-auto p-4">
         <div class="card bg-base-100 shadow-xl border border-base-300">
             <div class="card-body gap-4">
 
@@ -39,7 +39,7 @@
                     {# Colonna principale: chat #}
                     <turbo-frame id="chat_frame" class="col-span-1">
                         <div
-                            class="flex flex-col gap-3 h-[480px]"
+                            class="flex flex-col gap-3 h-[590px]"
                             data-controller="chat"
                             data-chat-endpoint-value="{{ path('app_api_chat') }}"
                             data-chat-stream-endpoint-value="{{ path('app_api_chat_stream') }}"
