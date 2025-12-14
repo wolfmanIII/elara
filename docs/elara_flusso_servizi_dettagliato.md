@@ -36,15 +36,21 @@ chat(array $messages, string $model): string
 - embedding fino a 1536 dimensioni,
 - costo a consumo.
 
+### **GeminiClient**
+- usa l’API Gemini ufficiale,
+- altissima qualità nelle risposte,
+- embedding fino a 1536|3072 dimensioni,
+- costo a consumo.
+
 ### **OllamaClient**
 - gira in locale tramite Ollama,
 - nessun costo,
-- embedding tipicamente 768 o 1024 (bge-m3),
+- embedding 1024 (bge-m3),
 - utile per ambienti self-hosted.
 
 Il backend è configurabile tramite:
 ```
-AI_BACKEND=ollama|openai
+AI_BACKEND=ollama|openai|gemini
 ```
 
 ---
@@ -263,7 +269,7 @@ Rimuove:
          ┌────────────────────┼────────────────────┐
          │                    │                    │
  DocumentChunkRepository   Prompt Engine        AiClientInterface
- (ricerca vettoriale)     (system+user)      (OpenAI/Ollama)
+ (ricerca vettoriale)     (system+user)      (OpenAI/Ollama/Gemini)
          │                    │                    │
          └───────────────┬────┴────────────────────┘
                          │

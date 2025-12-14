@@ -9,7 +9,7 @@ ELARA implementa un sistema completo di **Retrieval-Augmented Generation (RAG)**
 - i documenti vengono indicizzati in forma strutturata,
 - le informazioni vengono trasformate in embedding vettoriali,
 - PostgreSQL + pgvector effettua ricerche semantiche,
-- un modello LLM (Ollama o OpenAI) genera risposte basate sui documenti.
+- un modello LLM (Ollama, OpenAI, Gemini) genera risposte basate sui documenti.
 
 L’obiettivo è garantire risposte **accurate, contestualizzate e riproducibili**, senza allucinazioni.
 
@@ -91,6 +91,7 @@ Ogni chunk viene trasformato in un vettore float via AiClientInterface.
 
 Modelli supportati:
 - OpenAI embedding (1536 dim),
+- Gemini embedding (1536|3072 dim),
 - Ollama embedding (bge-m3, 1024 dim),
 - ogni altro modello conforme allo standard.
 
@@ -184,7 +185,7 @@ Rispondi SOLO usando il contesto sotto. Non inventare.
 {{question}}
 ```
 
-Il backend AI (Ollama o OpenAI) produce la risposta, che viene restituita in formato JSON.
+Il backend AI (Ollama, OpenAI, Gemini) produce la risposta, che viene restituita in formato JSON.
 
 ---
 

@@ -15,7 +15,7 @@ ELARA è un **motore RAG (Retrieval-Augmented Generation)** scritto in Symfony 7
 - generare embedding vettoriali tramite modelli AI,
 - memorizzarli in PostgreSQL tramite l’estensione pgvector,
 - recuperare i chunk più rilevanti rispetto a una domanda,
-- costruire un contesto da passare al modello AI (Ollama o OpenAI),
+- costruire un contesto da passare al modello AI (Ollama, OpenAI, Gemini),
 - generare una risposta basata esclusivamente sulle fonti indicizzate.
 
 ELARA separa nettamente:
@@ -29,7 +29,7 @@ ELARA separa nettamente:
 
 ```
 src/
-  AI/              # integrazione con backend AI (OpenAI, Ollama)
+  AI/              # integrazione con backend AI (OpenAI, Ollama, Gemini)
   Command/         # comandi CLI per indicizzazione/lista/unindex
   Controller/      # API REST
   Entity/          # DocumentFile, DocumentChunk
@@ -210,11 +210,11 @@ Questo riduce hallucination e mantiene coerenza.
 
 ---
 
-# 12. Backend AI: Ollama e OpenAI
+# 12. Backend AI: Ollama - OpenAI - Gemini
 ELARA permette di cambiare backend tramite ENV:
 
 ```
-AI_BACKEND=ollama|openai
+AI_BACKEND=ollama|openai|gemini
 ```
 
 ### Ollama
@@ -222,7 +222,7 @@ AI_BACKEND=ollama|openai
 - nessun costo
 - latenza maggiore
 
-### OpenAI
+### OpenAI | Gemini
 - qualità superiore
 - costi per token
 

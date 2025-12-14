@@ -57,7 +57,7 @@ I valori nella colonna *target* sono quelli consigliati come default pratici.
 - Chunk un po’ più ampi (1300–1400).
 - top_k ridotto a **4**.
 
-## 🔹 Embedding **1536** (modelli heavy stile OpenAI)
+## 🔹 Embedding **1536** (modelli heavy stile OpenAI|Gemini)
 - Costosissimi in pgvector su CPU.
 - Per self-hosting → top_k basso (**3**).
 - Chunk ampi: 1400–1600 caratteri.

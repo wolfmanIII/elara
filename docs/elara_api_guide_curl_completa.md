@@ -58,7 +58,7 @@ Flusso:
 2. ChatbotService crea l’**embedding** della domanda.
 3. Viene eseguita la **ricerca vettoriale** sui chunk indicizzati.
 4. Viene costruito un **contesto RAG**.
-5. Viene chiamato il backend AI (Ollama/OpenAI) per generare la risposta.
+5. Viene chiamato il backend AI (Ollama, OpenAI, Gemini) per generare la risposta.
 6. Viene restituita una risposta JSON con il testo generato.
 
 ## 3.2 Modalità TEST
@@ -87,7 +87,7 @@ Configurata da:
 APP_AI_OFFLINE_FALLBACK=true
 ```
 
-Se attiva, e se il backend AI (Ollama/OpenAI) non risponde o genera errore:
+Se attiva, e se il backend AI (Ollama, OpenAI, Gemini) non risponde o genera errore:
 - ChatbotService **non fallisce brutalmente**,
 - viene eseguita una ricerca vettoriale,
 - vengono restituiti estratti testuali rilevanti dai documenti,
@@ -103,7 +103,8 @@ Le principali variabili che influenzano il comportamento dell’API sono:
 
 ```env
 # Scelta del backend AI
-AI_BACKEND=ollama|openai
+AI_BACKEND=ollama|openai|gemini
+APP_CHAT_CONSOLE_TOKEN=1234...
 
 # Modalità test (nessuna chiamata al modello AI)
 APP_AI_TEST_MODE=true|false
@@ -115,6 +116,7 @@ APP_AI_OFFLINE_FALLBACK=true|false
 ### 4.1 AI_BACKEND
 - `ollama` → utilizza il server Ollama locale.
 - `openai` → utilizza le API OpenAI.
+- `gemini` → utilizza le API Gemini.
 
 La logica AI è incapsulata nell’`AiClientInterface`, per cui il controller non cambia.
 
@@ -135,12 +137,17 @@ Di seguito una serie di esempi pratici per interagire con `/api/chat`.
 ## 5.1 Richiesta base — modalità normale
 
 ```bash
-curl -X POST \
-  http://localhost:8000/api/chat \
+curl -X POST http://localhost:8000/api/chat \
   -H "Content-Type: application/json" \
-  -d '{
-    "message": "Puoi riassumere il flusso FILE → Estrattore → Chunking → Embedding → Retrieval → Risposta?"
-  }'
+  -H "Authorization: Bearer {token_generato}" \
+  -d '{"message":"Riassumi ELaRA"}'
+```
+```bash
+curl -X POST http://localhost:8000/api/chat/stream \
+  -H "Content-Type: application/json" \
+  -H "Accept: text/event-stream" \
+  -H "Authorization: Bearer {token_generato}" \
+  -d '{"message":"Riassumi ELaRA"}'
 ```
 
 ### Comportamento atteso
@@ -159,11 +166,10 @@ APP_AI_TEST_MODE=true
 Quindi:
 
 ```bash
-curl -X POST \
-  http://localhost:8000/api/chat \
+curl -X POST http://localhost:8000/api/chat \
   -H "Content-Type: application/json" \
-  -d '{
-    "message": "helix artefatto iuno"
+  -H "Authorization: Bearer {token_generato}" \
+  -d '{"message":"Riassumi ELaRA"}'
   }'
 ```
 
@@ -178,10 +184,10 @@ curl -X POST \
 ## 5.3 Richiesta con messaggio vuoto (errore)
 
 ```bash
-curl -X POST \
-  http://localhost:8000/api/chat \
+curl -X POST http://localhost:8000/api/chat \
   -H "Content-Type: application/json" \
-  -d '{ "message": "" }'
+  -H "Authorization: Bearer {token_generato}" \
+  -d '{"message":""}'
 ```
 
 ### Risposta attesa
@@ -209,12 +215,10 @@ il comportamento dell’endpoint rimane identico dal punto di vista dell’utent
 La chiamata curl rimane la stessa:
 
 ```bash
-curl -X POST \
-  http://localhost:8000/api/chat \
+curl -X POST http://localhost:8000/api/chat \
   -H "Content-Type: application/json" \
-  -d '{
-    "message": "Spiegami come funziona l\'indicizzazione dei documenti in ELARA."
-  }'
+  -H "Authorization: Bearer {token_generato}" \
+  -d '{"message":"Riassumi ELaRA"}'
 ```
 
 ---
@@ -305,11 +309,12 @@ In contesti produttivi è consigliabile:
 # ✅ 8. Best practice per l’utilizzo di `/api/chat`
 
 1. **Sempre inviare `Content-Type: application/json`** nelle richieste.
-2. **Validare lato client** che `message` non sia vuoto o composto solo da spazi.
-3. **Gestire time-out client**: i modelli AI possono impiegare alcuni secondi.
-4. **Non abusare della modalità TEST in produzione**: è anzitutto uno strumento di debug.
-5. **Gestire le modalità via ENV** (test/fallback/backend) **senza cambiare il codice**.
-6. **Loggare le richieste critiche** (ad es. per audit, se i dati sono sensibili).
+2. **Sempre inviare `Authorization: Bearer {token_generato}`** nelle richieste
+3. **Validare lato client** che `message` non sia vuoto o composto solo da spazi.
+4. **Gestire time-out client**: i modelli AI possono impiegare alcuni secondi.
+5. **Non abusare della modalità TEST in produzione**: è anzitutto uno strumento di debug.
+6. **Gestire le modalità via ENV** (test/fallback/backend) **senza cambiare il codice**.
+7. **Loggare le richieste critiche** (ad es. per audit, se i dati sono sensibili).
 
 ---
 
@@ -333,6 +338,7 @@ La natura JSON dell’API la rende adatta a qualunque ecosistema.
   { "message": "Domanda dell'utente" }
   ```
 - **Header obbligatorio**: `Content-Type: application/json`
+- **Header obbligatorio**: `Authorization: Bearer {token_generato}`
 - **Modalità TEST**: `APP_AI_TEST_MODE=true`
 - **Offline fallback**: `APP_AI_OFFLINE_FALLBACK=true`
 - **Backend AI**: `AI_BACKEND=ollama|openai`
@@ -340,10 +346,10 @@ La natura JSON dell’API la rende adatta a qualunque ecosistema.
 Esempio curl minimal:
 
 ```bash
-curl -X POST \
-  http://localhost:8000/api/chat \
+curl -X POST http://localhost:8000/api/chat \
   -H "Content-Type: application/json" \
-  -d '{ "message": "Spiegami in breve cos\'è un sistema RAG." }'
+  -H "Authorization: Bearer {token_generato}" \
+  -d '{"message":"Riassumi ELaRA"}'
 ```
 
 ---

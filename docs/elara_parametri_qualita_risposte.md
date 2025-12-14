@@ -28,9 +28,10 @@ Influisce sulla qualità linguistica e sul ragionamento. Modelli più grandi (7B
 ## 2.3 Backend selezionato
 Configurazione:
 ```
-AI_BACKEND=ollama|openai
+AI_BACKEND=ollama|openai|gemini
 ```
-OpenAI → qualità più alta.  
+OpenAI → qualità più alta.
+Gemini → qualità più alta. 
 Ollama → locale, meno costo, più latenza.
 
 ---

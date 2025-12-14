@@ -23,7 +23,7 @@ Obiettivo: **consultare la documentazione in linguaggio naturale**.
 FILE → Estrattore → Chunking → Embedding → PostgreSQL
       → Indice Vettoriale (HNSW/IVF-FLAT)
       → /api/chat → embedding domanda → retrieval → contesto
-      → modello AI (Ollama/OpenAI) → risposta JSON
+      → modello AI (Ollama/OpenAI/Gemini) → risposta JSON
 ```
 
 Componenti principali:
@@ -61,7 +61,7 @@ Risultato: una base di conoscenza interrogabile via embedding.
 
 ### Risposta
 - prompt RAG con contesto,
-- modello AI (Ollama/OpenAI),
+- modello AI (Ollama/OpenAI/Gemini),
 - risposta deterministica basata sui documenti.
 
 ---
@@ -69,7 +69,7 @@ Risultato: una base di conoscenza interrogabile via embedding.
 # 🔌 5. Backend AI intercambiabile
 Configurabile via ENV:
 ```
-AI_BACKEND=ollama|openai
+AI_BACKEND=ollama|openai|gemini
 ```
 ### Ollama
 - locale
@@ -79,6 +79,10 @@ AI_BACKEND=ollama|openai
 ### OpenAI
 - qualità più alta
 - embedding 1536
+
+### Gemini
+- qualità più alta
+- embedding 1536|3072
 
 ---
 
@@ -103,7 +107,7 @@ Risposta:
 - **Symfony 7.3** (backend)
 - **Doctrine ORM**
 - **PostgreSQL + pgvector**
-- **Ollama / OpenAI**
+- **Ollama / OpenAI / Gemini**
 - **Chunking intelligente**
 
 ---

@@ -49,12 +49,12 @@ Dietro le quinte ELARA fa un lavoro piuttosto sofisticato, ma nascosto all’ute
 * crea l’embedding della domanda
 * cerca i chunk più simili
 * costruisce un contesto
-* chiama il modello AI (Ollama o OpenAI)
+* chiama il modello AI (Ollama, OpenAI, Gemini)
 * restituisce una risposta JSON pulita
 
 La filosofia di ELARA è:
 * semplicità d’uso: dall’esterno è solo “POST /api/chat con un messaggio”
-* flessibilità: si può cambiare backend AI (locale con Ollama, cloud con OpenAI) via configurazione, senza toccare il codice applicativo
+* flessibilità: si può cambiare backend AI (locale con Ollama, cloud con OpenAI o Gemini) via configurazione, senza toccare il codice applicativo
 * controllo: l’indice è nel nostro database, i flussi sono chiari e documentati, e possiamo decidere cosa indicizzare e cosa no.
 # 3. Cosa si intende per “embedding del testo”
 Adesso arriviamo al concetto chiave: embedding.
@@ -256,7 +256,7 @@ Scegliere una dimensione standard come 1536 significa:
 * poter cambiare modello embedding in futuro senza cambiare database
 * compatibilità con centinaia di modelli attuali e futuri
 * stabilità dell’indice pgvector/IVF-FLAT
-* pieno supporto da parte delle librerie AI usate da ELARA (sia OpenAI che Ollama)
+* pieno supporto da parte delle librerie AI usate da ELARA (sia Ollama che OpenAI che Gemini)
 In altre parole: è una scelta che protegge l’investimento tecnico e mantiene il sistema flessibile nel tempo.
 
 # 6. Conclusioni: perché conviene un motore RAG interno
@@ -269,7 +269,7 @@ Chiudo con qualche punto:
 3. Controllo su dati e fonti
     Gli embedding e i testi nel PostgreSQL in locale, con pgvector e gli indici configurati e personalizzati. Si può decidere cosa indicizzare, cosa escludere, come strutturare gli accessi e in futuro agganciare autenticazione e ruoli.
 4. Privacy e conformità
-    Si possono usare backend locali (Ollama) per evitare che i documenti escano all'esterno, oppure usare OpenAI solo per la parte di generazione, mantenendo comunque in casa l’indice vettoriale e i dati sensibili.
+    Si possono usare backend locali (Ollama) per evitare che i documenti escano all'esterno, oppure usare OpenAI o Gemini solo per la parte di generazione, mantenendo comunque in casa l’indice vettoriale e i dati sensibili.
 5. Integrazione con lo stack esistente
     ELARA è scritto in Symfony, usa Doctrine e PostgreSQL: si integra bene con applicazioni già esistenti.
 6. Scalabilità graduale
