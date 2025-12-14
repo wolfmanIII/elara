@@ -175,8 +175,13 @@ doctrine:
 ## 4. Backend AI Ollama | OpenAI | Gemini
 ### Variabili d'ambiente, nel file .env.local
 ```env
+# Database PostgreSQL 18
 DATABASE_URL="postgresql://app:!ChangeMe!@127.0.0.1:5432/app?serverVersion=16&charset=utf8"
 
+# Token per l'utilizzo del Chatbot
+APP_CHAT_CONSOLE_TOKEN=1234567...
+
+# Parametri AI Backend
 AI_BACKEND=ollama
 SHOW_SOURCES=false
 
@@ -324,3 +329,17 @@ curl -X POST https://localhost/api/chat/stream \
   -H "Authorization: Bearer <token_generato>" \
   -d '{"question":"Riassumi la pipeline"}'
 ```
+# 9. Da implementare
+## 1. Modalità “profilo di indicizzazione”  
+preset salvati (dimensione chunk, top‑k, backend embeddings, fallback) da richiamare via CLI o UI, così si può passare da un setup Ollama → OpenAI senza toccare .env.
+## 2. Scheduler di re-index  
+comando che pianifica via cron (o Symfony Messenger) scansioni incrementali, con notifica se trova documenti non indicizzati o fallimenti.  
+## 3. Dashboard API token  
+elenco token per utente, ultimi utilizzi, revoche rapide
+oggi c’è solo il comando CLI.  
+## 4. Audit delle chat
+log minimale (utente/timestamp/latency/modello) per capire carico e qualità, magari con filtri su top-k e soglia similitudine usata.
+## 5. Test di regressione RAG
+un comando che esegue richieste “di riferimento” e confronta score/risposte con baseline, utile prima di cambiare modello embedding o parametri.
+## 6. Alerting per stato indice
+Live component per aggiungere webhooks/email quando chunk non cercabili superano una soglia o l’indexer fallisce.

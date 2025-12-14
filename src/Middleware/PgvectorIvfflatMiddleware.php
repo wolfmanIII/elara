@@ -34,8 +34,9 @@ final class PgvectorIvfflatDriver extends AbstractDriverMiddleware
     {
         $connection = parent::connect($params);
 
-        // QUI imposto la sessione pgvector
-        $connection->exec('SET ivfflat.probes = '.$this->probes);
+        // QUI imposto la sessione pgvector per l'indice IVF-FLAT
+        // In questo momento non mi serve, sto usando l'indice HNSW
+        //$connection->exec('SET ivfflat.probes = '.$this->probes);
 
         return $connection;
     }
