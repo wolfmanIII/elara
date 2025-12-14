@@ -110,14 +110,25 @@ All'interno dell'applicativo:
 ### Cos’è cosine_similarity e cosa fa nella query
 Ecco un esempio:
 ```php
-$qb = $this->em->createQueryBuilder()
-    ->select('c', 'f')
-    ->from(DocumentChunk::class, 'c')
-    ->join('c.file', 'f')
-    ->where('c.embedding IS NOT NULL')
-    ->orderBy('cosine_similarity(c.embedding, :vec)', 'DESC')
-    ->setMaxResults(5)
-    ->setParameter('vec', $queryVec);
+public function findTopKCosineSimilarity(array $embedding): array
+{
+    return $this->createQueryBuilder('c')
+        ->select('c.id')
+        ->addSelect('c.content AS chunk_content')
+        ->addSelect('c.chunkIndex AS chunk_index')
+        ->addSelect('f.path AS file_path')
+        ->addSelect('cosine_similarity(c.embedding, :vec) AS similarity')
+        ->join('c.file', 'f')
+        ->where('c.embedding IS NOT NULL')
+        ->andWhere('c.searchable = true')
+        ->andWhere('cosine_similarity(c.embedding, :vec) > :minScore')
+        ->orderBy('similarity', 'DESC')
+        ->setMaxResults((int)$_ENV['TOP_K'])
+        ->setParameter('vec', $embedding, 'vector')
+        ->setParameter('minScore', 0.55)
+        ->getQuery()
+        ->getResult();
+}
 ```
 Qui accadono 2 cose molto importanti:
 1. `:vec` è l’embedding della domanda (array di 1024 float).
