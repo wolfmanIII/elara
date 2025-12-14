@@ -48,6 +48,21 @@
                 <div class="flex-none text-[42px]">
                     <code><b>ELaRA</b></code>
                 </div>
+
+                <div class="flex-1"></div>
+
+                <div class="flex-none px-4">
+                    {% if app.user %}
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm opacity-80">{{ app.user.userIdentifier }}</span>
+                            <form method="post" action="{{ path('app_logout') }}">
+                                <button class="btn btn-sm btn-outline">Logout</button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <a href="{{ path('app_login') }}" class="btn btn-sm btn-outline">Login</a>
+                    {% endif %}
+                </div>
             </nav>
 
             <div class="p-4">

@@ -6,6 +6,7 @@ use App\Repository\DocumentFileRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\User;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: DocumentFileRepository::class)]
@@ -42,6 +43,10 @@ class DocumentFile
 
     #[ORM\Column(nullable: true)]
     private ?int $size = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?User $indexedBy = null;
 
     public function __construct()
     {
@@ -136,6 +141,17 @@ class DocumentFile
     {
         $this->size = $size;
 
+        return $this;
+    }
+
+    public function getIndexedBy(): ?User
+    {
+        return $this->indexedBy;
+    }
+
+    public function setIndexedBy(?User $indexedBy): self
+    {
+        $this->indexedBy = $indexedBy;
         return $this;
     }
 }
