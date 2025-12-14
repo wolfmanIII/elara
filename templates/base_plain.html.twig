@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html data-theme="business" lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>{% block title %}ELaRA{% endblock %}</title>
+    <link rel="icon" href="{{ asset('img/favicon.ico') }}">
+    {% block stylesheets %}{% endblock %}
+    {% block javascripts %}
+        {% block importmap %}{{ importmap('app') }}{% endblock %}
+    {% endblock %}
+</head>
+<body class="bg-base-200 min-h-screen">
+    <div class="flex flex-col items-center justify-center min-h-screen px-4 py-8">
+        <div class="w-full max-w-xl bg-base-100 shadow-xl border border-base-300 rounded-2xl p-6">
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div role="alert" class="alert alert-{{ label }} alert-outline mb-3">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            {% block pageContent %}{% endblock %}
+        </div>
+    </div>
+</body>
+</html>
