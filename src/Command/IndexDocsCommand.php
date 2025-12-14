@@ -37,7 +37,7 @@ final class IndexDocsCommand extends Command
             ->addOption('force-reindex', null, InputOption::VALUE_NONE, 'Forza la reindicizzazione anche se l\'hash è invariato')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Simula senza modificare il database')
             ->addOption('test-mode', null, InputOption::VALUE_NONE, 'Non chiama il modello esterno, utile per test')
-            ->addOption('offline-fallback', null, InputOption::VALUE_NONE, 'Usa embedding fake in caso di errore col modello')
+            ->addOption('offline-fallback', null, InputOption::VALUE_REQUIRED, 'Usa embedding fake in caso di errore col modello', true)
             ->addOption('path', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Limita a questi sotto-path relativi')
         ;
     }
