@@ -17,6 +17,8 @@ security:
             form_login:
                 login_path: app_login
                 check_path: app_login
+                username_parameter: email
+                password_parameter: password
                 enable_csrf: true
                 default_target_path: app_home
             logout:
@@ -28,7 +30,8 @@ security:
     access_control:
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/_components, roles: PUBLIC_ACCESS }
-        - { path: ^/api, roles: PUBLIC_ACCESS }
+        - { path: ^/api, roles: ROLE_USER }
+        - { path: ^/ai, roles: ROLE_USER }
         - { path: ^/descrizione, roles: PUBLIC_ACCESS }
         - { path: ^/indice, roles: ROLE_USER }
         - { path: ^/, roles: PUBLIC_ACCESS }
