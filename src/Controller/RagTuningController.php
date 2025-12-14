@@ -9,7 +9,7 @@ final class RagTuningController extends BaseController
 {
     public const CONTROLLER_NAME = 'RagTuningController';
 
-    #[Route('/rag-tuning', name: 'app_rag_tuning', methods: ['GET'])]
+    #[Route('/descrizione/rag-tuning', name: 'app_rag_tuning', methods: ['GET'])]
     public function index(): Response
     {
         return $this->render('rag/tuning.html.twig', [

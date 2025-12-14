@@ -34,6 +34,7 @@ class GeminiClient implements AiClientInterface
                             ['text' => $text],
                         ],
                     ],
+                    'taskType' => 'SEMANTIC_SIMILARITY',
                     'outputDimensionality' => $this->dimension,
                 ],
                 'timeout' => 120,
@@ -165,7 +166,7 @@ TXT;
                         'maxOutputTokens' => 1024,
                     ],
                 ],
-                'timeout' => 5,
+                'timeout' => 12,
             ],
         );
 

@@ -9,7 +9,7 @@ final class PipelineController extends BaseController
 {
     public const CONTROLLER_NAME = 'PipelineController';
 
-    #[Route('/pipeline-architettura', name: 'app_pipeline_architecture', methods: ['GET'])]
+    #[Route('/descrizione/pipeline-architettura', name: 'app_pipeline_architecture', methods: ['GET'])]
     public function index(): Response
     {
         return $this->render('pipeline/architecture.html.twig', [

@@ -25,7 +25,7 @@ class DocumentChunkRepository extends ServiceEntityRepository
      * @param int $k
      * @return array
      */
-    public function findTopKCosineSimilarity(array $embedding, int $k = 4): array
+    public function findTopKCosineSimilarity(array $embedding): array
     {
         return $this->createQueryBuilder('c')
             ->select('c.id')
@@ -38,7 +38,7 @@ class DocumentChunkRepository extends ServiceEntityRepository
             ->andWhere('c.searchable = true')
             ->andWhere('cosine_similarity(c.embedding, :vec) > :minScore')
             ->orderBy('similarity', 'DESC')
-            ->setMaxResults($k)
+            ->setMaxResults((int)$_ENV['TOP_K'])
             ->setParameter('vec', $embedding, 'vector')
             ->setParameter('minScore', 0.55)
             ->getQuery()

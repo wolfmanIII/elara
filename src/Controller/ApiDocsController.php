@@ -9,7 +9,7 @@ final class ApiDocsController extends BaseController
 {
     public const CONTROLLER_NAME = 'ApiDocsController';
 
-    #[Route('/api/chat/docs', name: 'app_api_docs', methods: ['GET'])]
+    #[Route('/descrizione/api/chat/docs', name: 'app_api_docs', methods: ['GET'])]
     public function index(): Response
     {
         return $this->render('api/chat_docs.html.twig', [
