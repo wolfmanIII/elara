@@ -29,6 +29,7 @@ class ApiToken
         $this->user = $user;
         $this->token = $token;
         $this->expiresAt = $expiresAt;
+        $user->getApiTokens()->add($this);
     }
 
     public function getToken(): string

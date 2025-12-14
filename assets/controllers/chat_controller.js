@@ -7,6 +7,7 @@ export default class extends Controller {
         endpoint: String,
         streamEndpoint: String,
         engineStatusUrl: String,
+        apiToken: String,
     };
 
     connect() {
@@ -107,12 +108,18 @@ export default class extends Controller {
     async submitClassic(question) {
         this.toggleLoading(true);
         try {
+            const headers = {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            };
+
+            if (this.hasApiTokenValue && this.apiTokenValue) {
+                headers.Authorization = `Bearer ${this.apiTokenValue}`;
+            }
+
             const resp = await fetch(this.endpointValue, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
+                headers,
                 body: JSON.stringify({ question }),
             });
             const data = await resp.json();
@@ -135,12 +142,17 @@ export default class extends Controller {
         const assistantBubble = this.startAssistantMessage();
 
         try {
+            const headers = {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            };
+            if (this.hasApiTokenValue && this.apiTokenValue) {
+                headers.Authorization = `Bearer ${this.apiTokenValue}`;
+            }
+
             const resp = await fetch(this.streamEndpointValue, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
+                headers,
                 body: JSON.stringify({ question }),
             });
 

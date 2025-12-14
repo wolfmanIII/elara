@@ -29,7 +29,7 @@ final class ApiTokenCreateCommand extends Command
     {
         $this
             ->addArgument('email', InputArgument::REQUIRED, 'Email dell\'utente a cui assegnare il token')
-            ->addOption('ttl', null, InputOption::VALUE_REQUIRED, 'Durata in ore del token', 24 * 365 * 10);
+            ->addOption('ttl', null, InputOption::VALUE_REQUIRED, 'Durata in ore del token', 24 * 365);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

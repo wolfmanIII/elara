@@ -39,11 +39,11 @@
                         <span class="material-symbols-rounded text-base">Almeno</span>
                     </a>
 
-                    <a href="#quickstart" class="btn btn-ghost">
+                    <a href="{{ path('app_cli_operations') }}" class="btn btn-ghost">
                         Quickstart CLI
                     </a>
 
-                    <a href="#rag-pipeline" class="btn btn-outline">
+                    <a href="{{ path('app_pipeline_architecture') }}" class="btn btn-outline">
                         Pipeline RAG
                     </a>
                 </div>
@@ -63,6 +63,7 @@
 
                         <div class="mockup-code text-sm overflow-x-auto">
                             <pre data-prefix="$"><code>curl -X POST http://localhost:8000/api/chat \</code></pre>
+                            <pre data-prefix=" "><code>  -H "Authorization: Bearer {token_generato}" \</code></pre>
                             <pre data-prefix=" "><code>  -H "Content-Type: application/json" \</code></pre>
                             <pre data-prefix=" "><code>  -d '{"message":"Riassumi la pipeline di indicizzazione"}'</code></pre>
                         </div>

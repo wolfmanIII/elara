@@ -19,8 +19,11 @@ final class ChatController extends BaseController
     #[Route('/ai/console', name: 'app_ai_console', methods: ['GET'])]
     public function console(): Response
     {
+        $apiToken = $_ENV['APP_CHAT_CONSOLE_TOKEN'] ?? null;
+
         return $this->render('chat/console.html.twig', [
             'controller_name' => self::CONTROLLER_NAME,
+            'chat_api_token' => $apiToken,
         ]);
     }
 
@@ -29,7 +32,7 @@ final class ChatController extends BaseController
     {
         $backend = $_ENV['AI_BACKEND'] ?? 'ollama';
         $modelMap = [
-            'ollama' => $_ENV['OLLAMA_CHAT_MODEL'] ?? 'llama3.1:8b',
+            'ollama' => $_ENV['OLLAMA_CHAT_MODEL'] ?? 'llama3.2',
             'openai' => $_ENV['OPENAI_CHAT_MODEL'] ?? 'gpt-5.1-mini',
             'gemini' => $_ENV['GEMINI_CHAT_MODEL'] ?? 'gemini-1.5-flash',
         ];

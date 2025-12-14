@@ -288,3 +288,28 @@ php bin/console app:unindex-file "\\.pdf$"
 ```bash
 php bin/console app:unindex-file ".*"
 ```
+# 8. API come utilizzarla(ApiTokenAuthenticator)
+## 1. Command per generare token
+### ttl scadenza di default 1 anno
+```bash
+php bin/console app:api-token:create user@email.dev
+```
+### Con scadenza impostatata tramite il parametro ttl, indicata in ore
+```bash
+php bin/console app:api-token:create user@email.dev --ttl=48
+```
+## 2. Normale
+```bash
+curl -X POST https://localhost/api/chat \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token_generato>" \
+  -d '{"question":"Riassumi la pipeline"}'
+```
+## 3. Streaming
+```bash
+curl -X POST https://localhost/api/chat/stream \
+  -H "Content-Type: application/json" \
+  -H "Accept: text/event-stream" \
+  -H "Authorization: Bearer <token_generato>" \
+  -d '{"question":"Riassumi la pipeline"}'
+```
