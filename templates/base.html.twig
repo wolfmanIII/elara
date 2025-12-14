@@ -24,7 +24,7 @@
 
         <!-- CONTENUTO PAGINA -->
         <div class="drawer-content flex flex-col min-h-screen">
-            <nav class="navbar w-full bg-base-300 sticky top-0 z-50">
+            <nav class="navbar w-full bg-base-300 sticky top-0 z-30">
                 <!-- Bottone: visibile solo su schermi piccoli -->
                 <div class="flex-none lg:hidden">
                     <label for="my-drawer-4"
@@ -95,136 +95,7 @@
         </div>
 
         <!-- SIDEBAR -->
-        <div class="drawer-side">
-            <label for="my-drawer-4" aria-label="close sidebar" class="drawer-overlay"></label>
-
-            <div class="min-h-full w-64 bg-base-200 flex flex-col items-start">
-                <ul class="menu w-full grow">
-                    
-                    <li>
-                        <a href="{{ path('app_home') }}"
-                            class="{% if controller_name == constant('App\\Controller\\HomeController::CONTROLLER_NAME') %}menu-active{% endif %}">
-                            {# icona "sparkles" #}
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" 
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z">
-                                </path><polyline points="9 22 9 12 15 12 15 22"></polyline>
-                            </svg>
-                            <span>Homepage</span>
-                        </a>
-                    </li>
-
-                    <li class="menu-title">Descrizione</li>
-
-                    <li>
-                        <a href="{{ path('app_overview') }}"
-                           class="{% if controller_name == constant('App\\Controller\\OverviewController::CONTROLLER_NAME') %}menu-active{% endif %}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2"></path>
-                                <path d="M3 8h18"></path>
-                                <path d="M6 12v4"></path>
-                                <path d="M10 12v4"></path>
-                                <path d="M14 12v4"></path>
-                                <path d="M18 12v4"></path>
-                            </svg>
-                            <span>Panoramica</span>
-                        </a>
-                    </li>
-
-                    <li>    
-                        <a href="{{ path('app_pipeline_architecture') }}"
-                           class="{% if controller_name == constant('App\\Controller\\PipelineController::CONTROLLER_NAME') %}menu-active{% endif %}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 3h-6a2 2 0 0 0-2 2v4"></path>
-                                <path d="M21 3l-9 9"></path>
-                                <path d="M3 21h6a2 2 0 0 0 2-2v-4"></path>
-                                <path d="M3 21l9-9"></path>
-                            </svg>
-                            <span>Pipeline & Architettura</span>
-                        </a>
-
-                        <a href="{{ path('app_rag_tuning') }}"
-                           class="{% if controller_name == constant('App\\Controller\\RagTuningController::CONTROLLER_NAME') %}menu-active{% endif %}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 3v18"></path>
-                                <path d="M5 9h14"></path>
-                                <path d="M5 15h14"></path>
-                            </svg>
-                            <span>RAG Tuning</span>
-                        </a>
-
-                        <a href="{{ path('app_cli_operations') }}"
-                           class="{% if controller_name == constant('App\\Controller\\CliController::CONTROLLER_NAME') %}menu-active{% endif %}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M4 17l6-6-6-6"></path>
-                                <path d="M12 19h8"></path>
-                            </svg>
-                            <span>CLI & Operazioni</span>
-                        </a>
-
-                        <a href="{{ path('app_api_docs') }}"
-                           class="{% if controller_name == constant('App\\Controller\\ApiDocsController::CONTROLLER_NAME') %}menu-active{% endif %}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M4 21V7a2 2 0 0 1 2-2h6"></path>
-                                <path d="M18 21V9a2 2 0 0 0-2-2h-6"></path>
-                                <path d="M9 21h6"></path>
-                                <path d="M9 3h6"></path>
-                            </svg>
-                            <span>API Chat</span>
-                        </a>
-
-                        <a href="{{ path('app_user_guide') }}"
-                           class="{% if controller_name == constant('App\\Controller\\UserGuideController::CONTROLLER_NAME') %}menu-active{% endif %}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                                <path d="M6.5 17A2.5 2.5 0 0 0 4 14.5V5"></path>
-                                <path d="M20 15c0-1.4-1.5-2-3-2H8"></path>
-                                <path d="M4 5h16"></path>
-                            </svg>
-                            <span>Guida utente</span>
-                        </a>
-                    </li>
-
-                    <li class="menu-title">Chatbot</li>
-
-                    <li>    
-                        <a href="{{ path('app_ai_console') }}"
-                            class="{% if controller_name == constant('App\\Controller\\ChatController::CONTROLLER_NAME') %}menu-active{% endif %}">
-                            {# icona "sparkles" #}
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" 
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                            </svg>
-                            <span>Almeno</span>
-                        </a>
-                    </li>
-
-                    <li class="menu-title">Stato</li>
-
-                    <li>    
-                        <a href="{{ path('app_index_monitor') }}"
-                           class="{% if controller_name == constant('App\\Controller\\IndexMonitorController::CONTROLLER_NAME') %}menu-active{% endif %}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="4 14 10 14 10 20"></polyline>
-                                <path d="M4 20h16"></path>
-                                <path d="M20 10V4H4v6"></path>
-                                <path d="M4 10c4.29-3 8.29-3 12.57 0c1.48 1.036 2.48 1.451 3.43 1.543"></path>
-                            </svg>
-                            <span>Indice documenti</span>
-                        </a>
-
-                    </li>
-
-                </ul>
-            </div>
-        </div>
+        {{ include('layout/_sidebar.html.twig') }}
     </div>
 
 </body>
