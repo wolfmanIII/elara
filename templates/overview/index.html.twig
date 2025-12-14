@@ -1,0 +1,171 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Overview - ELaRA{% endblock %}
+
+{% block pageContent %}
+<div class="bg-base-200 text-base-content">
+    <div class="space-y-8 p-5">
+
+        {# PANORAMICA #}
+        <section id="overview" class="space-y-4 lg:space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                <h2 class="text-xl sm:text-2xl font-bold">Cos’è ELaRA e a cosa serve</h2>
+                <span class="badge badge-outline self-start sm:self-auto">RAG · Motore interno</span>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                <div class="card bg-base-100 border border-base-300 h-full">
+                    <div class="card-body space-y-2">
+                        <h3 class="card-title text-base">Definizione</h3>
+                        <p class="text-sm opacity-80">
+                            ELaRA è un motore RAG che combina un motore di ricerca vettoriale
+                            sui tuoi documenti con un modello di AI generativa. Risponde
+                            usando esclusivamente le fonti indicizzate, riducendo le
+                            hallucination rispetto ai chatbot “generici”.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300 h-full">
+                    <div class="card-body space-y-2">
+                        <h3 class="card-title text-base">Scopo</h3>
+                        <p class="text-sm opacity-80">
+                            Permettere a chiunque, senza competenze tecniche, di interrogare
+                            documentazione interna in linguaggio naturale, con risposte
+                            leggibili, basate sui documenti, e facilmente integrabili via API.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300 h-full">
+                    <div class="card-body space-y-2">
+                        <h3 class="card-title text-base">Cosa fa bene</h3>
+                        <ul class="text-sm opacity-80 space-y-1 list-disc list-inside">
+                            <li>Indicizza PDF, MD, DOCX, ODT con estrazione testo pulita</li>
+                            <li>Gestisce embedding e ricerca vettoriale con pgvector</li>
+                            <li>Espone un’unica API semplice: <code>POST /api/chat</code></li>
+                            <li>Supporta backend AI switchabile (Ollama / OpenAI)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {# VALUE PROP / PERSONE #}
+        <section id="value-prop" class="space-y-4 lg:space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                <h2 class="text-xl sm:text-2xl font-bold">Perché ELaRA · Valore per i diversi attori</h2>
+                <span class="badge badge-info badge-outline self-start sm:self-auto">
+                    Vista business & tecnica
+                </span>
+            </div>
+
+            <div class="grid gap-4 md:grid-cols-3">
+                <div class="card bg-base-100 border border-base-300 h-full">
+                    <div class="card-body space-y-2">
+                        <h3 class="card-title text-base">Responsabili IT</h3>
+                        <ul class="list-disc list-inside text-sm opacity-80 space-y-1">
+                            <li>Dati sempre on-premise / nel proprio cluster.</li>
+                            <li>Stack standard: Symfony, PostgreSQL, PHP.</li>
+                            <li>Configurabile via ENV, senza lock-in di vendor.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300 h-full">
+                    <div class="card-body space-y-2">
+                        <h3 class="card-title text-base">Referenti funzionali</h3>
+                        <ul class="list-disc list-inside text-sm opacity-80 space-y-1">
+                            <li>Riduce il tempo di ricerca nelle norme/procedure.</li>
+                            <li>Risposte uniformi basate sulla documentazione ufficiale.</li>
+                            <li>Facile da usare: una casella di testo, italiano naturale.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300 h-full">
+                    <div class="card-body space-y-2">
+                        <h3 class="card-title text-base">Team di sviluppo</h3>
+                        <ul class="list-disc list-inside text-sm opacity-80 space-y-1">
+                            <li>Un solo endpoint REST, JSON pulito.</li>
+                            <li>Servizi PHP separati e testabili (SRP).</li>
+                            <li>Estensibile: nuovi comandi, nuovi backend AI, nuovi formati.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        {# STATS / OVERVIEW TECNICA #}
+        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6">
+            <div class="stat bg-base-100 shadow-sm rounded-2xl border border-base-300">
+                <div class="stat-title text-base">Backend AI</div>
+                <div class="stat-value text-lg">Ollama · OpenAI - Gemini</div>
+                <div class="text-sm opacity-70">
+                    Selezionabile via <code class="kbd kbd-base">AI_BACKEND</code>
+                </div>
+            </div>
+
+            <div class="stat bg-base-100 shadow-sm rounded-2xl border border-base-300">
+                <div class="stat-title text-base">Database</div>
+                <div class="stat-value text-lg">PostgreSQL + pgvector</div>
+                <div class="text-sm opacity-70">
+                    Colonna <code class="kbd kbd-sm">vector(1024)</code> su <code>DocumentChunk</code>
+                </div>
+            </div>
+
+            <div class="stat bg-base-100 shadow-sm rounded-2xl border border-base-300">
+                <div class="stat-title text-base">Indice vettoriale</div>
+                <div class="stat-value text-lg">HNSW</div>
+                <div class="text-sm opacity-70">
+                    Ricerca approssimata veloce con <code>vector_cosine_ops</code>
+                </div>
+            </div>
+
+            <div class="stat bg-base-100 shadow-sm rounded-2xl border border-base-300">
+                <div class="stat-title text-base">Documenti & Chunk</div>
+                <div class="stat-value text-lg">File - Chunk</div>
+                <div class="text-sm opacity-70">
+                    Modello Entity(DocumentFile + DocumentChunk) dedicato a file, hash, chunk e embedding
+                </div>
+            </div>
+        </section>
+
+        <div class="w-full text-xs">
+            Documenti di riferimento:
+            <button class="btn btn-xs btn-outline"
+                    onclick="document.getElementById('modal-elara-definizione').showModal()">
+                <code>ElaRA - Definizione</code>
+            </button>
+            <button class="btn btn-xs btn-outline"
+                    onclick="document.getElementById('modal-elara-analisi').showModal()">
+                <code>ElaRA - Analisi Tecnica</code>
+            </button>
+            <button class="btn btn-xs btn-outline"
+                    onclick="document.getElementById('modal-elara-flusso-applicativo').showModal()">
+                <code>ElaRA - Flusso Applicativo</code>
+            </button>
+        </div>
+
+    </div>
+</div>
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-definizione',
+    title: 'ELaRA — Definizione',
+    markdownFile: 'docs/elara_definizione.md'
+}) }}
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-analisi',
+    title: 'ELaRA — Analisi Tecnica',
+    markdownFile: 'docs/elara_analisi_tecnica.md'
+}) }}
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-flusso-applicativo',
+    title: 'ELaRA — Flusso Applicativo',
+    markdownFile: 'docs/elara_flusso_applicativo.md'
+}) }}
+{% endblock %}

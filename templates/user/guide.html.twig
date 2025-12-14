@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Guida Utente - ELaRA{% endblock %}
+
+{% block pageContent %}
+<div class="bg-base-200 text-base-content">
+    <div class="space-y-8 p-5">
+
+        {# GUIDA UTENTE — COME FARE LE DOMANDE #}
+        <section id="user-guide" class="space-y-4 lg:space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                <h2 class="text-xl sm:text-2xl font-bold">Guida utente · Come fare le domande giuste</h2>
+                <span class="badge badge-info badge-outline self-start sm:self-auto">
+                    Pensata per utenti non tecnici
+                </span>
+            </div>
+
+            <div class="grid gap-6 lg:grid-cols-[minmax(0,1.1fr),minmax(0,0.9fr)]">
+                <div class="card bg-base-100 border border-base-300">
+                    <div class="card-body space-y-3">
+                        <h3 class="card-title text-base">Principi di base</h3>
+                        <ul class="list-disc list-inside text-sm opacity-80 space-y-1">
+                            <li>ELaRA risponde solo in base ai documenti indicizzati.</li>
+                            <li>Più la domanda è chiara e specifica, migliore sarà il retrieval.</li>
+                            <li>Evita domande troppo generiche tipo <em>“Parlami di…”</em>.</li>
+                            <li>Hai dubbi sulla pertinenza? Usa la modalità TEST per vedere i chunk.</li>
+                        </ul>
+
+                        <h4 class="font-semibold text-base mt-3">Template utili</h4>
+                        <ul class="text-sm space-y-1 opacity-80">
+                            <li><strong>Concetto:</strong> “Nei documenti caricati, come viene definito <code>{concetto}</code>?”</li>
+                            <li><strong>Procedura:</strong> “Quali sono i passaggi descritti per <code>{procedura}</code>?”</li>
+                            <li><strong>Riassunto:</strong> “Puoi riassumere ciò che i documenti dicono riguardo <code>{argomento}</code>?”</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300">
+                    <div class="card-body space-y-3">
+                        <h3 class="card-title text-base">Esempi pratici</h3>
+                        <div class="grid gap-3 text-xs">
+                            <div class="border border-base-300 rounded-xl p-3 text-sm">
+                                <p class="font-semibold mb-1">❌ Domanda vaga</p>
+                                <p class="opacity-80 mb-1">“Come funziona ELaRA?”</p>
+                                <p class="font-semibold mb-1">✔️ Domanda efficace</p>
+                                <p class="opacity-80">
+                                    “Puoi spiegare il flusso FILE → Estrattore → Chunking →
+                                    Embedding → Retrieval → Risposta?”
+                                </p>
+                            </div>
+
+                            <div class="border border-base-300 rounded-xl p-3 text-sm">
+                                <p class="font-semibold mb-1">❌ Troppo generico</p>
+                                <p class="opacity-80 mb-1">“Cos’è un indice?”</p>
+                                <p class="font-semibold mb-1">✔️ Meglio</p>
+                                <p class="opacity-80">
+                                    “Cosa si intende per indice HNSW in pgvector e perché è
+                                    consigliato rispetto a IVF-FLAT nel motore ELaRA?”
+                                </p>
+                            </div>
+                        </div>
+
+                        <p class="text-sm opacity-70">
+                            Regola d’oro: formula la domanda come se stessi chiedendo a un collega,
+                            citando l’argomento e il contesto che ti interessa.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="w-full text-xs">
+            Documenti di riferimento:
+            <button class="btn btn-xs btn-outline"
+                    onclick="document.getElementById('modal-elara-prompt').showModal()">
+                <code>ElaRA - Guida al Prompt</code>
+            </button>
+        </div>
+
+    </div>
+</div>
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-prompt',
+    title: 'ELaRA — Guida al Prompt',
+    markdownFile: 'docs/elara_guida_utente_prompt.md'
+}) }}
+{% endblock %}

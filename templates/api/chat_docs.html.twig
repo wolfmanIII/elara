@@ -1,0 +1,130 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}API Chat - Documentazione{% endblock %}
+
+{% block pageContent %}
+<div class="bg-base-200 text-base-content">
+    <div class="space-y-8 p-5">
+
+        {# API SECTION #}
+        <section id="api-chat" class="space-y-4 lg:space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                <h2 class="text-xl sm:text-2xl font-bold">API /api/chat</h2>
+                <span class="badge badge-accent badge-outline text-xs self-start sm:self-auto">
+                    JSON · RAG · Stateless
+                </span>
+            </div>
+
+            <div class="grid gap-6 md:grid-cols-2 items-start">
+                <div class="space-y-4">
+                    <p class="text-base opacity-80">
+                        L’API principale espone 2 endpoint:
+                        <code class="kbd kbd-sm">POST /api/chat</code> e <code class="kbd kbd-sm">POST /api/chat/stream</code>
+                        che accettano un corpo JSON minimale:
+                    </p>
+
+                    <div class="mockup-code text-sm">
+                        <pre data-prefix=" "><code>{</code></pre>
+                        <pre data-prefix=" "><code>  "message": "testo della domanda"</code></pre>
+                        <pre data-prefix=" "><code>}</code></pre>
+                    </div>
+
+                    <p class="text-sm opacity-80">
+                        Esempio in modalità normale:
+                    </p>
+                    <div class="mockup-code text-sm overflow-x-auto">
+                        <pre data-prefix="$"><code>curl -X POST http://localhost:8000/api/chat \</code></pre>
+                        <pre data-prefix=" "><code>  -H "Content-Type: application/json" \</code></pre>
+                        <pre data-prefix=" "><code>  -d '{"message":"Riassumi Helix"}'</code></pre>
+                    </div>
+
+                    <p class="text-sm opacity-80 mt-2">
+                        Risposta errore (messaggio vuoto):
+                    </p>
+                    <div class="mockup-code text-sm">
+                        <pre data-prefix=" "><code>{ "error": "Messaggio vuoto" }</code></pre>
+                    </div>
+
+                    <p class="text-sm opacity-70">
+                        Modalità e backend sono controllati da variabili ambiente:
+                        <code>AI_BACKEND</code>,
+                        <code>APP_AI_TEST_MODE</code>,
+                        <code>APP_AI_OFFLINE_FALLBACK</code>.
+                    </p>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300">
+                    <div class="card-body space-y-4">
+                        <h3 class="card-title text-base">Flusso interno della richiesta</h3>
+
+                        <ul class="timeline timeline-vertical text-sm">
+                            <li>
+                                <div class="timeline-start">1 · Validazione</div>
+                                <div class="timeline-middle">
+                                    <span class="dot dot-primary"></span>
+                                </div>
+                                <div class="timeline-end timeline-box text-sm">
+                                    <code>ChatController</code> valida il JSON in input
+                                    e rifiuta messaggi vuoti.
+                                </div>
+                            </li>
+                            <li>
+                                <div class="timeline-start">2 · ChatbotService</div>
+                                <div class="timeline-middle">
+                                    <span class="dot dot-secondary"></span>
+                                </div>
+                                <div class="timeline-end timeline-box text-sm">
+                                    Metodo <code>ask()</code>: legge ENV (test mode, fallback),
+                                    calcola l’embedding domanda e cerca i chunk più simili.
+                                </div>
+                            </li>
+                            <li>
+                                <div class="timeline-start">3 · AI Backend</div>
+                                <div class="timeline-middle">
+                                    <span class="dot dot-accent"></span>
+                                </div>
+                                <div class="timeline-end timeline-box text-sm">
+                                    <code>AiClientInterface</code> instrada la chiamata verso
+                                    Ollama o OpenAI. In caso di errore può attivare
+                                    <em>offline fallback</em> basato solo sui chunk.
+                                </div>
+                            </li>
+                        </ul>
+
+                        <p class="text-sm opacity-70">
+                            In modalità TEST, il sistema non chiama il modello AI ma
+                            restituisce direttamente gli estratti dai chunk trovati,
+                            utile per debug della qualità del retrieval.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="w-full text-xs">
+            Documenti di riferimento:
+            <button class="btn btn-xs btn-outline"
+                    onclick="document.getElementById('modal-elara-readme').showModal()">
+                <code>ElaRA - README</code>
+            </button>
+            <button class="btn btn-xs btn-outline"
+                    onclick="document.getElementById('modal-elara-api-guide').showModal()">
+                <code>ElaRA - Guida API</code>
+            </button>
+        </div>
+
+    </div>
+</div>
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-readme',
+    title: 'ELaRA — README',
+    markdownFile: 'README.md'
+}) }}
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-api-guide',
+    title: 'ELaRA — Guida API',
+    markdownFile: 'docs/elara_api_guide_curl_completa.md'
+}) }}
+{% endblock %}

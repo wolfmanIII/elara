@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CLI & Operazioni - ELaRA{% endblock %}
+
+{% block pageContent %}
+
+<div class="bg-base-200 text-base-content">
+    <div class="space-y-8 p-5">
+
+        {# QUICKSTART / COMMANDS #}
+        <section id="quickstart" class="space-y-4 lg:space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                <h2 class="text-xl sm:text-2xl font-bold">Quickstart · indicizzazione &amp; comandi</h2>
+                <span class="badge badge-secondary badge-outline self-start sm:self-auto">
+                    CLI · Symfony console
+                </span>
+            </div>
+
+            <div class="grid gap-6 lg:grid-cols-[minmax(0,1.1fr),minmax(0,0.9fr)]">
+
+                <div class="card bg-base-100 border border-base-300">
+                    <div class="card-body space-y-4">
+                        <h3 class="card-title text-lg">2 · Indicizzare, elencare, rimuovere</h3>
+
+                        <div class="tabs tabs-boxed tabs-base">
+                            <a class="tab tab-active">Index</a>
+                            <a class="tab">List</a>
+                            <a class="tab">Unindex</a>
+                        </div>
+
+                        <div class="space-y-3 text-sm">
+                            <p class="opacity-80">
+                                Indicizza tutti i file nuovi/modificati in
+                                <code>var/knowledge</code> usando hash:
+                            </p>
+                            <div class="mockup-code overflow-x-auto">
+                                <pre data-prefix="$"><code>php bin/console app:index-docs</code></pre>
+                            </div>
+
+                            <p class="opacity-80">
+                                Re-indicizza tutto ignorando gli hash:
+                            </p>
+                            <div class="mockup-code overflow-x-auto">
+                                <pre data-prefix="$"><code>php bin/console app:index-docs --force-reindex</code></pre>
+                            </div>
+
+                            <p class="opacity-80">
+                                Elenco dei file indicizzati:
+                            </p>
+                            <div class="mockup-code overflow-x-auto">
+                                <pre data-prefix="$"><code>php bin/console app:list-docs --limit=50</code></pre>
+                            </div>
+
+                            <p class="opacity-80">
+                                Rimuovere un file o pattern dall’indice:
+                            </p>
+                            <div class="mockup-code overflow-x-auto">
+                                <pre data-prefix="$"><code>php bin/console app:unindex-file "manuali/helix.md"</code></pre>
+                                <pre data-prefix="$"><code>php bin/console app:unindex-file "\\.pdf$"</code></pre>
+                            </div>
+                        </div>
+
+                        <p class="text-sm opacity-70">
+                            I comandi seguono la pipeline: estrazione testo → chunking →
+                            embedding → salvataggio su PostgreSQL. L’hash del file
+                            assicura che vengano reindicizzati solo file nuovi/modificati.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="w-full text-xs">
+            Documenti di riferimento:
+            <button class="btn btn-xs btn-outline"
+                    onclick="document.getElementById('modal-elara-readme').showModal()">
+                <code>ElaRA - README</code>
+            </button>
+        </div>
+
+    </div>
+</div>
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-readme',
+    title: 'ELaRA — README',
+    markdownFile: 'README.md'
+}) }}
+{% endblock %}

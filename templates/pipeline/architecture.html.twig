@@ -1,0 +1,200 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Pipeline & Architettura - ELaRA{% endblock %}
+
+{% block pageContent %}
+<div class="bg-base-200 text-base-content">
+    <div class="space-y-8 p-5">
+
+        {# PIPELINE RAG #}
+        <section id="rag-pipeline" class="space-y-4 lg:space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                <h2 class="text-xl sm:text-2xl font-bold">Pipeline RAG end-to-end</h2>
+                <span class="badge badge-outline self-start sm:self-auto">FILE → Risposta</span>
+            </div>
+
+            <p class="max-w-7xl opacity-80 text-base">
+                Il flusso completo di ELaRA segue lo schema:
+                <span class="font-semibold">
+                    FILE → Estrattore → Chunking → Embedding → DB → HNSW (pgvector) → Retrieval → Prompt → AI → Risposta
+                </span>.
+            </p>
+
+            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <div class="card bg-base-100 border border-base-300 h-full">
+                    <div class="card-body space-y-2">
+                        <h3 class="card-title text-lg">1 · Indicizzazione</h3>
+                        <p class="text-sm opacity-80">
+                            I file in <code class="kbd kbd-sm">var/knowledge</code> vengono
+                            letti da <span class="font-semibold">DocumentTextExtractor</span>
+                            (PDF, MD, DOCX, ODT). Il testo viene ripulito, normalizzato e
+                            spezzato in chunk dal <code>ChunkingService</code>.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300 h-full">
+                    <div class="card-body space-y-2">
+                        <h3 class="card-title text-lg">2 · Embedding</h3>
+                        <p class="text-sm opacity-80">
+                            Ogni chunk viene trasformato in un embedding vettoriale
+                            (attualmente 1024 dimensioni tramite modello
+                            <code>bge-m3</code> via Ollama | OpenAi | Gemini) e memorizzato su PostgreSQL
+                            in <code>document_chunk.embedding</code> usando pgvector.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300 h-full">
+                    <div class="card-body space-y-2">
+                        <h3 class="card-title text-lg">3 · Retrieval</h3>
+                        <p class="text-sm opacity-80">
+                            La domanda dell’utente viene embeddizzata e confrontata con
+                            i chunk via cosine similarity. La query ordina per
+                            <code>embedding &lt;=&gt; :query_vec</code> e recupera i top-K
+                            più simili, sfruttando l’indice HNSW.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300 h-full">
+                    <div class="card-body space-y-2">
+                        <h3 class="card-title text-lg">4 · Risposta AI</h3>
+                        <p class="text-sm opacity-80">
+                            <span class="font-semibold">ChatbotService</span> costruisce
+                            il contesto con i chunk trovati, aggiunge un prompt che
+                            impone “rispondi solo usando il contesto” e chiama il modello
+                            AI selezionato (Ollama | OpenAI | Gemini), restituendo una risposta JSON
+                            pulita tramite <code>ChatController</code>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {# ARCHITETTURA & COMPONENTI #}
+        <section id="architecture" class="space-y-4 lg:space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                <h2 class="text-xl sm:text-2xl font-bold">Architettura e Componenti Core</h2>
+                <span class="badge badge-secondary badge-outline self-start sm:self-auto">
+                    Symfony 7.3 · Servizi dedicati
+                </span>
+            </div>
+
+            <div class="grid gap-6 lg:grid-cols-[minmax(0,1.1fr),minmax(0,0.9fr)]">
+                <div class="card bg-base-100 border border-base-300">
+                    <div class="card-body space-y-3">
+                        <h3 class="card-title text-lg">Struttura src/</h3>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div>
+                                <p class="font-semibold mb-1">Core</p>
+                                <ul class="space-y-1 opacity-80">
+                                    <li><code>AI/</code> — client Ollama | OpenAI | Gemini + factory</li>
+                                    <li><code>Service/</code> — DocsIndexer, DocumentTextExtractor, ChunkingService, ChatbotService</li>
+                                    <li><code>Repository/</code> — ricerca vettoriale DocumentChunkRepository</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <p class="font-semibold mb-1">Integrazione</p>
+                                <ul class="space-y-1 opacity-80">
+                                    <li><code>Command/</code> — app:index-docs, app:list-docs, app:unindex-file</li>
+                                    <li><code>Controller/</code> — ChatController (/api/chat)</li>
+                                    <li><code>Entity/</code> — DocumentFile, DocumentChunk</li>
+                                    <li><code>Middleware/</code> — PgvectorIvfflatMiddleware (se usato)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <p class="text-sm opacity-70">
+                            L’architettura è pensata per un alto isolamento logico:
+                            ogni responsabilità è assegnata a un servizio dedicato
+                            facilmente testabile e sostituibile.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300">
+                    <div class="card-body space-y-3">
+                        <h3 class="card-title text-lg">Servizi fondamentali</h3>
+                        <ul class="timeline timeline-vertical text-sm">
+                            <li>
+                                <div class="timeline-start">DocsIndexer</div>
+                                <div class="timeline-middle"><span class="dot dot-primary"></span></div>
+                                <div class="timeline-end timeline-box text-sm">
+                                    Gestisce tutta la pipeline per l'indicizzazione dei documenti
+                                </div>
+                            </li>
+                            <li>
+                                <div class="timeline-start">DocumentTextExtractor</div>
+                                <div class="timeline-middle"><span class="dot dot-primary"></span></div>
+                                <div class="timeline-end timeline-box text-sm">
+                                    Converte PDF, MD, DOCX, ODT in testo pulito, normalizza whitespace,
+                                    rimuove emoji e caratteri invisibili.
+                                </div>
+                            </li>
+                            <li>
+                                <div class="timeline-start">ChunkingService</div>
+                                <div class="timeline-middle"><span class="dot dot-secondary"></span></div>
+                                <div class="timeline-end timeline-box text-sm">
+                                    Spezza il testo in chunk coerenti con overlap e limiti di lunghezza,
+                                    evitando chunk “vuoti” e troppo corti.
+                                </div>
+                            </li>
+                            <li>
+                                <div class="timeline-start">ChatbotService</div>
+                                <div class="timeline-middle"><span class="dot dot-accent"></span></div>
+                                <div class="timeline-end timeline-box text-sm">
+                                    Gestisce l’intera pipeline di domanda:
+                                    embedding → retrieval top-k → costruzione contesto →
+                                    chiamata al modello AI → risposta.
+                                </div>
+                            </li>
+                        </ul>
+
+                        <p class="text-sm opacity-70">
+                            Ogni servizio è pensato per essere sostituibile (es. nuovo modello embedding,
+                            nuovo backend AI) senza toccare il resto del sistema.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="w-full text-xs">
+            Documenti di riferimento:
+            <button class="btn btn-xs btn-outline"
+                    onclick="document.getElementById('modal-elara-flusso-applicativo').showModal()">
+                <code>ElaRA - Flusso Applicativo</code>
+            </button>
+            <button class="btn btn-xs btn-outline"
+                    onclick="document.getElementById('modal-elara-flusso-servizi').showModal()">
+                <code>ElaRA - Flusso Servizi</code>
+            </button>
+            <button class="btn btn-xs btn-outline"
+                    onclick="document.getElementById('modal-elara-chunking-embedding').showModal()">
+                <code>ElaRA - Guida - Chunking & Embedding</code>
+            </button>
+        </div>
+
+    </div>
+</div>
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-flusso-applicativo',
+    title: 'ELaRA — Flusso Applicativo',
+    markdownFile: 'docs/elara_flusso_applicativo.md'
+}) }}
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-flusso-servizi',
+    title: 'ELaRA — Flusso Servizi',
+    markdownFile: 'docs/elara_flusso_servizi_dettagliato.md'
+}) }}
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-chunking-embedding',
+    title: 'ELaRA — Guida Chunking Embedding',
+    markdownFile: 'docs/guida_rag_chunking_embedding.md'
+}) }}
+
+{% endblock %}

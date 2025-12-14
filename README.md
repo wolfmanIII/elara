@@ -8,18 +8,21 @@ ELARA (Embedding Linking & Retrieval Answering) è un motore RAG progettato per 
 
 Il tutto con un flusso semplice, trasparente e controllabile.
 
-## 2. Dipendenze aggiuntive che verranno installate con il comando:
+## 2. Installare le dipendenze e abilitare Symfony UX Live Components:
 ```bash
 composer install
+php bin/console importmap:require @symfony/ux-live-component
 ```
+### Elenco delle dipendenze che verrannno installate:
 * smalot/pdfparser
 * phpoffice/phpword
 * openai-php/client
 * partitech/doctrine-pgvector
 * symfony/uid
+* symfony/ux-twig-component
+* symfony/ux-live-component
 * symfonycasts/tailwind-bundle
 * league/commonmark
-* symfony/ux-twig-component
 ### Interfaccia grafica, Tailwind, Tipography e DaisyUI
 #### Installare nvm (nodejs version manager)
 ```bash
@@ -175,7 +178,7 @@ OLLAMA_EMBED_DIMENSION=1024
 # OpenAI
 #AI_BACKEND=openai
 #OPENAI_API_KEY=sk-...
-#OPENAI_CHAT_MODEL=gpt-4.1-mini
+#OPENAI_CHAT_MODEL=gpt-5.1-mini
 #OPENAI_EMBED_MODEL=text-embedding-3-small
 #OPENAI_EMBED_DIMENSION=768
 

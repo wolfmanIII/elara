@@ -1,0 +1,227 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}RAG Tuning - ELaRA{% endblock %}
+
+{% block pageContent %}
+<div class="bg-base-200 text-base-content">
+    <div class="space-y-8 p-5">
+
+        {# CONFIG & ENV #}
+        <section id="config-env" class="space-y-4 lg:space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                <h2 class="text-xl sm:text-2xl font-bold">Configurazione &amp; variabili ambiente</h2>
+                <span class="badge badge-outline self-start sm:self-auto">
+                    Deploy · Tuning · Sicurezza
+                </span>
+            </div>
+
+            <div class="grid gap-6 lg:grid-cols-[minmax(0,1.15fr),minmax(0,0.85fr)]">
+                <div class="card bg-base-100 border border-base-300">
+                    <div class="card-body space-y-3 text-sm">
+                        <h3 class="card-title text-base">Variabili chiave (.env.local)</h3>
+                        <div class="overflow-x-auto">
+                            <table class="table table-xs sm:table-sm">
+                                <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Descrizione</th>
+                                    <th>Esempio</th>
+                                </tr>
+                                </thead>
+                                <tbody class="align-top">
+                                <tr>
+                                    <td><code>AI_BACKEND</code></td>
+                                    <td>Seleziona il backend AI da usare per le risposte.</td>
+                                    <td><code>ollama</code> · <code>openai</code> · <code>gemini</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>OLLAMA_CHAT_MODEL | OPENAI_CHAT_MODEL | GEMINI_CHAT_MODEL</code></td>
+                                    <td>Modello di chat principale.</td>
+                                    <td><code>llama3.2</code> | <code>gpt-5.1-mini</code>> | <code>gemini-2.5-flash</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>OLLAMA_EMBED_MODEL | OPENAI_EMBED_MODEL | GEMINI_CHAT_MODEL</code></td>
+                                    <td>Modello usato per generare gli embedding dei chunk.</td>
+                                    <td><code>bge-m3</code> | <code>text-embedding-3-small</code> | <code>gemini-embedding-001</code> (1024 | 1536 | 1536 dim)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>APP_AI_TEST_MODE</code></td>
+                                    <td>Se <code>true</code>, restituisce direttamente i chunk invece di chiamare l’AI.</td>
+                                    <td><code>false</code> | <code>true</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>APP_AI_OFFLINE_FALLBACK</code></td>
+                                    <td>Abilita risposta basata solo sui chunk in caso di errore del backend.</td>
+                                    <td><code>false</code> | <code>true</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>DATABASE_URL</code></td>
+                                    <td>Connessione PostgreSQL con estensione <code>vector</code> attiva.</td>
+                                    <td><code>postgresql://...</code></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="w-full text-xs">
+                            Documenti di riferimento:
+                            <button class="btn btn-xs btn-outline"
+                                    onclick="document.getElementById('modal-elara-analisi').showModal()">
+                                <code>ElaRA - Analisi Tecnica</code>
+                            </button>
+                            <button class="btn btn-xs btn-outline"
+                                    onclick="document.getElementById('modal-elara-chunking-embedding').showModal()">
+                                <code>ElaRA - Guida Chunking Embedding</code>
+                            </button>
+                            <button class="btn btn-xs btn-outline"
+                                    onclick="document.getElementById('modal-elara-parametri-risposte').showModal()">
+                                <code>ElaRA - Parametri Qualità Risposte</code>
+                            </button>
+                        </div>
+                        <div class="alert alert-warning text-sm">
+                            <span class="font-semibold">Nota:</span>
+                            <div>
+                                cambiare modello di embedding richiede coerenza con la dimensione della colonna 
+                                <code><b><i>DocumentChunk->embedding(vector)</i></b></code>. Se necessario, re-indicizzare.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {# RAG TUNING & LINEE GUIDA #}
+        <section id="rag-tuning" class="space-y-4 lg:space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                <h2 class="text-xl sm:text-2xl font-bold">Linee guida RAG · Chunk, top_k, embedding</h2>
+                <span class="badge badge-outline self-start sm:self-auto">
+                    Performance &amp; Qualità
+                </span>
+            </div>
+
+            <div class="grid gap-6 lg:grid-cols-[minmax(0,1.05fr),minmax(0,0.95fr)]">
+                <div class="card bg-base-100 border border-base-300">
+                    <div class="card-body space-y-3">
+                        <h3 class="card-title text-base">Parametri consigliati attuali</h3>
+                        <p class="text-sm opacity-80">
+                            Setup pensato per embedding a 1024 dimensioni (modello <code>bge-m3</code>)
+                            e contesto RAG self-hosted:
+                        </p>
+                        <ul class="text-sm opacity-80 list-disc list-inside space-y-1">
+                            <li><strong>min_chunk</strong>: 400–500 caratteri</li>
+                            <li><strong>target/max_chunk</strong>: ~1300–1500 caratteri</li>
+                            <li><strong>overlap</strong>: 200–300 caratteri</li>
+                            <li><strong>top_k</strong>: 4–5</li>
+                            <li><strong>Indice vettoriale</strong>: HNSW su <code>embedding</code></li>
+                        </ul>
+                        <p class="text-sm opacity-70 mt-2">
+                            Obiettivo: chunk coerenti, niente “cadaveri” a una sola riga, recall
+                            alta e contesto compatibile con modelli 7B/8B.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300">
+                    <div class="card-body space-y-3">
+                        <h3 class="card-title text-base">pgvector &amp; indici vettoriali</h3>
+                        <ul class="text-sm opacity-80 list-disc list-inside space-y-1">
+                            <li><strong>HNSW</strong>: scelta raccomandata per dataset medio/piccoli.</li>
+                            <li><strong>IVF-FLAT</strong>: utile solo su milioni di chunk
+                                e con tuning (lists, probes, reindex).</li>
+                            <li><strong>Importante:</strong> non usare HNSW e IVF-FLAT insieme
+                                sulla stessa colonna: è solo spreco di spazio e complessità.</li>
+                            <li><strong>Operatore</strong> <code>&lt;=&gt;</code>:
+                                misura la cosine distance tra embedding domanda e chunk.</li>
+                        </ul>
+                        <p class="text-sm opacity-70 mt-2">
+                            Le query ordinano i chunk dal più simile al meno simile, e
+                            i primi N formano il contesto passato al modello AI.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="w-full text-xs">
+            Documenti di riferimento:
+            <button class="btn btn-xs btn-outline"
+                    onclick="document.getElementById('modal-elara-definizione').showModal()">
+                <code>ElaRA - Definizione</code>
+            </button>
+            <button class="btn btn-xs btn-outline"
+                    onclick="document.getElementById('modal-elara-readme').showModal()">
+                <code>ElaRA - README</code>
+            </button>
+            <button class="btn btn-xs btn-outline"
+                    onclick="document.getElementById('modal-elara-chunking-embedding').showModal()">
+                <code>ElaRA - Guida Chunking Embedding</code>
+            </button>
+            <button class="btn btn-xs btn-outline"
+                    onclick="document.getElementById('modal-elara-parametri-risposte').showModal()">
+                <code>ElaRA - Parametri Qualità Risposte</code>
+            </button>
+
+            <div class="w-full text-xs mt-10">
+                <div class="mt-3 w-full text-sm mb-5">
+                    <div class="card bg-base-100 border border-base-300 shadow-sm">
+                        <div class="card-body p-4 space-y-2">
+                            <div class="flex items-center gap-2">
+                                <span class="badge badge-info badge-sm">Ollama</span>
+                                <span class="font-semibold text-sm">Guida Ubuntu 22 | 24 (servizio + GPU)</span>
+                            </div>
+                            <ul class="list-disc list-inside space-y-1 text-xs sm:text-sm opacity-80">
+                                <li>Installazione come servizio systemd (`curl -fsSL https://ollama.com/install.sh | sh`).</li>
+                                <li>Abilitare Vulkan o CUDA via override `systemctl edit ollama` con variabili `OLLAMA_BACKEND`.</li>
+                                <li>Pull e run modelli: `ollama pull llama3.1:8b`, `ollama pull bge-m3`, `ollama run ...`.</li>
+                                <li>Log e troubleshooting: `journalctl -u ollama -f` e override verificato con `systemctl show ollama | grep OLLAMA`.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                Documenti di riferimento:
+                <button class="btn btn-xs btn-outline"
+                        onclick="document.getElementById('modal-ollama').showModal()">
+                    <code>Guida Ollama Backend</code>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-analisi',
+    title: 'ELaRA — Analisi Tecnica',
+    markdownFile: 'docs/elara_analisi_tecnica.md'
+}) }}
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-chunking-embedding',
+    title: 'ELaRA — Guida Chunking Embedding',
+    markdownFile: 'docs/guida_rag_chunking_embedding.md'
+}) }}
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-parametri-risposte',
+    title: 'ELaRA — Parametri e Qualità delle Risposte',
+    markdownFile: 'docs/elara_parametri_qualita_risposte.md'
+}) }}
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-definizione',
+    title: 'ELaRA — Definizione',
+    markdownFile: 'docs/elara_definizione.md'
+}) }}
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-readme',
+    title: 'ELaRA — README',
+    markdownFile: 'README.md'
+}) }}
+
+{{ component('markdown_modal', {
+    id: 'modal-ollama',
+    title: 'ELaRA — Guida Ollama Backend',
+    markdownFile: 'docs/ollama_ubuntu_24_04_guida.md'
+}) }}
+{% endblock %}
