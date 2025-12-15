@@ -51,7 +51,7 @@ TXT;
                 ['role' => 'system', 'content' => $system],
                 ['role' => 'user', 'content' => $user],
             ],
-            'max_tokens' => 400,
+            'max_tokens' => 1024,
         ]);
 
         //return $resp->choices[0]->message->content ?? '';
@@ -87,7 +87,7 @@ TXT;
                 ['role' => 'system', 'content' => $system],
                 ['role' => 'user', 'content' => $user],
             ],
-            'max_tokens' => 400,
+            'max_tokens' => 1024,
         ]);
 
         foreach ($stream as $response) {

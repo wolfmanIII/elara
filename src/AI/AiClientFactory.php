@@ -27,7 +27,7 @@ class AiClientFactory
                 apiKey: $this->openaiKey ?? $_ENV['OPENAI_API_KEY'],
                 chatModel: $_ENV['OPENAI_CHAT_MODEL'] ?? 'gpt-4.1-mini',
                 embedModel: $_ENV['OPENAI_EMBED_MODEL'] ?? 'text-embedding-3-small',
-                dimension: (int) ($_ENV['OPENAI_EMBED_DIMENSION'] ?? 1024)
+                dimension: (int) ($_ENV['OPENAI_EMBED_DIMENSION'] ?? 768)
             ),
 
             'gemini' => new GeminiClient(
