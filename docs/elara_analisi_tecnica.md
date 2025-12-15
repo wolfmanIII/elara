@@ -173,6 +173,10 @@ ORDER BY embedding <=> :query_vec
 
 Risultati più simili costituiscono il **contesto** per la fase di generazione.
 
+Di seguito un articolo molto esplicativo sui concetti espressi nella ricerca vettoriale, come:
+Cosine Similarty, Approximate-Nearest Neighbor(ANN)  
+[IBM ricerca vettoriale](https://www.ibm.com/it-it/think/topics/vector-search)
+
 ---
 
 # 10. ChatbotService: Flusso di Generazione Risposte

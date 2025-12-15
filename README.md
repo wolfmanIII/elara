@@ -44,6 +44,15 @@ npm init
 npm install -D @tailwindcss/typography
 npm i -D daisyui@latest
 ```
+### Impostare workers e agganciarli al symfony CLI
+nel file .symfony.local.yaml - se non c'è, crearlo nella directory del progetto
+```yaml
+workers:
+    # ...
+
+    tailwind:
+        cmd: ['symfony', 'console', 'tailwind:build', '--watch']
+```
 ## 3. PostgreSQL + pgvector + Doctrine
 ### Installare postgres + pgvector
 ```bash
@@ -178,9 +187,6 @@ doctrine:
 # Database PostgreSQL 18
 DATABASE_URL="postgresql://app:!ChangeMe!@127.0.0.1:5432/app?serverVersion=16&charset=utf8"
 
-# Token per l'utilizzo del Chatbot
-APP_CHAT_CONSOLE_TOKEN=1234567...
-
 # Parametri AI Backend
 AI_BACKEND=ollama
 SHOW_SOURCES=false
@@ -213,6 +219,10 @@ APP_AI_OFFLINE_FALLBACK=false
 ## Uso solo indici hwsn
 # Postgres pgvector - sonde per indice ivfflat
 # APP_IVFFLAT_PROBES=10
+
+# Xdebug vscode
+XDEBUG_MODE=debug
+XDEBUG_CONFIG="client_host=127.0.0.1 client_port=9003"
 ```
 ### Configurazione AI_BACKEND, PDF parser, IVF-FLAT Probes, nel file services.yaml
 ```yaml
@@ -330,9 +340,63 @@ curl -X POST https://localhost/api/chat/stream \
   -H "Authorization: Bearer <token_generato>" \
   -d '{"question":"Riassumi la pipeline"}'
 ```
-# 9. Da implementare
+
+# 9. Xdebug e vscode debugger configuration
+## VsCode -> Run & Debug -> Add Configuration
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Listen for Xdebug",
+      "type": "php",
+      "request": "launch",
+      "port": 9003
+    },
+    {
+      "name": "Symfony CLI (console)",
+      "type": "php",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/console",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "app:index-docs",
+        "--dry-run"
+      ],
+      "port": 9003,
+      "env": {
+        "APP_ENV": "dev",
+        "XDEBUG_MODE": "debug"
+      }
+    }
+  ]
+}
+```
+## .env.local
+```env
+# Xdebug
+XDEBUG_MODE=debug
+XDEBUG_CONFIG="client_host=127.0.0.1 client_port=9003"
+```
+## xdebug.ini
+```ini
+
+zend_extension=xdebug
+xdebug.mode=debug
+xdebug.start_with_request=yes
+xdebug.client_host=127.0.0.1
+xdebug.client_port=9003
+xdebug.log_level=0
+
+# docker/WSL
+#xdebug.client_host=host.docker.internal  # Oppure l’IP della tua macchina
+#xdebug.client_port=9003
+#xdebug.mode=debug
+```
+
+# 10. Da implementare
 ## 1. Modalità “profilo di indicizzazione”  
-preset salvati (dimensione chunk, top‑k, backend embeddings, fallback) da richiamare via CLI o UI, così si può passare da un setup Ollama → OpenAI senza toccare .env.
+preset salvati (dimensione chunk, top‑k, backend embeddings, fallback) da richiamare via CLI o UI, così si può passare da un setup Ollama → OpenAI → Gemini senza toccare .env.
 ## 2. Scheduler di re-index  
 comando che pianifica via cron (o Symfony Messenger) scansioni incrementali, con notifica se trova documenti non indicizzati o fallimenti.  
 ## 3. Dashboard API token  
