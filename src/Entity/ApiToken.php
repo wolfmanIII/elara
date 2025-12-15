@@ -23,11 +23,14 @@ class ApiToken
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private User $user;
 
-    public function __construct(User $user, string $token, \DateTimeImmutable $expiresAt)
+    /**
+     * @param string $tokenHash hash SHA-256 del token
+     */
+    public function __construct(User $user, string $tokenHash, \DateTimeImmutable $expiresAt)
     {
         $this->id = Uuid::v7();
         $this->user = $user;
-        $this->token = $token;
+        $this->token = $tokenHash;
         $this->expiresAt = $expiresAt;
         $user->getApiTokens()->add($this);
     }

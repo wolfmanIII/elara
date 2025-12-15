@@ -18,7 +18,14 @@ class ApiTokenRepository extends ServiceEntityRepository
 
     public function findValidToken(string $token): ?ApiToken
     {
-        $apiToken = $this->findOneBy(['token' => $token]);
+        $hash = hash('sha256', $token);
+
+        // Preferisce match su hash; fallback per eventuali token legacy in chiaro
+        $apiToken = $this->findOneBy(['token' => $hash]);
+        if (!$apiToken) {
+            $apiToken = $this->findOneBy(['token' => $token]);
+        }
+
         if (!$apiToken) {
             return null;
         }

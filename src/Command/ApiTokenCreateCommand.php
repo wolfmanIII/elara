@@ -44,9 +44,10 @@ final class ApiTokenCreateCommand extends Command
         }
 
         $tokenValue = bin2hex(random_bytes(16));
+        $tokenHash = hash('sha256', $tokenValue);
         $expiresAt = new \DateTimeImmutable(sprintf('+%d hours', max(1, $ttl)));
 
-        $apiToken = new ApiToken($user, $tokenValue, $expiresAt);
+        $apiToken = new ApiToken($user, $tokenHash, $expiresAt);
         $this->em->persist($apiToken);
         $this->em->flush();
 
