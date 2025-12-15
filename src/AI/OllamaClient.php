@@ -145,7 +145,7 @@ TXT;
                     'prompt' => $prompt,
                     'stream' => true,
                 ],
-                'timeout' => 12,
+                'timeout' => 15,
             ]
         );
 
