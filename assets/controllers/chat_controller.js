@@ -7,7 +7,6 @@ export default class extends Controller {
         endpoint: String,
         streamEndpoint: String,
         engineStatusUrl: String,
-        apiToken: String,
     };
 
     connect() {
@@ -113,10 +112,6 @@ export default class extends Controller {
                 'X-Requested-With': 'XMLHttpRequest',
             };
 
-            if (this.hasApiTokenValue && this.apiTokenValue) {
-                headers.Authorization = `Bearer ${this.apiTokenValue}`;
-            }
-
             const resp = await fetch(this.endpointValue, {
                 method: 'POST',
                 headers,
@@ -146,9 +141,6 @@ export default class extends Controller {
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
             };
-            if (this.hasApiTokenValue && this.apiTokenValue) {
-                headers.Authorization = `Bearer ${this.apiTokenValue}`;
-            }
 
             const resp = await fetch(this.streamEndpointValue, {
                 method: 'POST',

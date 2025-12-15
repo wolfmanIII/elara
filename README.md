@@ -184,6 +184,7 @@ APP_CHAT_CONSOLE_TOKEN=1234567...
 # Parametri AI Backend
 AI_BACKEND=ollama
 SHOW_SOURCES=false
+TOP_K=35
 
 # Ollama
 OLLAMA_HOST=http://localhost:11434

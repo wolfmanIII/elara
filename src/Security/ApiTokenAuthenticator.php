@@ -19,16 +19,26 @@ final class ApiTokenAuthenticator extends AbstractAuthenticator
     }
     public function supports(Request $request): ?bool
     {
-        return str_starts_with($request->getPathInfo(), '/api/');
+        if (!str_starts_with($request->getPathInfo(), '/api/')) {
+            return false;
+        }
+
+        $auth = $request->headers->get('Authorization');
+
+        return $auth !== null && $auth !== '';
     }
 
     public function authenticate(Request $request): Passport
     {
-        $token = $request->headers->get('Authorization');
-        $token = $token ? trim(str_replace('Bearer', '', $token)) : null;
+        $authHeader = $request->headers->get('Authorization');
+        $token = null;
 
-        if (!$token) {
-            throw new AuthenticationException('Token mancante');
+        if ($authHeader && preg_match('/^Bearer\s+(.+)$/i', $authHeader, $matches)) {
+            $token = trim($matches[1]);
+        }
+
+        if ($token === null || $token === '') {
+            throw new AuthenticationException('Token mancante o malformato');
         }
 
         $apiToken = $this->apiTokenRepository->findValidToken($token);

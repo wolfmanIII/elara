@@ -19,11 +19,8 @@ final class ChatController extends BaseController
     #[Route('/ai/console', name: 'app_ai_console', methods: ['GET'])]
     public function console(): Response
     {
-        $apiToken = $_ENV['APP_CHAT_CONSOLE_TOKEN'] ?? null;
-
         return $this->render('chat/console.html.twig', [
             'controller_name' => self::CONTROLLER_NAME,
-            'chat_api_token' => $apiToken,
         ]);
     }
 

@@ -12,13 +12,8 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        api:
-            pattern: ^/api
-            stateless: true
-            provider: app_user_provider
-            custom_authenticator: App\Security\ApiTokenAuthenticator
-        
         main:
+            pattern: ^/
             provider: app_user_provider
             lazy: true
             form_login:
@@ -31,6 +26,8 @@ security:
             logout:
                 path: app_logout
                 target: app_login
+            custom_authenticators:
+                - App\Security\ApiTokenAuthenticator
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
