@@ -89,7 +89,7 @@ AI_BACKEND=ollama|openai|gemini
 # 🌐 6. API /api/chat
 Richiesta:
 ```json
-{ "message": "La tua domanda" }
+{ "question": "La tua domanda" }
 ```
 Modalità supportate:
 - normale

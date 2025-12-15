@@ -29,17 +29,17 @@ Protocollo previsto:
 
 ## 2.1 JSON minimo richiesto
 
-La richiesta minima accettata dall’API è un JSON con il campo `message`:
+La richiesta minima accettata dall’API è un JSON con il campo `question`:
 
 ```json
 {
-  "message": "testo della domanda"
+  "question": "testo della domanda"
 }
 ```
 
 Requisiti:
-- `message` **obbligatorio**,
-- `message` dev’essere una **stringa non vuota**.
+- `question` **obbligatorio**,
+- `question` dev’essere una **stringa non vuota**.
 
 Se il campo è mancante o vuoto, ELARA risponde con un errore strutturato (vedi sezione [6.2](#62-risposte-di-errore)).
 
@@ -54,7 +54,7 @@ Il comportamento dell’endpoint `/api/chat` dipende da alcune variabili di ambi
 È la modalità di default.
 
 Flusso:
-1. L’API riceve `message`.
+1. L’API riceve `question`.
 2. ChatbotService crea l’**embedding** della domanda.
 3. Viene eseguita la **ricerca vettoriale** sui chunk indicizzati.
 4. Viene costruito un **contesto RAG**.
@@ -140,14 +140,14 @@ Di seguito una serie di esempi pratici per interagire con `/api/chat`.
 curl -X POST http://localhost:8000/api/chat \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {token_generato}" \
-  -d '{"message":"Riassumi ELaRA"}'
+  -d '{"question":"Riassumi ELaRA"}'
 ```
 ```bash
 curl -X POST http://localhost:8000/api/chat/stream \
   -H "Content-Type: application/json" \
   -H "Accept: text/event-stream" \
   -H "Authorization: Bearer {token_generato}" \
-  -d '{"message":"Riassumi ELaRA"}'
+  -d '{"question":"Riassumi ELaRA"}'
 ```
 
 ### Comportamento atteso
@@ -169,7 +169,7 @@ Quindi:
 curl -X POST http://localhost:8000/api/chat \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {token_generato}" \
-  -d '{"message":"Riassumi ELaRA"}'
+  -d '{"question":"Riassumi ELaRA"}'
   }'
 ```
 
@@ -187,7 +187,7 @@ curl -X POST http://localhost:8000/api/chat \
 curl -X POST http://localhost:8000/api/chat \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {token_generato}" \
-  -d '{"message":""}'
+  -d '{"question":""}'
 ```
 
 ### Risposta attesa
@@ -218,7 +218,7 @@ La chiamata curl rimane la stessa:
 curl -X POST http://localhost:8000/api/chat \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {token_generato}" \
-  -d '{"message":"Riassumi ELaRA"}'
+  -d '{"question":"Riassumi ELaRA"}'
 ```
 
 ---
@@ -263,7 +263,7 @@ Formato esemplificativo:
 ```json
 {
   "mode": "test",
-  "message": "[TEST MODE] Ho trovato estratti nei seguenti chunk:",
+  "question": "[TEST MODE] Ho trovato estratti nei seguenti chunk:",
   "chunks": [
     "...primo estratto...",
     "...secondo estratto..."
@@ -297,7 +297,7 @@ Questa modalità assicura che l’API non sia completamente inutilizzabile in ca
 Sebbene la logica di mapping possa essere estesa, i casi principali sono:
 
 - `200 OK` → richiesta valida, risposta prodotta (modalità normale, test o fallback).
-- `400 Bad Request` → input non valido (ad es. `message` vuoto o mancante).
+- `400 Bad Request` → input non valido (ad es. `question` vuoto o mancante).
 - `500 Internal Server Error` → eccezioni non gestite correttamente (ad es. problemi con il backend AI senza fallback).
 
 In contesti produttivi è consigliabile:
@@ -310,7 +310,7 @@ In contesti produttivi è consigliabile:
 
 1. **Sempre inviare `Content-Type: application/json`** nelle richieste.
 2. **Sempre inviare `Authorization: Bearer {token_generato}`** nelle richieste
-3. **Validare lato client** che `message` non sia vuoto o composto solo da spazi.
+3. **Validare lato client** che `question` non sia vuoto o composto solo da spazi.
 4. **Gestire time-out client**: i modelli AI possono impiegare alcuni secondi.
 5. **Non abusare della modalità TEST in produzione**: è anzitutto uno strumento di debug.
 6. **Gestire le modalità via ENV** (test/fallback/backend) **senza cambiare il codice**.
@@ -335,7 +335,7 @@ La natura JSON dell’API la rende adatta a qualunque ecosistema.
 - **Endpoint**: `POST /api/chat`
 - **Richiesta minima**:
   ```json
-  { "message": "Domanda dell'utente" }
+  { "question": "Domanda dell'utente" }
   ```
 - **Header obbligatorio**: `Content-Type: application/json`
 - **Header obbligatorio**: `Authorization: Bearer {token_generato}`
@@ -349,7 +349,7 @@ Esempio curl minimal:
 curl -X POST http://localhost:8000/api/chat \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {token_generato}" \
-  -d '{"message":"Riassumi ELaRA"}'
+  -d '{"question":"Riassumi ELaRA"}'
 ```
 
 ---

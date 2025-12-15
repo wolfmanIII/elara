@@ -22,11 +22,19 @@ I principali macro-servizi sono:
 ---
 
 # 2. AiClientInterface e Implementazioni
-L’interfaccia **AiClientInterface** definisce due funzioni fondamentali:
+L’interfaccia **AiClientInterface** definisce 3 funzioni fondamentali:
 
 ```
-embed(string|array $text): array
-chat(array $messages, string $model): string
+embed(string|array $text): array;
+
+chat(string $question, string $context, ?string $source): string;
+
+chatStream(
+        string $question,
+        string $context,
+        ?string $source,
+        callable $onChunk
+    ): void;
 ```
 
 ## 2.1 Implementazioni

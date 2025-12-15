@@ -25,7 +25,7 @@
 
                     <div class="mockup-code text-sm">
                         <pre data-prefix=" "><code>{</code></pre>
-                        <pre data-prefix=" "><code>  "message": "testo della domanda"</code></pre>
+                        <pre data-prefix=" "><code>  "question": "testo della domanda"</code></pre>
                         <pre data-prefix=" "><code>}</code></pre>
                     </div>
 
@@ -36,7 +36,7 @@
                         <pre data-prefix="$"><code>curl -X POST http://localhost:8000/api/chat \</code></pre>
                         <pre data-prefix=" "><code>  -H "Content-Type: application/json" \</code></pre>
                         <pre data-prefix=" "><code>  -H "Authorization: Bearer {token_generato}" \</code></pre>
-                        <pre data-prefix=" "><code>  -d '{"message":"Riassumi ELaRA"}'</code></pre>
+                        <pre data-prefix=" "><code>  -d '{"question":"Riassumi ELaRA"}'</code></pre>
                     </div>
 
                     <p class="text-sm opacity-80">
@@ -47,7 +47,7 @@
                         <pre data-prefix=" "><code>  -H "Content-Type: application/json" \</code></pre>
                         <pre data-prefix=" "><code>  -H "Accept: text/event-stream" \</code></pre>
                         <pre data-prefix=" "><code>  -H "Authorization: Bearer {token_generato}" \</code></pre>
-                        <pre data-prefix=" "><code>  -d '{"message":"Riassumi ELaRA"}'</code></pre>
+                        <pre data-prefix=" "><code>  -d '{"question":"Riassumi ELaRA"}'</code></pre>
                     </div>
 
                     <p class="text-sm opacity-80 mt-2">

@@ -236,7 +236,7 @@ Endpoint principale:
 ```
 POST /api/chat
 {
-  "message": "domanda"
+  "question": "domanda"
 }
 ```
 

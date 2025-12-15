@@ -144,7 +144,7 @@ L’API principale è:
 ```
 POST /api/chat
 {
-  "message": "domanda utente"
+  "question": "domanda utente"
 }
 ```
 
