@@ -102,8 +102,8 @@ final class IndexDocsCommand extends Command
             '  force-reindex: %s, dry-run: %s, test-mode: %s, offline-fallback: %s',
             $forceReindex ? 'si' : 'no',
             $dryRun ? 'si' : 'no',
-            $this->formatBoolOption($testMode),
-            $this->formatBoolOption($offlineFallback),
+            $this->formatBoolOption($testMode ?? $activeProfileData['ai']['test_mode']),
+            $this->formatBoolOption($offlineFallback ?? $activeProfileData['ai']['offline_fallback']),
         ));
 
         if ($pathsFilter !== []) {
