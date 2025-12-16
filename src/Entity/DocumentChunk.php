@@ -7,6 +7,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: DocumentChunkRepository::class)]
+#[ORM\Table(name: 'document_chunk', indexes: [
+    new ORM\Index(name: 'document_chunk_embedding_hnsw', columns: ['embedding']),
+])]
 class DocumentChunk
 {
     #[ORM\Id]
