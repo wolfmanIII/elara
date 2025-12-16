@@ -6,29 +6,7 @@
             <li>
                 <a href="{{ path('app_home') }}"
                    class="{% if controller_name == constant('App\\Controller\\HomeController::CONTROLLER_NAME') %}menu-active{% endif %}">
-                    {# Icona arcologia #}
-                    {#
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M4 15c0-5 4-9 8-9s8 4 8 9"></path>
-                        <path d="M4 15h16"></path>
-                        <path d="M6 15v5"></path>
-                        <path d="M18 15v5"></path>
-                        <path d="M10 15v3"></path>
-                        <path d="M14 15v3"></path>
-                        <circle cx="12" cy="13" r="2"></circle>
-                    </svg>
-                    #}
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 12c0-3 6-6 9-6s9 3 9 6-6 6-9 6-9-3-9-6z"></path>
-                        <path d="M3 12h18"></path>
-                        <path d="M7 12l-2 5"></path>
-                        <path d="M17 12l2 5"></path>
-                        <path d="M10 12l-.5 4"></path>
-                        <path d="M14 12l.5 4"></path>
-                        <circle cx="12" cy="12" r="1.5"></circle>
-                    </svg>
+                    {{ include('icons/spacecraft.html.twig') }}
                     <span>Homepage</span>
                 </a>
             </li>
@@ -38,82 +16,37 @@
             <li>
                 <a href="{{ path('app_overview') }}"
                    class="{% if controller_name == constant('App\\Controller\\OverviewController::CONTROLLER_NAME') %}menu-active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="2"></circle>
-                        <path d="M12 4a8 8 0 018 8"></path>
-                        <path d="M12 8a4 4 0 014 4"></path>
-                        <path d="M4 12a8 8 0 018-8"></path>
-                        <path d="M8 12a4 4 0 014-4"></path>
-                        <path d="M4 12h4"></path>
-                        <path d="M16 12h4"></path>
-                    </svg>
+                    {{ include('icons/radar.html.twig') }}
                     <span>Panoramica</span>
                 </a>
 
                 <a href="{{ path('app_pipeline_architecture') }}"
                    class="{% if controller_name == constant('App\\Controller\\PipelineController::CONTROLLER_NAME') %}menu-active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="4" width="6" height="6" rx="1"></rect>
-                        <rect x="15" y="4" width="6" height="6" rx="1"></rect>
-                        <rect x="9" y="14" width="6" height="6" rx="1"></rect>
-                        <path d="M9 7h6"></path>
-                        <path d="M6 10v4"></path>
-                        <path d="M18 10v4"></path>
-                        <path d="M12 14v-4"></path>
-                    </svg>
+                    {{ include('icons/pipeline.html.twig') }}
                     <span>Pipeline & Architettura</span>
                 </a>
 
                 <a href="{{ path('app_cli_operations') }}"
                    class="{% if controller_name == constant('App\\Controller\\CliController::CONTROLLER_NAME') %}menu-active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M4 17l6-6-6-6"></path>
-                        <path d="M12 19h8"></path>
-                    </svg>
+                    {{ include('icons/terminal.html.twig') }}
                     <span>CLI & Operazioni</span>
                 </a>
 
                 <a href="{{ path('app_api_docs') }}"
                    class="{% if controller_name == constant('App\\Controller\\ApiDocsController::CONTROLLER_NAME') %}menu-active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="6" r="2"></circle>
-                        <circle cx="6" cy="18" r="2"></circle>
-                        <circle cx="18" cy="18" r="2"></circle>
-                        <path d="M12 8v4"></path>
-                        <path d="M10 12H6a2 2 0 1 0 0 4h1"></path>
-                        <path d="M14 12h4a2 2 0 1 1 0 4h-1"></path>
-                    </svg>
+                    {{ include('icons/api.html.twig') }}
                     <span>API Chat</span>
                 </a>
 
                 <a href="{{ path('app_rag_tuning') }}"
                    class="{% if controller_name == constant('App\\Controller\\RagTuningController::CONTROLLER_NAME') %}menu-active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="6" y1="4" x2="6" y2="20"></line>
-                        <line x1="12" y1="4" x2="12" y2="20"></line>
-                        <line x1="18" y1="4" x2="18" y2="20"></line>
-                        <line x1="3" y1="8" x2="9" y2="8"></line>
-                        <line x1="9" y1="16" x2="15" y2="16"></line>
-                        <line x1="15" y1="12" x2="21" y2="12"></line>
-                    </svg>
+                    {{ include('icons/tuning.html.twig') }}
                     <span>RAG Tuning</span>
                 </a>
 
                 <a href="{{ path('app_user_guide') }}"
                    class="{% if controller_name == constant('App\\Controller\\UserGuideController::CONTROLLER_NAME') %}menu-active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M5 4h9l4 4v12H5z"></path>
-                        <path d="M14 4v4h4"></path>
-                        <path d="M8 12h5"></path>
-                        <path d="M8 16h3"></path>
-                        <path d="M17 15h2v3l-1-1-1 1z"></path>
-                    </svg>
+                    {{ include('icons/handbook.html.twig') }}
                     <span>Guida al prompt</span>
                 </a>
             </li>
@@ -122,13 +55,7 @@
             <li>
                 <a href="{{ path('app_ai_console') }}"
                    class="{% if controller_name == constant('App\\Controller\\ChatController::CONTROLLER_NAME') %}menu-active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M4 5h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H7l-3 3V7a2 2 0 0 1 2-2z"></path>
-                        <circle cx="9.5" cy="11" r="1"></circle>
-                        <circle cx="15.5" cy="11" r="1"></circle>
-                        <path d="M8 15h8"></path>
-                    </svg>
+                    {{ include('icons/almeno.html.twig') }}
                     <span>Almeno</span>
                 </a>
             </li>
@@ -138,13 +65,7 @@
             <li>
                 <a href="{{ path('app_index_monitor') }}"
                     class="{% if controller_name == constant('App\\Controller\\IndexMonitorController::CONTROLLER_NAME') %}menu-active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 3l7 5l-7 13l-7-13z"></path>
-                        <path d="M5 8h14"></path>
-                        <path d="M9 14l6-6"></path>
-                        <path d="M15 14l-6-6"></path>
-                    </svg>
+                    {{ include('icons/holocron.html.twig') }}
                     <span>Indice</span>
                 </a>
             </li>
