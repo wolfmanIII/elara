@@ -1,0 +1,28 @@
+{
+  "recommendations": [
+    "alexcvzz.vscode-sqlite",
+    "bmewburn.vscode-intelephense-client",
+    "bradlc.vscode-tailwindcss",
+    "docker.docker",
+    "duboiss.sf-pack",
+    "ecmel.vscode-html-css",
+    "formulahendry.docker-explorer",
+    "mechatroner.rainbow-csv",
+    "mikestead.dotenv",
+    "ms-azuretools.vscode-containers",
+    "ms-azuretools.vscode-docker",
+    "ms-python.debugpy",
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-python.vscode-python-envs",
+    "ms-vscode-remote.remote-containers",
+    "nadim-vscode.symfony-code-snippets",
+    "nadim-vscode.twig-code-snippets",
+    "openai.chatgpt",
+    "phproberto.vscode-php-getters-setters",
+    "redhat.vscode-yaml",
+    "shd101wyy.markdown-preview-enhanced",
+    "thenouillet.symfony-vscode",
+    "xdebug.php-debug"
+  ]
+}
