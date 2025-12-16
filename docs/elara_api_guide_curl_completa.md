@@ -317,7 +317,7 @@ In contesti produttivi è consigliabile:
 3. **Validare lato client** che `question` non sia vuoto o composto solo da spazi.
 4. **Gestire time-out client**: i modelli AI possono impiegare alcuni secondi.
 5. **Non abusare della modalità TEST in produzione**: è anzitutto uno strumento di debug.
-6. **Gestire le modalità via ENV** (test/fallback/backend) **senza cambiare il codice**.
+6. **Gestire le modalità via config/packages/rag_profiles.yaml** (test/fallback/backend) **senza cambiare il codice**.
 7. **Loggare le richieste critiche** (ad es. per audit, se i dati sono sensibili).
 
 ---
@@ -356,6 +356,7 @@ curl -X POST http://localhost:8000/api/chat \
 
 curl -X POST http://localhost:8000/api/chat/stream \
   -H "Content-Type: application/json" \
+  -H "Accept: text/event-stream" \
   -H "Authorization: Bearer {token_generato}" \
   -d '{"question":"Riassumi ELaRA"}'
 ```
