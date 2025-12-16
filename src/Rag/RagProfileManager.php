@@ -12,6 +12,7 @@ final class RagProfileManager
     public function __construct(
         array $config,
         ?string $envProfile = null,
+        private readonly ?ActiveProfileStorage $storage = null,
     ) {
         $this->presets = $config['presets'] ?? [];
 
@@ -20,7 +21,17 @@ final class RagProfileManager
         }
 
         $defaultProfile = $config['default_profile'] ?? array_key_first($this->presets);
-        $this->activeProfileName = $this->resolveProfileName($envProfile, $defaultProfile);
+        $storedProfile  = $this->storage?->load();
+
+        if ($storedProfile !== null) {
+            $initialProfile = $storedProfile;
+        } elseif ($envProfile !== null && $envProfile !== '') {
+            $initialProfile = $envProfile;
+        } else {
+            $initialProfile = $defaultProfile;
+        }
+
+        $this->activeProfileName = $this->resolveProfileName($initialProfile, $defaultProfile);
     }
 
     public function getActiveProfileName(): string
@@ -63,9 +74,13 @@ final class RagProfileManager
         return $list;
     }
 
-    public function useProfile(string $profileName): void
+    public function useProfile(string $profileName, bool $persist = true): void
     {
         $this->activeProfileName = $this->resolveProfileName($profileName, $this->activeProfileName);
+
+        if ($persist && $this->storage !== null) {
+            $this->storage->save($this->activeProfileName);
+        }
     }
 
     public function hasProfile(string $profileName): bool

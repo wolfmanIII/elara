@@ -2,11 +2,12 @@
 
 namespace App\Security;
 
+use App\Repository\ApiTokenRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use App\Repository\ApiTokenRepository;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CustomCredentials;
@@ -14,9 +15,10 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 
 final class ApiTokenAuthenticator extends AbstractAuthenticator
 {
-    public function __construct(private ApiTokenRepository $apiTokenRepository)
-    {
-    }
+    public function __construct(
+        private ApiTokenRepository $apiTokenRepository,
+        private EntityManagerInterface $em
+    ) {}
     public function supports(Request $request): ?bool
     {
         if (!str_starts_with($request->getPathInfo(), '/api/')) {
@@ -45,6 +47,10 @@ final class ApiTokenAuthenticator extends AbstractAuthenticator
         if (!$apiToken) {
             throw new AuthenticationException('Token API non valido o scaduto');
         }
+
+        $apiToken->markUsed();
+        $this->em->persist($apiToken);
+        $this->em->flush();
 
         return new Passport(
             new UserBadge($apiToken->getUser()->getUserIdentifier(), fn() => $apiToken->getUser()),

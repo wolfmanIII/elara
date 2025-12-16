@@ -52,7 +52,7 @@ final class IndexDocsCommand extends Command
         $profileOption = $input->getOption('rag-profile');
         if ($profileOption !== null) {
             try {
-                $this->profiles->useProfile((string) $profileOption);
+                $this->profiles->useProfile((string) $profileOption, persist: false);
             } catch (\InvalidArgumentException $e) {
                 $available = array_map(
                     static fn (array $info) => $info['name'],

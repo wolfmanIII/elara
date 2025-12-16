@@ -67,8 +67,9 @@
                             <h3 class="text-base font-semibold">Preset disponibili</h3>
                             <a href="{{ path('app_cli_operations') }}#deploy-tuning" class="btn btn-xs btn-outline">Guida CLI</a>
                         </div>
-                        <p class="opacity-70">Usa la variabile d'ambiente <code>RAG_PROFILE=&lt;nome&gt;</code> (o l'opzione <code>--rag-profile</code>
-                        del comando <code>app:index-docs</code>) per commutare - config/packages/rag_profiles.yaml</p>
+                        <p class="opacity-70">
+                            Attiva qui il profilo desiderato: l’impostazione viene salvata e applicata al motore RAG (chunking, embedding, backend AI).
+                        </p>
                         <ul class="space-y-2">
                             {% for profile in available_profiles %}
                                 <li class="flex items-center justify-between text-sm px-2 py-1 rounded border {% if profile.name == active_profile_name %}border-primary/60 bg-primary/5{% else %}border-base-300{% endif %}">
@@ -82,6 +83,29 @@
                                 </li>
                             {% endfor %}
                         </ul>
+                        <form method="post" action="{{ path('app_rag_profile_switch') }}" class="flex flex-col gap-3 pt-3 border-t border-base-300">
+                            <input type="hidden" name="_token" value="{{ csrf_token('rag_profile_switch') }}">
+                            <div class="form-control w-full">
+                                <div class="label">
+                                    <span class="label-text text-xs uppercase opacity-70">Cambia profilo</span>
+                                </div>
+                                <div class="flex flex-col sm:flex-row gap-2">
+                                    <select name="profile" class="select select-bordered select-sm sm:flex-1 sm:max-w-[30%]">
+                                        {% for profile in available_profiles %}
+                                            <option value="{{ profile.name }}" {% if profile.name == active_profile_name %}selected{% endif %}>
+                                                {{ profile.label ?? profile.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="btn btn-primary btn-sm">
+                                        Attiva
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="text-sm opacity-60">
+                                Preferisci la CLI? Usa <code class="kbd kbd-sm">RAG_PROFILE=&lt;nome&gt;</code> o <code class="kbd kbd-sm">php bin/console app:index-docs --rag-profile=&lt;nome&gt;</code>.
+                            </p>
+                        </form>
                     </div>
                 </div>
             </div>

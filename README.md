@@ -354,6 +354,7 @@ php bin/console app:unindex-file "\\.pdf$"
 php bin/console app:unindex-file ".*"
 ```
 # 8. API come utilizzarla(ApiTokenAuthenticator)
+Dashboard dedicata: da **Status → API Token** puoi vedere elenco, utilizzi e revocare rapidamente i token in uso.
 ## 1. Command per generare token
 ### ttl scadenza di default 1 anno
 ```bash

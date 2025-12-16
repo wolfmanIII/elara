@@ -26,10 +26,33 @@ class ApiTokenRepository extends ServiceEntityRepository
             $apiToken = $this->findOneBy(['token' => $token]);
         }
 
-        if (!$apiToken) {
+        if (!$apiToken || $apiToken->isExpired() || $apiToken->isRevoked()) {
             return null;
         }
 
-        return $apiToken->isExpired() ? null : $apiToken;
+        return $apiToken;
+    }
+
+    /**
+     * @return ApiToken[]
+     */
+    public function findAllOrdered(): array
+    {
+        return $this->createQueryBuilder('t')
+            ->leftJoin('t.user', 'u')->addSelect('u')
+            ->orderBy('t.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function countActive(): int
+    {
+        return (int) $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->where('t.expiresAt > :now')
+            ->andWhere('t.revokedAt IS NULL')
+            ->setParameter('now', new \DateTimeImmutable())
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

@@ -29,13 +29,15 @@ final class ApiTokenCreateCommand extends Command
     {
         $this
             ->addArgument('email', InputArgument::REQUIRED, 'Email dell\'utente a cui assegnare il token')
-            ->addOption('ttl', null, InputOption::VALUE_REQUIRED, 'Durata in ore del token', 24 * 365);
+            ->addOption('ttl', null, InputOption::VALUE_REQUIRED, 'Durata in ore del token', 24 * 365)
+            ->addOption('label', null, InputOption::VALUE_REQUIRED, 'Etichetta descrittiva del token', null);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $email = (string) $input->getArgument('email');
         $ttl = (int) $input->getOption('ttl');
+        $label = $input->getOption('label');
 
         $user = $this->userRepository->findOneBy(['email' => $email]);
         if (!$user) {
@@ -47,7 +49,7 @@ final class ApiTokenCreateCommand extends Command
         $tokenHash = hash('sha256', $tokenValue);
         $expiresAt = new \DateTimeImmutable(sprintf('+%d hours', max(1, $ttl)));
 
-        $apiToken = new ApiToken($user, $tokenHash, $expiresAt);
+        $apiToken = new ApiToken($user, $tokenHash, $expiresAt, is_string($label) && $label !== '' ? $label : null);
         $this->em->persist($apiToken);
         $this->em->flush();
 
@@ -55,6 +57,9 @@ final class ApiTokenCreateCommand extends Command
         $output->writeln(sprintf('  Utente: %s', $email));
         $output->writeln(sprintf('  Token: %s', $tokenValue));
         $output->writeln(sprintf('  Scade: %s', $expiresAt->format('Y-m-d H:i')));
+        if ($label) {
+            $output->writeln(sprintf('  Etichetta: %s', $label));
+        }
 
         return Command::SUCCESS;
     }

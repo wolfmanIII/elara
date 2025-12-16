@@ -31,7 +31,12 @@ services:
         factory: [ '@App\AI\AiClientFactory', 'create' ]
         arguments: [ '@App\Rag\RagProfileManager' ]
 
+    App\Rag\ActiveProfileStorage:
+        arguments:
+            $storagePath: '%kernel.project_dir%/var/rag_active_profile'
+
     App\Rag\RagProfileManager:
         arguments:
             $config: '%rag_profiles%'
             $envProfile: '%env(default::RAG_PROFILE)%'
+            $storage: '@App\Rag\ActiveProfileStorage'

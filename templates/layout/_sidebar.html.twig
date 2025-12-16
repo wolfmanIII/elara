@@ -37,12 +37,6 @@
                     <span>API Chat</span>
                 </a>
 
-                <a href="{{ path('app_rag_tuning') }}"
-                   class="{% if controller_name == constant('App\\Controller\\RagTuningController::CONTROLLER_NAME') %}menu-active{% endif %}">
-                    {{ include('icons/tuning.html.twig') }}
-                    <span>RAG Tuning</span>
-                </a>
-
                 <a href="{{ path('app_user_guide') }}"
                    class="{% if controller_name == constant('App\\Controller\\UserGuideController::CONTROLLER_NAME') %}menu-active{% endif %}">
                     {{ include('icons/handbook.html.twig') }}
@@ -61,6 +55,18 @@
 
             <li class="menu-title">Status</li>
             <li>
+                <a href="{{ path('app_rag_tuning') }}"
+                   class="{% if controller_name == constant('App\\Controller\\RagTuningController::CONTROLLER_NAME') %}menu-active{% endif %}">
+                    {{ include('icons/tuning.html.twig') }}
+                    <span>RAG Tuning</span>
+                </a>
+
+                <a href="{{ path('app_api_tokens') }}"
+                    class="{% if controller_name == constant('App\\Controller\\ApiTokenController::CONTROLLER_NAME') %}menu-active{% endif %}">
+                    {{ include('icons/token.html.twig') }}
+                    <span>API Token</span>
+                </a>
+
                 <a href="{{ path('app_index_monitor') }}"
                     class="{% if controller_name == constant('App\\Controller\\IndexMonitorController::CONTROLLER_NAME') %}menu-active{% endif %}">
                     {{ include('icons/holocron.html.twig') }}

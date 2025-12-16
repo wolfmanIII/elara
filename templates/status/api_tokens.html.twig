@@ -1,0 +1,115 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard API Token - ELaRA{% endblock %}
+
+{% block pageContent %}
+    <div class="space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <h1 class="text-2xl font-semibold">Dashboard API Token</h1>
+            <a href="{{ path('app_cli_operations') }}#api-token" class="btn btn-sm btn-outline">
+                Guida CLI
+            </a>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="stat bg-base-100 border border-base-300 rounded-box">
+                <div class="stat-title text-xs uppercase opacity-70">Totali</div>
+                <div class="stat-value text-primary">{{ summary.total }}</div>
+                <div class="stat-desc">Token registrati</div>
+            </div>
+            <div class="stat bg-base-100 border border-base-300 rounded-box">
+                <div class="stat-title text-xs uppercase opacity-70">Attivi</div>
+                <div class="stat-value text-success">{{ summary.active }}</div>
+                <div class="stat-desc">Validi e non revocati</div>
+            </div>
+            <div class="stat bg-base-100 border border-base-300 rounded-box">
+                <div class="stat-title text-xs uppercase opacity-70">Revocati / Scaduti</div>
+                <div class="stat-value text-error">{{ summary.revoked }}</div>
+                <div class="stat-desc">Revocati manualmente</div>
+            </div>
+            <div class="stat bg-base-100 border border-base-300 rounded-box">
+                <div class="stat-title text-xs uppercase opacity-70">Richieste totali</div>
+                <div class="stat-value">{{ summary.usage }}</div>
+                <div class="stat-desc">Somma utilizzi registrati</div>
+            </div>
+        </div>
+
+        <div class="card bg-base-100 border border-base-300">
+            <div class="card-body space-y-4">
+                <h2 class="card-title text-base">Elenco token</h2>
+                <div class="overflow-x-auto">
+                    <table class="table table-zebra table-sm">
+                        <thead>
+                        <tr>
+                            <th>Nome / Owner</th>
+                            <th>Token</th>
+                            <th>Creato</th>
+                            <th>Ultimo uso</th>
+                            <th>Richieste</th>
+                            <th>Scadenza</th>
+                            <th>Stato</th>
+                            <th class="text-right">Azioni</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for token in tokens %}
+                            {% set isActive = token.isActive() %}
+                            <tr>
+                                <td>
+                                    <div class="font-medium">{{ token.name ?? '—' }}</div>
+                                    <div class="text-xs opacity-70">{{ token.user.email }}</div>
+                                </td>
+                                <td>
+                                    <code class="text-xs">{{ token.token|slice(0, 12) }}…</code>
+                                </td>
+                                <td>{{ token.createdAt|date('Y-m-d H:i') }}</td>
+                                <td>
+                                    {% if token.lastUsedAt %}
+                                        {{ token.lastUsedAt|date('Y-m-d H:i') }}
+                                    {% else %}
+                                        <span class="opacity-50">Mai</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ token.usageCount }}</td>
+                                <td>
+                                    {{ token.expiresAt|date('Y-m-d H:i') }}
+                                </td>
+                                <td>
+                                    {% if token.isRevoked() %}
+                                        <span class="badge badge-error badge-outline">Revocato</span>
+                                    {% elseif token.isExpired() %}
+                                        <span class="badge badge-warning badge-outline">Scaduto</span>
+                                    {% else %}
+                                        <span class="badge badge-success badge-outline">Attivo</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-right">
+                                    {% if isActive %}
+                                        <form method="post" action="{{ path('app_api_tokens_revoke', {id: token.id}) }}">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('revoke_token_' ~ token.id) }}">
+                                            <button class="btn btn-xs btn-outline btn-error" type="submit">
+                                                Revoca
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <span class="text-xs opacity-50">—</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center text-sm opacity-70 py-6">
+                                    Nessun token ancora registrato.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-xs opacity-70">
+                    La generazione di nuovi token avviene dal comando <code>app:api-token:create</code>.
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
