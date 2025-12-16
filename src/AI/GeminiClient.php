@@ -11,9 +11,9 @@ class GeminiClient implements AiClientInterface
     public function __construct(
         private HttpClientInterface $httpClient,
         private string $apiKey,
-        private string $chatModel = 'gemini-2.5-flash',
-        private string $embedModel = 'text-embedding-004',
-        private int $dimension = 768,
+        private string $chatModel,
+        private string $embedModel,
+        private int $dimension,
     ) {}
 
     public function embed(string $text): ?array

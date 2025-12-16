@@ -20,7 +20,7 @@ class OllamaClient implements AiClientInterface
         private string              $host,
         private string              $embedModel,
         private string              $chatModel,
-        private int                 $dimension
+        private int                 $dimension,
     ) {
     }
 

@@ -223,7 +223,7 @@ DATABASE_URL="postgresql://app:!ChangeMe!@127.0.0.1:5432/app?serverVersion=16&ch
 RAG_PROFILE=ollama-bgem3   # preset definito in config/packages/rag_profiles.yaml
 AI_BACKEND=ollama          # fallback legacy per servizi non profilati
 SHOW_SOURCES=false         # oggi arriva dal profilo, lo lascio come reference
-TOP_K=35                   # idem, i servizi core leggono retrieval.top_k
+TOP_K=5                   # idem, i servizi core leggono retrieval.top_k
 
 # Ollama
 OLLAMA_HOST=http://localhost:11434

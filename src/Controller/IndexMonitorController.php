@@ -11,7 +11,7 @@ final class IndexMonitorController extends BaseController
 {
     public const CONTROLLER_NAME = 'IndexMonitorController';
 
-    #[Route('/indice/documenti', name: 'app_index_monitor', methods: ['GET'])]
+    #[Route('/status/indice', name: 'app_index_monitor', methods: ['GET'])]
     public function monitor(
         DocumentFileRepository $fileRepository,
         Request $request
