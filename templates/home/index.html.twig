@@ -16,7 +16,7 @@
 
                 <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
                     <span class="block text-info mt-2">
-                        Embedding Linking and Retrieval Answering
+                        Embedding Linking <i>and</i> Retrieval Answering
                     </span>
                 </h1>
 
@@ -24,7 +24,7 @@
                     Un motore RAG che indicizza i tuoi documenti, li trasforma in embedding vettoriali
                     e ti permette di interrogarli in linguaggio naturale tramite 2 semplici
                     endpoint <code class="kbd kbd-base">POST /api/chat</code>
-                    (streaming disponibile su <code class="kbd kbd-base">/api/chat/stream</code>)
+                    e in modalità streaming su <code class="kbd kbd-base">/api/chat/stream</code>
                 </p>
 
                 <div class="flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-4">
@@ -33,7 +33,10 @@
                         <span class="pt-1">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                <path d="M4 5h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H7l-3 3V7a2 2 0 0 1 2-2z"></path>
+                                <circle cx="9.5" cy="11" r="1"></circle>
+                                <circle cx="15.5" cy="11" r="1"></circle>
+                                <path d="M8 15h8"></path>
                             </svg>
                         </span>
                         <span class="material-symbols-rounded text-base">Almeno</span>
@@ -58,7 +61,7 @@
 
                         <p class="text-base opacity-80">
                             ELaRA collega l’utente finale con i documenti indicizzati:
-                            manuali, PDF, markdown, DOCX, ODT e altro ancora.
+                            PDF, markdown, DOCX e ODT.
                         </p>
 
                         <div class="mockup-code text-sm overflow-x-auto">
@@ -72,7 +75,7 @@
                             L’endpoint <code class="kbd kbd-base">/api/chat</code> usa
                             <span class="font-semibold">ChatbotService</span> per:
                             embedding della domanda → ricerca vettoriale pgvector →
-                            costruzione contesto → chiamata al modello AI (Ollama/OpenAI).
+                            costruzione contesto → chiamata al modello AI (Ollama / OpenAI / Gemini).
                         </p>
 
                     </div>
@@ -99,7 +102,7 @@
                             <li>Supporto backend AI multipli (Ollama / OpenAI / Gemini) configurabili da ENV.</li>
                             <li>Integrazione PostgreSQL + pgvector con indice HNSW su embedding.</li>
                             <li>Landing page per la presentazione del progetto.</li>
-                            <li>Interfaccia grafica minimale per il chatbot (UI web dedicata).</li>
+                            <li>UI minimale per il chatbot.</li>
                             <li>Autenticazione e gestione utenti per accessi controllati.</li>
                             <li>Dashboard runtime per monitoraggio stato indice e AI Backend.</li>
                             <li>Documentazione tecnica, guida RAG e guida utente prompt.</li>
@@ -111,9 +114,14 @@
                     <div class="card-body space-y-3">
                         <h3 class="card-title text-base">Prossimi step</h3>
                         <ul class="list-disc list-inside text-sm opacity-80 space-y-1">
-                            <li>Interfaccia grafica avanzata per il chatbot (UI web dedicata).</li>
-                            <li>Interfaccia grafica per upload e gestione file.</li>
-                            <li>Scheduler per automatizzare indicizzazione documenti caricati.</li>
+                            <li>UI avanzata per il chatbot.</li>
+                            <li>Dashboard per upload e gestione file.</li>
+                            <li>Scheduler di re-index - Symfony Messenger - Scansioni incrementali.</li>
+                            <li>Profili di indicizzazione - Preset salvati(top_k, vector dim, fallback...) - via CLI / UI.</li>
+                            <li>Dashboard API token - Elenco - Utilizzi - Revoche rapide.</li>
+                            <li>Audit delle chat - log minimale (utente/timestamp/latency/modello).</li>
+                            <li>Test di regressione RAG - Comando richieste “di riferimento”, confronto score/risposte con baseline.</li>
+                            <li>Notifiche per stato indice - Webhooks / Email quando chunk non cercabili superano una soglia.</li>
                         </ul>
                     </div>
                 </div>

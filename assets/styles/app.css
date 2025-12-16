@@ -4,7 +4,6 @@
     themes: all;
 }
 
-
 .inner-bordered-table th,
 .inner-bordered-table td {
     @apply border border-base-content/4;

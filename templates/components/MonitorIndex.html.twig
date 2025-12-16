@@ -31,7 +31,7 @@
                 <div class="stat-title text-xs uppercase tracking-wide opacity-70">Ultimo aggiornamento</div>
                 <div class="stat-value text-lg">
                     {% if stats.last_indexed_at %}
-                        {{ stats.last_indexed_at|date('d/m H:i') }}
+                        {{ stats.last_indexed_at|date('d/m/Y H:i') }}
                     {% else %}
                         n/d
                     {% endif %}
