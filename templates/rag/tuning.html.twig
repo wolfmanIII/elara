@@ -67,7 +67,8 @@
                             <h3 class="text-base font-semibold">Preset disponibili</h3>
                             <a href="{{ path('app_cli_operations') }}#deploy-tuning" class="btn btn-xs btn-outline">Guida CLI</a>
                         </div>
-                        <p class="opacity-70">Usa la variabile d'ambiente <code>RAG_PROFILE=&lt;nome&gt;</code> (o l'opzione <code>--rag-profile</code> del comando <code>app:index-docs</code>) per commutare.</p>
+                        <p class="opacity-70">Usa la variabile d'ambiente <code>RAG_PROFILE=&lt;nome&gt;</code> (o l'opzione <code>--rag-profile</code>
+                        del comando <code>app:index-docs</code>) per commutare - config/packages/rag_profiles.yaml</p>
                         <ul class="space-y-2">
                             {% for profile in available_profiles %}
                                 <li class="flex items-center justify-between text-sm px-2 py-1 rounded border {% if profile.name == active_profile_name %}border-primary/60 bg-primary/5{% else %}border-base-300{% endif %}">
