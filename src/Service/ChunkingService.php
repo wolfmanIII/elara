@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Rag\RagProfileManager;
+
 class ChunkingService
 {
     /**
@@ -14,6 +16,13 @@ class ChunkingService
      *   "panic: caching disabled but unable to fit entire input in a batch"
      */
     private const HARD_MAX_CHARS = 1500;
+
+    private RagProfileManager $profiles;
+
+    public function __construct(RagProfileManager $profiles)
+    {
+        $this->profiles = $profiles;
+    }
 
     /**
      * Algoritmo di chunking:
@@ -29,10 +38,15 @@ class ChunkingService
      */
     public function chunkText(
         string $text,
-        int $min = 400,
-        int $max = 1500,
-        int $overlap = 250
+        ?int $min = null,
+        ?int $max = null,
+        ?int $overlap = null
     ): array {
+        $chunkConfig = $this->profiles->getChunking();
+        $min ??= (int) ($chunkConfig['min'] ?? 400);
+        $max ??= (int) ($chunkConfig['max'] ?? 1500);
+        $overlap ??= (int) ($chunkConfig['overlap'] ?? 250);
+
         $text = trim($text);
         if ($text === '') {
             return [];

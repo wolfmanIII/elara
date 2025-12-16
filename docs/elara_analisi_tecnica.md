@@ -215,11 +215,7 @@ Questo riduce hallucination e mantiene coerenza.
 ---
 
 # 12. Backend AI: Ollama - OpenAI - Gemini
-ELARA permette di cambiare backend tramite ENV:
-
-```
-AI_BACKEND=ollama|openai|gemini
-```
+ELARA permette di cambiare backend tramite i preset RAG (`config/packages/rag_profiles.yaml`) selezionati con `RAG_PROFILE=<nome>` o con il flag CLI `--rag-profile=<nome>`.
 
 ### Ollama
 - locale

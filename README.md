@@ -182,15 +182,48 @@ doctrine:
         distance: Partitech\DoctrinePgVector\Query\Distance
 ```
 ## 4. Backend AI Ollama | OpenAI | Gemini
+### Preset RAG (config/packages/rag_profiles.yaml)
+Definisco i profili una sola volta, ad esempio:
+```yaml
+parameters:
+  rag_profiles:
+    default_profile: 'ollama-bgem3'
+    presets:
+      ollama-bgem3:
+        label: 'Ollama · bge-m3'
+        backend: 'ollama'
+        chunking: { min: 400, max: 1400, overlap: 250 }
+        retrieval: { top_k: 5, min_score: 0.55 }
+        ai:
+          chat_model: 'llama3.2'
+          embed_model: 'bge-m3'
+          embed_dimension: 1024
+          test_mode: false
+          offline_fallback: true
+      openai-mini:
+        label: 'OpenAI · gpt-4.1-mini'
+        backend: 'openai'
+        chunking: { min: 380, max: 1200, overlap: 220 }
+        retrieval: { top_k: 5, min_score: 0.60 }
+        ai:
+          chat_model: 'gpt-4.1-mini'
+          embed_model: 'text-embedding-3-small'
+          embed_dimension: 1536
+          test_mode: false
+          offline_fallback: true
+```
+Per commutare basta impostare `RAG_PROFILE=<nome>` (o usare l'opzione CLI `--rag-profile=<nome>` durante l'indicizzazione).
+
 ### Variabili d'ambiente, nel file .env.local
 ```env
 # Database PostgreSQL 18
 DATABASE_URL="postgresql://app:!ChangeMe!@127.0.0.1:5432/app?serverVersion=16&charset=utf8"
 
 # Parametri AI Backend
-AI_BACKEND=ollama
-SHOW_SOURCES=false
-TOP_K=35
+RAG_PROFILE=ollama-bgem3   # preset definito in config/packages/rag_profiles.yaml
+AI_BACKEND=ollama          # fallback legacy per servizi non profilati
+SHOW_SOURCES=false         # oggi arriva dal profilo, lo lascio come reference
+TOP_K=35                   # idem, i servizi core leggono retrieval.top_k
 
 # Ollama
 OLLAMA_HOST=http://localhost:11434
@@ -213,7 +246,7 @@ OLLAMA_EMBED_DIMENSION=1024
 #GEMINI_EMBED_DIMENSION=768
 
 ## RAG Test Mode e Fallback
-APP_AI_TEST_MODE=true
+APP_AI_TEST_MODE=true        # ora configurato nel profilo, tengo questi flag per override veloci
 APP_AI_OFFLINE_FALLBACK=false
 
 ## Uso solo indici hwsn
@@ -224,13 +257,8 @@ APP_AI_OFFLINE_FALLBACK=false
 XDEBUG_MODE=debug
 XDEBUG_CONFIG="client_host=127.0.0.1 client_port=9003"
 ```
-### Configurazione AI_BACKEND, PDF parser, IVF-FLAT Probes, nel file services.yaml
+### Configurazione servizi (RagProfileManager, AiClient, PDF parser)
 ```yaml
-parameters:
-  # ...
-
-  ai.backend: '%env(AI_BACKEND)%' # ollama | openai | gemini
-
 services:
   # ...
 
@@ -243,12 +271,18 @@ services:
   #    arguments:
   #        $probes: '%env(int:APP_IVFFLAT_PROBES)%'
 
+  # Manager dei profili RAG (seleziona preset via env RAG_PROFILE)
+  App\Rag\RagProfileManager:
+      arguments:
+          $config: '%rag_profiles%'
+          $envProfile: '%env(default::RAG_PROFILE)%'
+
   # AiClientInterface per gestire il backend Ollama | OpenAi | Gemini
   App\AI\AiClientInterface:
       factory: [ '@App\AI\AiClientFactory', 'create' ]
-      arguments: [ '%ai.backend%' ]
+      arguments: [ '@App\Rag\RagProfileManager' ]
 ```
-Tramite la variabile di ambiente `APP_IVFFLAT_PROBES`, impostiamo il rapporto qualità velocità del nostro sistema RAG:
+Tramite la variabile di ambiente `APP_IVFFLAT_PROBES`(solo se usato), impostiamo il rapporto qualità velocità del nostro sistema RAG:
 * 5–10 = super veloce(si ok, ma dipende dal hardware)
 * 20–30 = molto preciso
 * 50–100 = qualità altissima (RAG più consistente, più lento)
@@ -262,6 +296,10 @@ I file da indicizzare devono essere caricati nella cartella var/knowledge
 ```bash
 php bin/console app:index-docs
 ```
+### 1bis. Full index usando un profilo specifico (es. OpenAI)
+```bash
+php bin/console app:index-docs --rag-profile=openai-mini
+```
 ### 2. Reindicizza TUTTO ignorando hash
 ```bash
 php bin/console app:index-docs --force-reindex
@@ -270,7 +308,7 @@ php bin/console app:index-docs --force-reindex
 ```bash
 php bin/console app:index-docs --path=manuali --path=log/2025
 ```
-### 4. Simulazione pura (solo vedere cosa succederebbe)
+### 4. Simulazione pura (solo per vedere cosa succederebbe )
 ```bash
 php bin/console app:index-docs --dry-run
 ```

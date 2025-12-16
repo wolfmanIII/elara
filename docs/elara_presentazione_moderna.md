@@ -67,10 +67,7 @@ Risultato: una base di conoscenza interrogabile via embedding.
 ---
 
 # 🔌 5. Backend AI intercambiabile
-Configurabile via ENV:
-```
-AI_BACKEND=ollama|openai|gemini
-```
+Configurabile via preset in `config/packages/rag_profiles.yaml` (variabile `RAG_PROFILE=<nome>` o `php bin/console app:index-docs --rag-profile=<nome>`). Ogni profilo definisce backend, modelli chat/embedding e flag di test/fallback.
 ### Ollama
 - locale
 - nessun costo

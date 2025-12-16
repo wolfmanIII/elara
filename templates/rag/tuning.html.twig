@@ -15,10 +15,81 @@
                 </span>
             </div>
 
+            <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr),minmax(0,1fr)]">
+                <div class="card bg-base-100 border border-base-300">
+                    <div class="card-body space-y-3 text-sm">
+                        <div class="flex items-center justify-between gap-3">
+                            <div>
+                                <p class="uppercase tracking-wide text-xs opacity-70">Profilo RAG attivo</p>
+                                <h3 class="text-xl font-semibold">{{ active_profile.label ?? active_profile_name }}</h3>
+                            </div>
+                            <span class="badge badge-info badge-outline text-xs">
+                                {{ active_profile_name }}
+                            </span>
+                        </div>
+                        <div class="flex flex-wrap gap-2 text-xs">
+                            <span class="badge badge-sm badge-outline">
+                                Backend · {{ (active_profile.backend ?? 'n/d')|capitalize }}
+                            </span>
+                            <span class="badge badge-sm badge-outline">
+                                Chat · {{ active_profile.ai.chat_model ?? 'n/d' }}
+                            </span>
+                            <span class="badge badge-sm badge-outline">
+                                Embedding · {{ active_profile.ai.embed_model ?? 'n/d' }}
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 text-sm mt-2">
+                            <div class="space-y-1">
+                                <p class="uppercase tracking-wide text-xs opacity-60">Chunking</p>
+                                <ul class="space-y-0.5">
+                                    <li>min: <strong>{{ active_profile.chunking.min ?? '—' }}</strong></li>
+                                    <li>max: <strong>{{ active_profile.chunking.max ?? '—' }}</strong></li>
+                                    <li>overlap: <strong>{{ active_profile.chunking.overlap ?? '—' }}</strong></li>
+                                </ul>
+                            </div>
+                            <div class="space-y-1">
+                                <p class="uppercase tracking-wide text-xs opacity-60">Retrieval</p>
+                                <ul class="space-y-0.5">
+                                    <li>top_k: <strong>{{ active_profile.retrieval.top_k ?? '—' }}</strong></li>
+                                    <li>min score: <strong>{{ active_profile.retrieval.min_score ?? '—' }}</strong></li>
+                                    <li>test mode: <strong>{{ active_profile.ai.test_mode ? 'ON' : 'OFF' }}</strong></li>
+                                    <li>fallback: <strong>{{ active_profile.ai.offline_fallback ? 'ON' : 'OFF' }}</strong></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300">
+                    <div class="card-body space-y-3 text-sm">
+                        <div class="flex items-center justify-between gap-3">
+                            <h3 class="text-base font-semibold">Preset disponibili</h3>
+                            <a href="{{ path('app_cli_operations') }}#deploy-tuning" class="btn btn-xs btn-outline">Guida CLI</a>
+                        </div>
+                        <p class="opacity-70">Usa la variabile d'ambiente <code>RAG_PROFILE=&lt;nome&gt;</code> (o l'opzione <code>--rag-profile</code> del comando <code>app:index-docs</code>) per commutare.</p>
+                        <ul class="space-y-2">
+                            {% for profile in available_profiles %}
+                                <li class="flex items-center justify-between text-sm px-2 py-1 rounded border {% if profile.name == active_profile_name %}border-primary/60 bg-primary/5{% else %}border-base-300{% endif %}">
+                                    <div>
+                                        <p class="font-medium">{{ profile.label ?? profile.name }}</p>
+                                        <p class="text-xs opacity-70">{{ profile.name }} · Backend {{ (profile.backend ?? 'n/d')|capitalize }}</p>
+                                    </div>
+                                    {% if profile.name == active_profile_name %}
+                                        <span class="badge badge-success badge-sm">Attivo</span>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid gap-6 lg:grid-cols-[minmax(0,1.15fr),minmax(0,0.85fr)]">
                 <div class="card bg-base-100 border border-base-300">
                     <div class="card-body space-y-3 text-sm">
                         <h3 class="card-title text-base">Variabili chiave (.env.local)</h3>
+                        <span>Fallback - adesso è gestito tutto dai rag profiles</span>
                         <div class="overflow-x-auto">
                             <table class="table table-xs sm:table-sm">
                                 <thead>

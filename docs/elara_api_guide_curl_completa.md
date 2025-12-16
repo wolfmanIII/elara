@@ -102,8 +102,10 @@ Questa modalità consente di mantenere un livello minimo di usabilità anche in 
 Le principali variabili che influenzano il comportamento dell’API sono:
 
 ```env
-# Scelta del backend AI
-AI_BACKEND=ollama|openai|gemini
+# Profilo RAG (backend AI + modelli + flag test/fallback)
+RAG_PROFILE=ollama-bgem3
+# Fallback legacy per servizi non profilati
+AI_BACKEND=ollama
 APP_CHAT_CONSOLE_TOKEN=1234...
 
 # Modalità test (nessuna chiamata al modello AI)
@@ -113,20 +115,21 @@ APP_AI_TEST_MODE=true|false
 APP_AI_OFFLINE_FALLBACK=true|false
 ```
 
-### 4.1 AI_BACKEND
-- `ollama` → utilizza il server Ollama locale.
-- `openai` → utilizza le API OpenAI.
-- `gemini` → utilizza le API Gemini.
-
-La logica AI è incapsulata nell’`AiClientInterface`, per cui il controller non cambia.
+### 4.1 Profilo RAG / backend
+- `RAG_PROFILE=<nome>` seleziona un preset definito in `config/packages/rag_profiles.yaml`.
+- Ogni preset specifica backend (`ollama|openai|gemini`), modelli chat/embedding e flag test/fallback.
+- È possibile forzare un profilo al volo sul comando di indicizzazione (`php bin/console app:index-docs --rag-profile=openai-mini`).
+`AI_BACKEND` resta come variabile di retrocompatibilità per eventuali script legacy.
 
 ### 4.2 APP_AI_TEST_MODE
 - `true` → la risposta mostrerà estratti chunk (modalità test),
 - `false` → normale comportamento RAG + LLM.
+(è impostato dentro il profilo, ma resta overridabile da ENV)
 
 ### 4.3 APP_AI_OFFLINE_FALLBACK
 - `true` → se il backend AI è giù, ELARA prova a restituire contenuti testuali rilevanti,
 - `false` → in caso di problemi del backend AI viene propagato un errore.
+(anche questo flag è nei profili, le ENV servono solo per override rapido)
 
 ---
 
@@ -134,14 +137,15 @@ La logica AI è incapsulata nell’`AiClientInterface`, per cui il controller no
 
 Di seguito una serie di esempi pratici per interagire con `/api/chat`.
 
-## 5.1 Richiesta base — modalità normale
-
+## 5.1 Richiesta base
+### modalità normale
 ```bash
 curl -X POST http://localhost:8000/api/chat \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {token_generato}" \
   -d '{"question":"Riassumi ELaRA"}'
 ```
+### in streaming
 ```bash
 curl -X POST http://localhost:8000/api/chat/stream \
   -H "Content-Type: application/json" \
@@ -200,17 +204,17 @@ curl -X POST http://localhost:8000/api/chat \
 
 Codice HTTP: tipicamente `400 Bad Request`.
 
-## 5.4 Esempio con variabile d’ambiente AI_BACKEND
+## 5.4 Esempio con selezione profilo RAG
 
 Eseguendo l’applicazione con, ad esempio:
 
 ```env
-AI_BACKEND=ollama
+RAG_PROFILE=ollama-bgem3
 ```
 
-il comportamento dell’endpoint rimane identico dal punto di vista dell’utente, ma:
-- il modello AI utilizzato è quello locale gestito da Ollama,
-- la qualità/latency dipenderanno dal modello scelto (`OLLAMA_CHAT_MODEL`, `OLLAMA_EMBED_MODEL`).
+oppure lanciando `php bin/console app:index-docs --rag-profile=openai-mini`, cambia il backend AI utilizzato (modelli chat/embedding e flag test/fallback) ma:
+- l’endpoint rimane identico dal punto di vista dell’utente,
+- la qualità/latency dipenderanno dal profilo scelto (Ollama locale vs OpenAI vs Gemini).
 
 La chiamata curl rimane la stessa:
 
@@ -332,21 +336,25 @@ La natura JSON dell’API la rende adatta a qualunque ecosistema.
 
 # 🧾 10. Cheat sheet rapido
 
-- **Endpoint**: `POST /api/chat`
+- **Endpoint**: `POST /api/chat` o `POST /api/chat/stream`
 - **Richiesta minima**:
   ```json
   { "question": "Domanda dell'utente" }
   ```
 - **Header obbligatorio**: `Content-Type: application/json`
-- **Header obbligatorio**: `Authorization: Bearer {token_generato}`
+- **Header obbligatorio in caso di streaming**: `Authorization: Bearer {token_generato}`
 - **Modalità TEST**: `APP_AI_TEST_MODE=true`
 - **Offline fallback**: `APP_AI_OFFLINE_FALLBACK=true`
-- **Backend AI**: `AI_BACKEND=ollama|openai`
+- **Backend AI / preset**: `RAG_PROFILE=<nome>` (es. `ollama-bgem3`, `openai-mini`)
 
 Esempio curl minimal:
 
 ```bash
 curl -X POST http://localhost:8000/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"question":"Riassumi ELaRA"}'
+
+curl -X POST http://localhost:8000/api/chat/stream \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {token_generato}" \
   -d '{"question":"Riassumi ELaRA"}'

@@ -1,0 +1,73 @@
+parameters:
+    rag_profiles:
+        default_backend: 'ollama'
+        default_profile: 'ollama-bgem3'
+        presets:
+            ollama-bgem3:
+                label: 'Ollama · bge-m3'
+                backend: 'ollama'
+                chunking:
+                    min: 400
+                    max: 1400
+                    overlap: 250
+                retrieval:
+                    top_k: 5
+                    min_score: 0.55
+                ai:
+                    chat_model: 'llama3.2'
+                    embed_model: 'bge-m3'
+                    embed_dimension: 1024
+                    test_mode: false
+                    offline_fallback: true
+                    show_sources: false
+            openai-mini:
+                label: 'OpenAI · gpt-4.1-mini'
+                backend: 'openai'
+                chunking:
+                    min: 380
+                    max: 1200
+                    overlap: 220
+                retrieval:
+                    top_k: 5
+                    min_score: 0.60
+                ai:
+                    chat_model: 'gpt-4.1-mini'
+                    embed_model: 'text-embedding-3-small'
+                    embed_dimension: 1536
+                    test_mode: false
+                    offline_fallback: true
+                    show_sources: true
+            gemini-flash:
+                label: 'Gemini · 2.5 Flash'
+                backend: 'gemini'
+                chunking:
+                    min: 380
+                    max: 1300
+                    overlap: 220
+                retrieval:
+                    top_k: 5
+                    min_score: 0.60
+                ai:
+                    chat_model: 'gemini-2.5-flash'
+                    embed_model: 'gemini-embedding-001'
+                    embed_dimension: 768
+                    test_mode: false
+                    offline_fallback: true
+                    show_sources: true
+            offline-test:
+                label: 'Offline Test (fake embedding)'
+                backend: 'ollama'
+                chunking:
+                    min: 300
+                    max: 900
+                    overlap: 150
+                retrieval:
+                    top_k: 3
+                    min_score: 0.50
+                ai:
+                    chat_model: 'llama3.2'
+                    embed_model: 'bge-m3'
+                    embed_dimension: 1024
+                    test_mode: true
+                    offline_fallback: true
+                    show_sources: false

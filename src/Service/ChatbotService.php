@@ -6,6 +6,7 @@ namespace App\Service;
 
 use App\AI\AiClientInterface;
 use App\Entity\DocumentChunk;
+use App\Rag\RagProfileManager;
 use Doctrine\ORM\EntityManagerInterface;
 
 class ChatbotService
@@ -13,6 +14,7 @@ class ChatbotService
     public function __construct(
         private EntityManagerInterface  $em,
         private AiClientInterface       $ai,
+        private RagProfileManager       $profiles,
     ) {}
 
     /**
@@ -20,9 +22,10 @@ class ChatbotService
      */
     public function ask(string $question): string
     {
-        $testMode = ($_ENV['APP_AI_TEST_MODE'] ?? 'false') === 'true';
-        $offlineFallbackEnabled =
-            ($_ENV['APP_AI_OFFLINE_FALLBACK'] ?? 'true') === 'true';
+        $aiConfig = $this->profiles->getAi();
+        $testMode = (bool) ($aiConfig['test_mode'] ?? false);
+        $offlineFallbackEnabled = (bool) ($aiConfig['offline_fallback'] ?? true);
+        $showSources = (bool) ($aiConfig['show_sources'] ?? false);
 
         // Modalità test: niente AI, solo ricerca testuale nel DB.
         if ($testMode) {
@@ -46,7 +49,7 @@ class ChatbotService
                 $similarity = number_format((float)$chunk["similarity"], 2, ',', '.');
                 $context .= "Fonte: " . $chunk['file_path'] . " - chunk ". $chunk["chunk_index"] . 
                 " - similarity " . $similarity . "\n";
-                if ($_ENV["SHOW_SOURCES"] === 'true') {
+                if ($showSources) {
                     $source .= "Fonte: " . $chunk['file_path'] . " - chunk ". $chunk["chunk_index"] . 
                     " - similarity " . $similarity . "\n";
                 }
@@ -73,9 +76,10 @@ class ChatbotService
      */
     public function askStream(string $question, callable $onChunk): void
     {
-        $testMode = ($_ENV['APP_AI_TEST_MODE'] ?? 'false') === 'true';
-        $offlineFallbackEnabled =
-            ($_ENV['APP_AI_OFFLINE_FALLBACK'] ?? 'true') === 'true';
+        $aiConfig = $this->profiles->getAi();
+        $testMode = (bool) ($aiConfig['test_mode'] ?? false);
+        $offlineFallbackEnabled = (bool) ($aiConfig['offline_fallback'] ?? true);
+        $showSources = (bool) ($aiConfig['show_sources'] ?? false);
 
         if ($testMode) {
             $onChunk($this->answerInTestMode($question));
@@ -98,7 +102,7 @@ class ChatbotService
                 $context .= "Fonte: " . $chunk['file_path'] . " - chunk ". $chunk["chunk_index"] . 
                     " - similarity " . $similarity . "\n";
 
-                if (($_ENV["SHOW_SOURCES"] ?? 'false') === 'true') {
+                if ($showSources) {
                     $source .= "Fonte: " . $chunk['file_path'] . " - chunk ". $chunk["chunk_index"] .
                         " - similarity " . $similarity . "\n";
                 }

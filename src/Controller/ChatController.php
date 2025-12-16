@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Rag\RagProfileManager;
 use App\Service\ChatbotService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,6 +13,10 @@ use Symfony\Component\Routing\Attribute\Route;
 final class ChatController extends BaseController
 {
     public const CONTROLLER_NAME = 'ChatController';
+
+    public function __construct(
+        private readonly RagProfileManager $profiles,
+    ) {}
 
     /**
      * Console grafica del chatbot (ELARA).
@@ -27,19 +32,23 @@ final class ChatController extends BaseController
     #[Route('/engine/status', name: 'app_engine_status', methods: ['GET'])]
     public function engineStatus(): JsonResponse
     {
-        $backend = $_ENV['AI_BACKEND'] ?? 'ollama';
-        $modelMap = [
-            'ollama' => $_ENV['OLLAMA_CHAT_MODEL'] ?? 'llama3.2',
-            'openai' => $_ENV['OPENAI_CHAT_MODEL'] ?? 'gpt-5.1-mini',
-            'gemini' => $_ENV['GEMINI_CHAT_MODEL'] ?? 'gemini-1.5-flash',
-        ];
+        $profile     = $this->profiles->getActiveProfile();
+        $aiConfig    = $this->profiles->getAi();
+        $backend     = $profile['backend'] ?? 'ollama';
+        $profileName = $this->profiles->getActiveProfileName();
+        $label       = $profile['label'] ?? ucfirst($backend);
 
         $status = [
             'ok' => true,
-            'model' => $modelMap[$backend] ?? 'n/d',
+            'profile' => [
+                'name'   => $profileName,
+                'label'  => $label,
+                'backend'=> $backend,
+            ],
+            'model' => $aiConfig['chat_model'] ?? 'n/d',
             'source' => ucfirst($backend),
-            'test_mode'   => ($_ENV['APP_AI_TEST_MODE'] ?? 'false') === "true" ? "Attivo" : "Disabilitato",
-            'offline_fallback' => ($_ENV['APP_AI_OFFLINE_FALLBACK'] ?? 'false') === "true" ? "Attivo" : "Disabilitato",
+            'test_mode'   => ($aiConfig['test_mode'] ?? false) ? 'Attivo' : 'Disabilitato',
+            'offline_fallback' => ($aiConfig['offline_fallback'] ?? false) ? 'Attivo' : 'Disabilitato',
         ];
         return $this->json($status);
     }

@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\AI\AiClientInterface;
 use App\Entity\DocumentChunk;
 use App\Entity\DocumentFile;
 use App\Model\Index\FileIndexStatus;
 use App\Model\Index\IndexSummary;
 use App\Model\Index\IndexedFileResult;
+use App\Rag\RagProfileManager;
 use Doctrine\ORM\EntityManagerInterface;
-use App\AI\AiClientInterface;
 
 /**
  * Service “puro” che si occupa di:
@@ -32,6 +33,7 @@ final class DocsIndexer
         private readonly DocumentTextExtractor $extractor,
         private readonly ChunkingService $chunking,
         private readonly AiClientInterface $embeddingClient,
+        private readonly RagProfileManager $profiles,
     ) {
         $this->embeddingDimension = $this->embeddingClient->getEmbeddingDimension();
     }
@@ -47,14 +49,16 @@ final class DocsIndexer
         string $rootDir,
         bool $forceReindex = false,
         bool $dryRun = false,
-        bool $testMode = false,
-        bool $offlineFallback = false,
+        ?bool $testMode = null,
+        ?bool $offlineFallback = null,
         array $pathsFilter = [],
         array $excludedDirs = [],
         array $excludedNamePatterns = [],
         ?callable $onStart = null,
         ?callable $onFileProcessed = null,
     ): IndexSummary {
+        [$testMode, $offlineFallback] = $this->resolveAiFlags($testMode, $offlineFallback);
+
         $files           = [];
         $totalFilesFound = 0;
         $totalProcessed  = 0;
@@ -436,5 +440,18 @@ final class DocsIndexer
         }
 
         return $vector;
+    }
+
+    /**
+     * @return array{bool,bool}
+     */
+    private function resolveAiFlags(?bool $testMode, ?bool $offlineFallback): array
+    {
+        $aiConfig = $this->profiles->getAi();
+
+        $resolvedTestMode = $testMode ?? (bool) ($aiConfig['test_mode'] ?? false);
+        $resolvedOffline  = $offlineFallback ?? (bool) ($aiConfig['offline_fallback'] ?? true);
+
+        return [$resolvedTestMode, $resolvedOffline];
     }
 }

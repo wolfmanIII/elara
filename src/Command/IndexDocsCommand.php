@@ -6,6 +6,7 @@ namespace App\Command;
 
 use App\Model\Index\FileIndexStatus;
 use App\Model\Index\IndexedFileResult;
+use App\Rag\RagProfileManager;
 use App\Service\DocsIndexer;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -25,6 +26,7 @@ final class IndexDocsCommand extends Command
 
     public function __construct(
         private readonly DocsIndexer $indexer,
+        private readonly RagProfileManager $profiles,
         #[Autowire('%kernel.project_dir%')]
         private readonly string $projectDir,
     ) {
@@ -37,7 +39,8 @@ final class IndexDocsCommand extends Command
             ->addOption('force-reindex', null, InputOption::VALUE_NONE, 'Forza la reindicizzazione anche se l\'hash è invariato')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Simula senza modificare il database')
             ->addOption('test-mode', null, InputOption::VALUE_NONE, 'Non chiama il modello esterno, utile per test')
-            ->addOption('offline-fallback', null, InputOption::VALUE_REQUIRED, 'Usa embedding fake in caso di errore col modello', true)
+            ->addOption('offline-fallback', null, InputOption::VALUE_REQUIRED, 'Usa embedding fake in caso di errore col modello', null)
+            ->addOption('rag-profile', null, InputOption::VALUE_REQUIRED, 'Seleziona un preset RAG (config/packages/rag_profiles.yaml)')
             ->addOption('path', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Limita a questi sotto-path relativi')
         ;
     }
@@ -46,10 +49,39 @@ final class IndexDocsCommand extends Command
     {
         $startedAt = microtime(true);
 
-        $forceReindex    = (bool) $input->getOption('force-reindex');
-        $dryRun          = (bool) $input->getOption('dry-run');
-        $testMode        = (bool) $input->getOption('test-mode');
-        $offlineFallback = (bool) $input->getOption('offline-fallback');
+        $profileOption = $input->getOption('rag-profile');
+        if ($profileOption !== null) {
+            try {
+                $this->profiles->useProfile((string) $profileOption);
+            } catch (\InvalidArgumentException $e) {
+                $available = array_map(
+                    static fn (array $info) => $info['name'],
+                    $this->profiles->listProfiles()
+                );
+                $output->writeln('<error>' . $e->getMessage() . '</error>');
+                $output->writeln('<comment>Profili disponibili:</comment> ' . implode(', ', $available));
+                return Command::INVALID;
+            }
+        }
+
+        $activeProfileName  = $this->profiles->getActiveProfileName();
+        $activeProfileData  = $this->profiles->getActiveProfile();
+        $activeProfileLabel = $activeProfileData['label'] ?? $activeProfileName;
+        $activeBackend      = ucfirst($activeProfileData['backend'] ?? 'n/d');
+
+        $forceReindex = (bool) $input->getOption('force-reindex');
+        $dryRun       = (bool) $input->getOption('dry-run');
+
+        $testMode = $input->hasParameterOption('--test-mode') ? true : null;
+
+        $offlineFallback = null;
+        if ($input->hasParameterOption('--offline-fallback')) {
+            $offlineFallback = $this->parseBooleanOption($input->getOption('offline-fallback'));
+            if ($offlineFallback === null) {
+                $output->writeln('<error>Valore non valido per --offline-fallback. Usa true/false.</error>');
+                return Command::INVALID;
+            }
+        }
         $pathsFilter     = (array) $input->getOption('path');
 
         $rootDir = $this->projectDir . DIRECTORY_SEPARATOR . self::ROOT_DIR;
@@ -60,11 +92,18 @@ final class IndexDocsCommand extends Command
         ));
 
         $output->writeln(sprintf(
+            '  profilo: %s (%s) · backend: %s',
+            $activeProfileName,
+            $activeProfileLabel,
+            $activeBackend,
+        ));
+
+        $output->writeln(sprintf(
             '  force-reindex: %s, dry-run: %s, test-mode: %s, offline-fallback: %s',
             $forceReindex ? 'si' : 'no',
             $dryRun ? 'si' : 'no',
-            $testMode ? 'si' : 'no',
-            $offlineFallback ? 'si' : 'no',
+            $this->formatBoolOption($testMode),
+            $this->formatBoolOption($offlineFallback),
         ));
 
         if ($pathsFilter !== []) {
@@ -170,5 +209,29 @@ final class IndexDocsCommand extends Command
         $secs = $seconds - ($hours * 3600) - ($minutes * 60);
 
         return sprintf('%02d:%02d:%05.2f', $hours, $minutes, $secs);
+    }
+
+    private function parseBooleanOption(mixed $value): ?bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if ($value === null) {
+            return null;
+        }
+
+        $normalized = strtolower((string) $value);
+
+        return match ($normalized) {
+            '1', 'true', 'yes', 'on'  => true,
+            '0', 'false', 'no', 'off' => false,
+            default                    => null,
+        };
+    }
+
+    private function formatBoolOption(?bool $value): string
+    {
+        return $value === null ? 'profilo' : ($value ? 'si' : 'no');
     }
 }

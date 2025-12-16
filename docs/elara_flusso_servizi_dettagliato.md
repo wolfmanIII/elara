@@ -56,10 +56,7 @@ chatStream(
 - embedding 1024 (bge-m3),
 - utile per ambienti self-hosted.
 
-Il backend è configurabile tramite:
-```
-AI_BACKEND=ollama|openai|gemini
-```
+Il backend è configurabile tramite i preset dichiarati in `config/packages/rag_profiles.yaml` (variabile `RAG_PROFILE=<nome>` o opzione CLI `--rag-profile=<nome>`); ogni profilo definisce backend, modelli chat/embedding e flag di fallback.
 
 ---
 

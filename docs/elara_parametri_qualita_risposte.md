@@ -26,12 +26,14 @@ Dimensioni embedding analizzate:
 Influisce sulla qualità linguistica e sul ragionamento. Modelli più grandi (7B, 8B, 13B) garantiscono risposte più coerenti e robuste.
 
 ## 2.3 Backend selezionato
-Configurazione:
-```
-AI_BACKEND=ollama|openai|gemini
-```
-OpenAI → qualità più alta.
-Gemini → qualità più alta. 
+Oggi la selezione avviene tramite i preset dichiarati in `config/packages/rag_profiles.yaml` (variabile `RAG_PROFILE=<nome>`). Ogni profilo definisce:
+- backend (`ollama|openai|gemini`)
+- modelli chat/embedding
+- dimensioni embedding
+- flag test/fallback
+
+OpenAI → qualità più alta.  
+Gemini → qualità più alta.  
 Ollama → locale, meno costo, più latenza.
 
 ---
@@ -107,12 +109,13 @@ Riduce il rischio di hallucination.
 Chiaro, robusto e aderente ai documenti.
 
 ## 5.3 Modalità operative
-Variabili ENV:
+Queste modalità sono configurate dentro ogni profilo RAG (`ai.test_mode`, `ai.offline_fallback`).  
+Posso comunque override locale con:
 ```
 APP_AI_TEST_MODE=true|false
 APP_AI_OFFLINE_FALLBACK=true|false
 ```
-Queste modalità influenzano il tipo di output (estratti, fallback testuale, o risposta completa generata).
+Determinano se il chatbot usa la modalità test (solo estratti) o il fallback locale in caso di errore del backend.
 
 ---
 
@@ -138,7 +141,7 @@ Chunk puliti → embedding di qualità.
 
 | Categoria | Parametri chiave |
 |----------|-------------------|
-| **Backend AI** | modello embedding, modello chat, AI_BACKEND |
+| **Backend AI** | modello embedding, modello chat, RAG_PROFILE (preset) |
 | **Chunking** | min, target, max, overlap, HARD_MAX_CHARS |
 | **Retrieval** | top_k, soglia cosine, indice HNSW, probes IVF-FLAT |
 | **Prompt** | system prompt, RAG template, modalità test/fallback |
@@ -147,4 +150,3 @@ Chunk puliti → embedding di qualità.
 Tutti questi parametri lavorano insieme: migliorare uno solo non basta. L’ottimizzazione va sempre considerata nel suo insieme.
 
 ---
-
