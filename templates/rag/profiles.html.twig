@@ -161,6 +161,10 @@
                     <code>ElaRA - Guida Chunking Embedding</code>
                 </button>
                 <button class="btn btn-xs btn-outline"
+                        onclick="document.getElementById('modal-elara-modelli-embedding-chat').showModal()">
+                    <code>ElaRA - Modelli Embedding e Chat</code>
+                </button>
+                <button class="btn btn-xs btn-outline"
                         onclick="document.getElementById('modal-elara-parametri-risposte').showModal()">
                     <code>ElaRA - Parametri Qualità Risposte</code>
                 </button>
@@ -169,4 +173,46 @@
 
     </div>
 </div>
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-analisi',
+    title: 'ELaRA — Analisi Tecnica',
+    markdownFile: 'docs/elara_analisi_tecnica.md'
+}) }}
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-chunking-embedding',
+    title: 'ELaRA — Guida Chunking Embedding',
+    markdownFile: 'docs/guida_rag_chunking_embedding.md'
+}) }}
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-parametri-risposte',
+    title: 'ELaRA — Parametri e Qualità delle Risposte',
+    markdownFile: 'docs/elara_parametri_qualita_risposte.md'
+}) }}
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-definizione',
+    title: 'ELaRA — Definizione',
+    markdownFile: 'docs/elara_definizione.md'
+}) }}
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-readme',
+    title: 'ELaRA — README',
+    markdownFile: 'README.md'
+}) }}
+
+{{ component('markdown_modal', {
+    id: 'modal-ollama',
+    title: 'ELaRA — Guida Ollama Backend',
+    markdownFile: 'docs/ollama_ubuntu_24_04_guida.md'
+}) }}
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-modelli-embedding-chat',
+    title: 'ELaRA — Modelli embedding e chat',
+    markdownFile: 'docs/guida_modelli_embedding_e_chat.md'
+}) }}
 {% endblock %}

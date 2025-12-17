@@ -204,5 +204,3 @@ Fattori importanti:
 
 ---
 
-# 🔚 Fine del documento
-

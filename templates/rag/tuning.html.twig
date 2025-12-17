@@ -56,27 +56,6 @@
                     </div>
                 </div>
             </div>
-
-            <div class="w-full text-xs">
-                Documenti di riferimento:
-                <button class="btn btn-xs btn-outline"
-                        onclick="document.getElementById('modal-elara-definizione').showModal()">
-                    <code>ElaRA - Definizione</code>
-                </button>
-                <button class="btn btn-xs btn-outline"
-                        onclick="document.getElementById('modal-elara-readme').showModal()">
-                    <code>ElaRA - README</code>
-                </button>
-                <button class="btn btn-xs btn-outline"
-                        onclick="document.getElementById('modal-elara-chunking-embedding').showModal()">
-                    <code>ElaRA - Guida Chunking Embedding</code>
-                </button>
-                <button class="btn btn-xs btn-outline"
-                        onclick="document.getElementById('modal-elara-parametri-risposte').showModal()">
-                    <code>ElaRA - Parametri Qualità Risposte</code>
-                </button>
-            </div>
-
         </section>
 
         {# CONFIG & ENV #}
@@ -170,12 +149,20 @@
             <div class="w-full text-xs">
                 Documenti di riferimento:
                 <button class="btn btn-xs btn-outline"
+                        onclick="document.getElementById('modal-elara-readme').showModal()">
+                    <code>ElaRA - README</code>
+                </button>
+                <button class="btn btn-xs btn-outline"
                         onclick="document.getElementById('modal-elara-analisi').showModal()">
                     <code>ElaRA - Analisi Tecnica</code>
                 </button>
                 <button class="btn btn-xs btn-outline"
                         onclick="document.getElementById('modal-elara-chunking-embedding').showModal()">
                     <code>ElaRA - Guida Chunking Embedding</code>
+                </button>
+                <button class="btn btn-xs btn-outline"
+                        onclick="document.getElementById('modal-elara-modelli-embedding-chat').showModal()">
+                    <code>ElaRA - Guida Modelli Embedding e Chat</code>
                 </button>
                 <button class="btn btn-xs btn-outline"
                         onclick="document.getElementById('modal-elara-parametri-risposte').showModal()">
@@ -247,5 +234,11 @@
     id: 'modal-ollama',
     title: 'ELaRA — Guida Ollama Backend',
     markdownFile: 'docs/ollama_ubuntu_24_04_guida.md'
+}) }}
+
+{{ component('markdown_modal', {
+    id: 'modal-elara-modelli-embedding-chat',
+    title: 'ELaRA — Modelli embedding e chat',
+    markdownFile: 'docs/guida_modelli_embedding_e_chat.md'
 }) }}
 {% endblock %}
