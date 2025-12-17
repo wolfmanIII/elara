@@ -439,16 +439,11 @@ xdebug.log_level=0
 ```
 
 # 10. Da implementare
-## 1. Modalità “profilo di indicizzazione”  
-preset salvati (dimensione chunk, top‑k, backend embeddings, fallback) da richiamare via CLI o UI, così si può passare da un setup Ollama → OpenAI → Gemini senza toccare .env.
-## 2. Scheduler di re-index  
+## 1. Scheduler di re-index  
 comando che pianifica via cron (o Symfony Messenger) scansioni incrementali, con notifica se trova documenti non indicizzati o fallimenti.  
-## 3. Dashboard API token  
-elenco token per utente, ultimi utilizzi, revoche rapide
-oggi c’è solo il comando CLI.  
-## 4. Audit delle chat
+## 2. Audit delle chat
 log minimale (utente/timestamp/latency/modello) per capire carico e qualità, magari con filtri su top-k e soglia similitudine usata.
-## 5. Test di regressione RAG
+## 3. Test di regressione RAG
 un comando che esegue richieste “di riferimento” e confronta score/risposte con baseline, utile prima di cambiare modello embedding o parametri.
-## 6. Alerting per stato indice
+## 4. Alerting per stato indice
 Live component per aggiungere webhooks/email quando chunk non cercabili superano una soglia o l’indexer fallisce.

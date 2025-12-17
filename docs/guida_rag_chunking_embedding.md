@@ -111,7 +111,7 @@ Questi valori sono adatti a documenti tecnici e qualunque tipo di conoscenza
 
 ## 🧩 Scelta della dimensione del vettore
 - Usa sempre `VECTOR(N)` come **valore fisso** nella migration.
-- Anche se modelli diversi producono dimensionalità diverse, puoi:
+- Anche se modelli diversi producono dimensionalità diverse, posso:
   - **ridurre** vettori maggiori (troncamento)
   - **zero‑padding** per vettori più piccoli
 - Il modo più stabile è scegliere il formato per il proprio progetto.
@@ -750,4 +750,3 @@ Si dovrebbe vedere qualcosa come:
 Index Scan using document_chunk_embedding_hnsw on document_chunk
 ```
 Se invece si vede "Seq Scan" → manca l'indice o Postgres non lo ritiene conveniente.
-

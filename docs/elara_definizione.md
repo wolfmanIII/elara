@@ -1,7 +1,7 @@
 # 1. Cos’è un sistema RAG, in parole semplici
 Quando parliamo di RAG, parliamo di Retrieval-Augmented Generation.
 Detto in modo meno tecnico: è un sistema che unisce due mondi:
-* da una parte un motore di ricerca intelligente sui tuoi documenti
+* da una parte un motore di ricerca intelligente sui miei documenti
 * dall’altra un assistente tipo chatbot che sa scrivere risposte in linguaggio naturale
 
 Il flusso, semplificando, è questo:
@@ -19,11 +19,11 @@ Solo a questo punto entra in gioco il modello di AI generativa: gli passiamo la 
 “Rispondi usando solo queste informazioni, senza inventare.”
 
 Il vantaggio rispetto a un “chatbot generico” è che:
-* risponde in base alle tue fonti interne
+* risponde in base alle mie fonti interne
 * può citare o riassumere documenti
 * riduce molto il rischio di risposte inventate (hallucination)
 
-In pratica RAG significa: “AI che risponde, ma con il naso dentro i tuoi documenti, non solo nella sua memoria addestrata.”
+In pratica RAG significa: “AI che risponde, ma con il naso dentro i miei documenti, non solo nella sua memoria addestrata.”
 # 2. Lo Scopo di ELARA
 ELARA è il nome che abbiamo dato al motore RAG interno:
 E.L.A.R.A. — Embedding Linking & Retrieval Answering.
@@ -145,14 +145,14 @@ L’indice HNSW costruisce una sorta di mappa a livelli dove:
 * più scendi, più la mappa è dettagliata
 * i collegamenti sono pensati per arrivare velocemente ai vettori più simili
 
-Quando fai una domanda:
+Quando faccio una domanda:
 * si parte dal livello più alto della “mappa”
 * si scende collezionando i nodi più promettenti
 * alla fine si ottengono rapidamente i vettori più simili
 
 È come cercare un libro in una biblioteca già ordinata, invece che sfogliare ogni libro uno per uno.
 
-> HNSW è un indice che permette a pgvector di trovare rapidamente gli embedding più simili alla tua domanda, rendendo il motore RAG veloce, preciso e scalabile(il tutto è sempre relativo al hardware che si ha a disposizione).
+> HNSW è un indice che permette a pgvector di trovare rapidamente gli embedding più simili alla mia domanda, rendendo il motore RAG veloce, preciso e scalabile(il tutto è sempre relativo al hardware che si ha a disposizione).
 
 In generale l'indice HMSW è ideale per data set di piccole e medie dimensioni, non richiede nessun tuning.
 

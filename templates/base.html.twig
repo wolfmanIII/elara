@@ -70,7 +70,7 @@
                 {% for label, messages in app.flashes %}
                     {% for message in messages %}
                         <div role="alert" class="alert alert-{{ label }} alert-outline">
-                            {{ message }}
+                            {{ message|raw }}
                         </div>
                     {% endfor %}
                 {% endfor %}

@@ -86,7 +86,7 @@ class DocumentTextExtractor
     private function extractOdt(string $path): ?string
     {
         if (!class_exists(\ZipArchive::class)) {
-            // Senza zip non posso leggere l'ODT
+            // Senza zip non si può leggere l'ODT
             return null;
         }
 
@@ -112,7 +112,7 @@ class DocumentTextExtractor
     private function extractDocx(string $path): ?string
     {
         if (!class_exists(\ZipArchive::class)) {
-            // Anche DOCX è uno zip, senza ZipArchive non posso leggerlo
+            // Anche DOCX è uno zip, senza ZipArchive non si può leggerlo
             return null;
         }
 

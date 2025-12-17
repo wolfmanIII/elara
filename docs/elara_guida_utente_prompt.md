@@ -105,7 +105,7 @@ ELARA può rispondere solo con ciò che è presente nei documenti.
 
 # 5. 🧪 Come testare correttamente il sistema
 
-Puoi verificare la qualità di una domanda usando la **Modalità TEST**:
+Posso verificare la qualità di una domanda usando la **Modalità TEST**:
 - non chiama l’AI
 - mostra i chunk trovati
 - permette di capire se la domanda è formulata bene
@@ -152,11 +152,10 @@ Sì. L’embedding ragiona sul significato, non sulle singole parole.
 
 # 8. 🎁 Suggerimento finale
 
-> Formula la domanda come se stessi chiedendo a un collega: chiara, mirata e contestualizzata.
+> Formulo la domanda come se stessi chiedendo a un collega: chiara, mirata e contestualizzata.
 
 ---
 
 # 9. 📚 Frase riassuntiva
 
-> **ELARA risponde bene quando tu gli dici chiaramente *di cosa stai parlando*.**
-
+> **ELARA risponde bene quando dico chiaramente *di cosa sto parlando*.**

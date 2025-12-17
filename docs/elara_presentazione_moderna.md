@@ -86,7 +86,7 @@ Configurabile via preset in `config/packages/rag_profiles.yaml` (variabile `RAG_
 # 🌐 6. API /api/chat
 Richiesta:
 ```json
-{ "question": "La tua domanda" }
+{ "question": "La mia domanda" }
 ```
 Modalità supportate:
 - normale
