@@ -160,6 +160,11 @@ In generale l'indice HMSW è ideale per data set di piccole e medie dimensioni, 
 
 > ***Gli indici vettoriali IVF-FLAT e HNSW, sono da considerare mutualmente esclusivi***
 
+> **Promemoria pratico**  
+> - HNSW = scelta predefinita per knowledge base aziendali: dataset moderati, tanta precisione, zero parametri da calibrare.  
+> - IVF-FLAT = solo quando i chunk superano i milioni e sei disposto a gestire `lists`, `probes` e REINDEX periodici.  
+> - Se hai dubbi, resta su HNSW: aggiungere IVF-FLAT “per sicurezza” genera solo confusione al planner e rallenta la manutenzione.
+
 # 5. L’operatore vettoriale <=> di Postgres/pgvector
 L’operatore <=> è una delle funzionalità che pgvector aggiunge a PostgreSQL.
 

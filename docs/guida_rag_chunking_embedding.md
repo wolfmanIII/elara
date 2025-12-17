@@ -689,6 +689,7 @@ Un solo indice — **HNSW** — è la scelta corretta nel 99% dei casi.
 - Recall più bassa se `lists`/`probes` non sono calibrati
 - Necessita tuning
 - Richiede "REINDEX" dopo grandi batch di insert
+- **Non adatto** a knowledge base medio-piccole: in quei casi HNSW offre risultati migliori con meno sforzo.
 
 ---
 

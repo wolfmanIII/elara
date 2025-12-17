@@ -153,6 +153,8 @@ Due possibili indici vettoriali, entrambi supportati da pgvector.
 
 ELARA supporta entrambi ma **si sconsiglia vivamente l’uso simultaneo**.
 
+> **Linea guida rapida:** se non stai gestendo un grafo di milioni di chunk, resta su HNSW. IVF-FLAT diventa utile solo su collezioni gigantesche in cui vale la pena pagare tuning e manutenzione.
+
 ---
 
 # 9. Ricerca Vettoriale e Retrieval

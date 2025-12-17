@@ -89,6 +89,11 @@ WITH (lists = 100);
 
 > ***Gli indici vettoriali IVF-FLAT e HNSW, sono da considerare mutualmente esclusivi***
 
+> **Quale indice usare?**  
+> - **HNSW** è il default consigliato per dataset piccoli/medi (documentazione interna, manuali, knowledge base self-hosted): offre ottima precisione senza tuning.  
+> - **IVF-FLAT** va considerato solo con dataset enormi (milioni di chunk) e con tempo per calibrare `lists`/`probes` e pianificare REINDEX periodici.  
+> - Evita di abilitarli entrambi: pgvector sceglie un indice alla volta e mantenere il secondo porta solo costi addizionali.
+
 ### Cos'è pgvector
 __pgvector__ è un’estensione per PostgreSQL che aggiunge:
 * un tipo di colonna: vector(N) → un array di N numeri (float)
