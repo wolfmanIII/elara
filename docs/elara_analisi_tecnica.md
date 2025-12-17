@@ -27,22 +27,44 @@ ELARA separa nettamente:
 
 # 2. Architettura del Progetto
 
+Struttura principale delle sorgenti:
+
 ```
 src/
-  AI/              # integrazione con backend AI (OpenAI, Ollama, Gemini)
-  Command/         # comandi CLI per indicizzazione/lista/unindex
-  Controller/      # API REST
-  Entity/          # DocumentFile, DocumentChunk
-  Middleware/      # ricostruzione indici vettoriali
-  Repository/      # ricerca vettoriale+
-  Service/         # ChatbotService, DocumentTextExtractor, ChunkingService, DocsIndexer
+  AI/                 # client per Ollama, OpenAI, Gemini
+  Command/            # CLI (index, list, reset schema, API token…)
+  Controller/         # dashboard, API REST, profili RAG
+  Entity/             # DocumentFile, DocumentChunk, ApiToken, User
+  Middleware/         # supporto pgvector (IVF-FLAT probes)
+  Rag/                # RagProfileManager + storage profilo attivo
+  Repository/         # query vettoriali ottimizzate
+  Security/           # autenticazione via API token
+  Service/            # DocsIndexer, ChunkingService, ChatbotService, estrazione testo
+  Twig/               # componenti UX (modali Markdown, badge, ecc.)
+
+templates/            # UI Tailwind/Daisy, include modali markdown dinamiche
+assets/               # Stimulus + JS (es. rag_profile_switch_controller)
+docs/                 # documentazione ufficiale (mirrored anche in var/knowledge)
+var/knowledge/        # knowledge base indicizzabile, usata dall’indexer
 ```
+
+Gli elementi recenti includono:
+- gestione profili RAG lato UI con pulsanti inline e controller Stimulus per evitare click doppi;
+- modali Markdown riutilizzabili per consultare la documentazione senza lasciare la dashboard;
+- mirror automatico dei documenti in `var/knowledge/` così l’indexer legge le stesse fonti mostrate in UI.
 
 Principi chiave:
 - modularità,
-- astrazione del backend AI tramite AiClientInterface,
+- astrazione del backend AI tramite AiClientInterface e profili,
 - separazione tra fase di indexing e fase di query,
-- persistenza chiara, auditabile e con versioning naturale tramite DocumentFile.
+- persistenza chiara, auditabile e con versioning naturale tramite DocumentFile,
+- documentazione sempre disponibile direttamente nella UI per guidare l’operatore.
+
+## 2.1 Gestione Profili RAG da UI
+- Pagina `Status → RAG Profiles` elenca i preset con badge “Attivo” e pulsante “Attiva” inline.
+- Ogni pulsante invia un form dedicato (`rag_profile_switch_controller`) che disabilita tutti i bottoni finché lo switch non termina, evitando click multipli.
+- Quando il profilo richiede una dimensione embedding diversa da quella attualmente salvata in `DocumentChunk->embedding`, viene mostrato automaticamente un alert con la dimensione mancante e i due comandi da eseguire (`reset-rag-schema`, `index-docs --force-reindex`).
+- La sezione include link rapidi a tutta la documentazione (modali Markdown) così l’operatore può verificare chunking, parametri e guide senza uscire dall’app.
 
 ---
 

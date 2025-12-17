@@ -92,14 +92,13 @@
                         <h3 class="card-title text-base">Già implementato</h3>
                         <ul class="list-disc list-inside text-sm opacity-80 space-y-1">
                             <li>Motore RAG completo (indicizzazione, embedding, retrieval, risposta).</li>
-                            <li>Command Symfony per indicizzare, elencare e rimuovere documenti.</li>
-                            <li>Supporto backend AI multipli (Ollama / OpenAI / Gemini) configurabili da ENV.</li>
-                            <li>Integrazione PostgreSQL + pgvector con indice HNSW su embedding.</li>
-                            <li>Landing page per la presentazione del progetto.</li>
-                            <li>UI minimale per il chatbot.</li>
-                            <li>Autenticazione e gestione utenti per accessi controllati.</li>
-                            <li>Dashboard runtime per monitoraggio stato indice e AI Backend.</li>
-                            <li>Documentazione tecnica, guida RAG e guida utente prompt.</li>
+                            <li>CLI Symfony per indicizzare, elencare, ripulire e resettare schema/documents.</li>
+                            <li>Supporto backend AI multipli (Ollama / OpenAI / Gemini) configurabili via profili.</li>
+                            <li>Persistenza PostgreSQL + pgvector con indice HNSW e DQL cosine_similarity.</li>
+                            <li>Dashboard profili RAG con pulsanti inline, alert embedding e modali guida.</li>
+                            <li>Chatbot console + API JSON/SSE con fallback test/offline.</li>
+                            <li>Autenticazione utenti + API token con revoca e tracking utilizzi.</li>
+                            <li>Documentazione completa disponibile in-app (modali markdown) e in README/docs.</li>
                         </ul>
                     </div>
                 </div>
@@ -108,14 +107,13 @@
                     <div class="card-body space-y-3">
                         <h3 class="card-title text-base">Prossimi step</h3>
                         <ul class="list-disc list-inside text-sm opacity-80 space-y-1">
-                            <li>UI avanzata per il chatbot.</li>
-                            <li>Dashboard per upload e gestione file.</li>
-                            <li>Scheduler di re-index - Symfony Messenger - Scansioni incrementali.</li>
-                            <li>Profili di indicizzazione - Preset salvati(top_k, vector dim, fallback...) - via CLI / UI.</li>
-                            <li>Dashboard API token - Elenco - Utilizzi - Revoche rapide.</li>
-                            <li>Audit delle chat - log minimale (utente/timestamp/latency/modello).</li>
-                            <li>Test di regressione RAG - Comando richieste “di riferimento”, confronto score/risposte con baseline.</li>
-                            <li>Notifiche per stato indice - Webhooks / Email quando chunk non cercabili superano una soglia.</li>
+                            <li>Workflow guidato “Cambio profilo → Reset schema → Reindex”.</li>
+                            <li>Scheduler re-index (Messenger) con notifiche e controlli incrementali.</li>
+                            <li>Dashboard file upload + gestione knowledge base.</li>
+                            <li>Audit delle chat: log modello/latency/top_k + filtri.</li>
+                            <li>Test di regressione RAG e baseline comparativa.</li>
+                            <li>Alert stato indice (webhook/email) quando chunk non cercabili superano soglie.</li>
+                            <li>UI avanzata chatbot (streaming, evidenza fonti, rating feedback).</li>
                         </ul>
                     </div>
                 </div>

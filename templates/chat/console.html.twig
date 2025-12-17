@@ -34,17 +34,17 @@
                 </div>
 
                 {# Corpo: chat + colonna destra #}
-                <div class="grid grid-cols-1 md:grid-cols-[minmax(0,2.3fr)_minmax(0,1fr)] gap-4">
+                <div
+                    class="grid grid-cols-1 md:grid-cols-[minmax(0,2.3fr)_minmax(0,1fr)] gap-4"
+                    data-controller="chat"
+                    data-chat-endpoint-value="{{ path('app_api_chat') }}"
+                    data-chat-stream-endpoint-value="{{ path('app_api_chat_stream') }}"
+                    data-chat-engine-status-url-value="{{ path('app_engine_status') }}"
+                >
 
                     {# Colonna principale: chat #}
                     <turbo-frame id="chat_frame" class="col-span-1">
-                        <div
-                            class="flex flex-col gap-3 h-[590px]"
-                            data-controller="chat"
-                            data-chat-endpoint-value="{{ path('app_api_chat') }}"
-                            data-chat-stream-endpoint-value="{{ path('app_api_chat_stream') }}"
-                            data-chat-engine-status-url-value="{{ path('app_engine_status') }}"
-                        >
+                        <div class="flex flex-col gap-3 h-[590px]">
                             <div
                                 id="chat-log"
                                 class="flex-1 overflow-y-auto pr-2 space-y-3 text-sm leading-relaxed"
@@ -132,6 +132,19 @@
                                 <p id="engine-status-text" class="text-xs opacity-80 whitespace-pre-line">
                                     In attesa di risposta dallo status endpoint…
                                 </p>
+                            </div>
+                        </div>
+
+                        <div class="card bg-base-100 border border-base-300 h-[300px] flex flex-col">
+                            <div class="card-body gap-3 overflow-hidden">
+                                <div class="flex items-center justify-between">
+                                    <h2 class="card-title text-sm">Fonti</h2>
+                                    <span class="badge badge-outline badge-sm" data-chat-target="sourcesBadge">0</span>
+                                </div>
+                                <p class="text-xs opacity-70" data-chat-target="sourcesEmpty">Ancora nessuna risposta.</p>
+                                <div class="flex-1 overflow-y-auto pr-1">
+                                    <ul class="text-xs space-y-2 hidden" data-chat-target="sourcesList"></ul>
+                                </div>
                             </div>
                         </div>
 

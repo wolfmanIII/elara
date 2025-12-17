@@ -2,7 +2,7 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-    static targets = ['form', 'input', 'submitButton', 'submitLabel', 'spinner'];
+    static targets = ['form', 'input', 'submitButton', 'submitLabel', 'spinner', 'sourcesList', 'sourcesEmpty', 'sourcesBadge'];
     static values = {
         endpoint: String,
         streamEndpoint: String,
@@ -11,6 +11,7 @@ export default class extends Controller {
 
     connect() {
         this.chatLog = this.element.querySelector('#chat-log');
+        this.clearSources('Ancora nessuna risposta.');
 
         // Controllo stato motore all’avvio
         if (this.hasEngineStatusUrlValue) {
@@ -96,6 +97,7 @@ export default class extends Controller {
 
         this.appendUserMessage(question);
         this.inputTarget.value = '';
+        this.setSourcesLoading();
 
         if (this.hasStreamEndpointValue) {
             await this.submitStream(question);
@@ -120,11 +122,14 @@ export default class extends Controller {
             const data = await resp.json();
             if (!resp.ok || data.error) {
                 this.appendSystemMessage(data.error || 'Errore dal server.');
+                this.clearSources('Impossibile recuperare fonti.');
             } else {
                 this.appendAssistantMessage(data.answer);
+                this.renderSources(Array.isArray(data.sources) ? data.sources : []);
             }
         } catch (e) {
             this.appendSystemMessage('Errore di rete, riprova più tardi.');
+            this.clearSources('Impossibile recuperare fonti.');
         } finally {
             this.toggleLoading(false);
             this.scrollToBottom();
@@ -154,6 +159,7 @@ export default class extends Controller {
                     assistantBubble,
                     data.error || data.answer || 'Impossibile ottenere una risposta.'
                 );
+                this.clearSources('Impossibile recuperare fonti.');
                 this.finishAssistantMessage();
                 return;
             }
@@ -196,6 +202,7 @@ export default class extends Controller {
 
                     if (payload.error) {
                         this.updateAssistantMessage(assistantBubble, payload.error);
+                        this.clearSources('Impossibile recuperare fonti.');
                         this.finishAssistantMessage();
                         this.toggleLoading(false);
                         this.scrollToBottom();
@@ -203,6 +210,7 @@ export default class extends Controller {
                     }
 
                     if (payload.done) {
+                        this.renderSources(Array.isArray(payload.sources) ? payload.sources : []);
                         this.finishAssistantMessage();
                         this.toggleLoading(false);
                         this.scrollToBottom();
@@ -214,6 +222,7 @@ export default class extends Controller {
             this.finishAssistantMessage();
         } catch (e) {
             this.updateAssistantMessage(assistantBubble, 'Errore di rete, riprova più tardi.');
+            this.clearSources('Impossibile recuperare fonti.');
             this.finishAssistantMessage();
         } finally {
             this.toggleLoading(false);
@@ -320,5 +329,61 @@ export default class extends Controller {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    clearSources(message = 'Nessuna fonte disponibile.') {
+        if (this.hasSourcesEmptyTarget) {
+            this.sourcesEmptyTarget.textContent = message;
+            this.sourcesEmptyTarget.classList.remove('hidden');
+        }
+        if (this.hasSourcesListTarget) {
+            this.sourcesListTarget.innerHTML = '';
+            this.sourcesListTarget.classList.add('hidden');
+        }
+        this.updateSourcesBadge(0);
+    }
+
+    setSourcesLoading() {
+        this.clearSources('Recupero fonti…');
+    }
+
+    renderSources(sources) {
+        if (!this.hasSourcesListTarget || !Array.isArray(sources) || sources.length === 0) {
+            this.clearSources('Nessuna fonte per questa risposta.');
+            return;
+        }
+
+        const items = sources.map((source) => this.formatSourceItem(source)).join('');
+        this.sourcesListTarget.innerHTML = items;
+        this.sourcesListTarget.classList.remove('hidden');
+        if (this.hasSourcesEmptyTarget) {
+            this.sourcesEmptyTarget.classList.add('hidden');
+        }
+        this.updateSourcesBadge(sources.length);
+    }
+
+    formatSourceItem(source) {
+        const file = this.escapeHtml(source.file ?? 'n/d');
+        const chunk = Number.isFinite(source.chunk) ? source.chunk : '—';
+        const similarity = source.similarity_formatted ?? (source.similarity ?? 'n/d');
+        const preview = this.escapeHtml(source.preview ?? '');
+
+        return `
+            <li class="border border-base-300 rounded-lg p-2 space-y-1">
+                <div class="flex items-center justify-between gap-2 text-[11px] font-semibold">
+                    <span class="truncate" title="${file}">${file}</span>
+                    <span class="badge badge-outline badge-xs">chunk ${chunk}</span>
+                </div>
+                <div class="text-[11px] opacity-70">similarity ${similarity}</div>
+                <p class="text-[11px] leading-snug">${preview}</p>
+            </li>
+        `;
+    }
+
+    updateSourcesBadge(count) {
+        if (!this.hasSourcesBadgeTarget) {
+            return;
+        }
+        this.sourcesBadgeTarget.textContent = count.toString();
     }
 }

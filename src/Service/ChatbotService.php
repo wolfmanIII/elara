@@ -20,16 +20,17 @@ class ChatbotService
     /**
      * Entry point principale chiamato dal controller.
      */
-    public function ask(string $question): string
+    public function ask(string $question): array
     {
         $aiConfig = $this->profiles->getAi();
         $testMode = (bool) ($aiConfig['test_mode'] ?? false);
         $offlineFallbackEnabled = (bool) ($aiConfig['offline_fallback'] ?? true);
-        $showSources = (bool) ($aiConfig['show_sources'] ?? false);
-
         // Modalità test: niente AI, solo ricerca testuale nel DB.
         if ($testMode) {
-            return $this->answerInTestMode($question);
+            return [
+                'answer' => $this->answerInTestMode($question),
+                'sources' => [],
+            ];
         }
 
         try {
@@ -39,33 +40,34 @@ class ChatbotService
             // 2) recupera chunk più simili (top 5) usando cosine_similarity
             $chunks = $this->em->getRepository(DocumentChunk::class)->findTopKCosineSimilarity($queryVec);
             if (!$chunks) {
-                return 'Non trovo informazioni rilevanti nei documenti indicizzati.';
+                return [
+                    'answer' => 'Non trovo informazioni rilevanti nei documenti indicizzati.',
+                    'sources' => [],
+                ];
             }
 
             // 3) Costruisco il contesto per il modello
-            $context = '';
-            $source = null;
-            foreach ($chunks as $chunk) {
-                $similarity = number_format((float)$chunk["similarity"], 2, ',', '.');
-                $context .= "Fonte: " . $chunk['file_path'] . " - chunk ". $chunk["chunk_index"] . 
-                " - similarity " . $similarity . "\n";
-                if ($showSources) {
-                    $source .= "Fonte: " . $chunk['file_path'] . " - chunk ". $chunk["chunk_index"] . 
-                    " - similarity " . $similarity . "\n";
-                }
-                $context .= $chunk["chunk_content"] . "\n\n";
-            }
+            [$context, $sources] = $this->buildContextPayload($chunks);
 
             // 4) Lascio che il backend AI generi la risposta usando contesto + domanda
-            $answer = $this->ai->chat($question, $context, $source);
+            $answer = $this->ai->chat($question, $context, null);
 
-            return $answer !== '' ? $answer : 'Non sono riuscito a generare una risposta.';
+            return [
+                'answer' => $answer !== '' ? $answer : 'Non sono riuscito a generare una risposta.',
+                'sources' => $sources,
+            ];
         } catch (\Throwable $e) {
             if ($offlineFallbackEnabled) {
-                return $this->answerInOfflineFallback($question, $e);
+                return [
+                    'answer' => $this->answerInOfflineFallback($question, $e),
+                    'sources' => [],
+                ];
             }
 
-            return 'Errore nella chiamata al servizio AI: ' . $e->getMessage() . $e->getTraceAsString();
+            return [
+                'answer' => 'Errore nella chiamata al servizio AI: ' . $e->getMessage() . $e->getTraceAsString(),
+                'sources' => [],
+            ];
         }
     }
 
@@ -74,16 +76,14 @@ class ChatbotService
      *
      * @param callable(string $chunk): void $onChunk
      */
-    public function askStream(string $question, callable $onChunk): void
+    public function askStream(string $question, callable $onChunk): array
     {
         $aiConfig = $this->profiles->getAi();
         $testMode = (bool) ($aiConfig['test_mode'] ?? false);
         $offlineFallbackEnabled = (bool) ($aiConfig['offline_fallback'] ?? true);
-        $showSources = (bool) ($aiConfig['show_sources'] ?? false);
-
         if ($testMode) {
             $onChunk($this->answerInTestMode($question));
-            return;
+            return [];
         }
 
         try {
@@ -92,32 +92,21 @@ class ChatbotService
 
             if (!$chunks) {
                 $onChunk('Non trovo informazioni rilevanti nei documenti indicizzati.');
-                return;
+                return [];
             }
 
-            $context = '';
-            $source = null;
-            foreach ($chunks as $chunk) {
-                $similarity = number_format((float)$chunk["similarity"], 2, ',', '.');
-                $context .= "Fonte: " . $chunk['file_path'] . " - chunk ". $chunk["chunk_index"] . 
-                    " - similarity " . $similarity . "\n";
+            [$context, $sources] = $this->buildContextPayload($chunks);
 
-                if ($showSources) {
-                    $source .= "Fonte: " . $chunk['file_path'] . " - chunk ". $chunk["chunk_index"] .
-                        " - similarity " . $similarity . "\n";
-                }
-
-                $context .= $chunk["chunk_content"] . "\n\n";
-            }
-
-            $this->ai->chatStream($question, $context, $source, $onChunk);
+            $this->ai->chatStream($question, $context, null, $onChunk);
+            return $sources;
         } catch (\Throwable $e) {
             if ($offlineFallbackEnabled) {
                 $onChunk($this->answerInOfflineFallback($question, $e));
-                return;
+                return [];
             }
 
             $onChunk('Errore nella chiamata al servizio AI: ' . $e->getMessage());
+            return [];
         }
     }
 
@@ -224,6 +213,51 @@ class ChatbotService
         $out .= "\n(Dettaglio tecnico: " . $e->getMessage() . ")";
 
         return $out;
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $chunks
+     * @return array{0: string, 1: array<int, array<string, mixed>>}
+     */
+    private function buildContextPayload(array $chunks): array
+    {
+        $context = '';
+        $sources = [];
+
+        foreach ($chunks as $chunk) {
+            $similarityFloat = (float) ($chunk['similarity'] ?? 0);
+            $similarityFormatted = number_format($similarityFloat, 2, ',', '.');
+            $filePath = (string) $chunk['file_path'];
+            $chunkIndex = (int) $chunk['chunk_index'];
+
+            $context .= sprintf(
+                "Fonte: %s - chunk %d - similarity %s\n%s\n\n",
+                $filePath,
+                $chunkIndex,
+                $similarityFormatted,
+                (string) $chunk['chunk_content']
+            );
+
+            $sources[] = [
+                'file' => $filePath,
+                'chunk' => $chunkIndex,
+                'similarity' => $similarityFloat,
+                'similarity_formatted' => $similarityFormatted,
+                'preview' => $this->makePreview((string) $chunk['chunk_content']),
+            ];
+        }
+
+        return [$context, $sources];
+    }
+
+    private function makePreview(string $text, int $maxLength = 240): string
+    {
+        $clean = trim(preg_replace('/\s+/', ' ', $text) ?? '');
+        if (mb_strlen($clean, 'UTF-8') <= $maxLength) {
+            return $clean;
+        }
+
+        return mb_substr($clean, 0, $maxLength, 'UTF-8') . '…';
     }
 
     /**

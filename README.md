@@ -224,6 +224,14 @@ parameters:
 ```
 Per commutare basta impostare `RAG_PROFILE=<nome>` (o usare l'opzione CLI `--rag-profile=<nome>` durante l'indicizzazione).
 
+#### Switch tramite UI
+- Dashboard `Status → RAG Profiles` mostra la lista dei preset con badge *Attivo* e pulsante “Attiva” direttamente nella riga.
+- Al click il pulsante si disabilita (Stimulus controller `rag_profile_switch`) per evitare click multipli finché lo switch non termina.
+- Se la dimensione dell’embedding salvata nello schema non coincide con quella richiesta dal profilo selezionato, compare un alert con i due comandi da eseguire nell’ordine corretto:
+  1. `php bin/console app:reset-rag-schema --force`
+  2. `php bin/console app:index-docs --force-reindex`
+- In basso sono sempre disponibili le scorciatoie CLI (`RAG_PROFILE=<nome>`, `app:index-docs --rag-profile=<nome>`) nel caso si preferisca uno switch via terminale.
+
 ### Variabili d'ambiente, nel file .env.local
 ```env
 # Database PostgreSQL 18
@@ -232,7 +240,7 @@ DATABASE_URL="postgresql://app:!ChangeMe!@127.0.0.1:5432/app?serverVersion=16&ch
 # Parametri AI Backend
 RAG_PROFILE=ollama-bgem3   # preset definito in config/packages/rag_profiles.yaml
 AI_BACKEND=ollama          # fallback legacy per servizi non profilati
-SHOW_SOURCES=false         # oggi arriva dal profilo, lo lascio come reference
+SHOW_SOURCES=true          # oggi arriva dal profilo, lo lascio come reference
 TOP_K=5                   # idem, i servizi core leggono retrieval.top_k
 
 # Ollama

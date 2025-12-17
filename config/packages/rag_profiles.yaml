@@ -19,7 +19,7 @@ parameters:
                     embed_dimension: 1024
                     test_mode: false
                     offline_fallback: true
-                    show_sources: false
+                    show_sources: true
             openai-mini:
                 label: 'OpenAI · gpt-4.1-mini'
                 backend: 'openai'
@@ -70,4 +70,4 @@ parameters:
                     embed_dimension: 1024
                     test_mode: true
                     offline_fallback: true
-                    show_sources: false
+                    show_sources: true

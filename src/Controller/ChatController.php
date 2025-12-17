@@ -79,11 +79,12 @@ final class ChatController extends BaseController
             ], 400);
         }
 
-        $answer = $bot->ask($question);
+        $result = $bot->ask($question);
 
         return $this->json([
             'question' => $question,
-            'answer'   => $answer,
+            'answer'   => $result['answer'] ?? '',
+            'sources'  => $result['sources'] ?? [],
         ]);
     }
 
@@ -115,13 +116,13 @@ final class ChatController extends BaseController
                 flush();
             };
 
-            $bot->askStream($question, static function (string $chunk) use ($flush) {
+            $sources = $bot->askStream($question, static function (string $chunk) use ($flush) {
                 $payload = json_encode(['chunk' => $chunk], JSON_UNESCAPED_UNICODE);
                 echo "data: " . $payload . "\n\n";
                 $flush();
             });
 
-            echo "data: " . json_encode(['done' => true]) . "\n\n";
+            echo "data: " . json_encode(['done' => true, 'sources' => $sources], JSON_UNESCAPED_UNICODE) . "\n\n";
             $flush();
         });
 
