@@ -1,0 +1,154 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}RAG Profiles - ELaRA{% endblock %}
+
+{% block pageContent %}
+<div class="bg-base-200 text-base-content">
+    <div class="space-y-8 p-5">
+
+        {# RAG PROFILES #}
+        <section id="rag-profiles" class="space-y-4 lg:space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                <h2 class="text-xl sm:text-2xl font-bold">RAG Profiles</h2>
+                <span class="badge badge-outline self-start sm:self-auto">
+                    Deploy · Tuning · Sicurezza
+                </span>
+            </div>
+
+            <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr),minmax(0,1fr)]">
+                <div class="card bg-base-100 border border-base-300">
+                    <div class="card-body space-y-3 text-sm">
+                        <div class="flex items-center justify-between gap-3">
+                            <div>
+                                <p class="uppercase tracking-wide text-xs opacity-70">Profilo RAG attivo</p>
+                                <h3 class="text-xl font-semibold">{{ active_profile.label ?? active_profile_name }}</h3>
+                            </div>
+                            <span class="badge badge-info badge-outline text-xs">
+                                {{ active_profile_name }}
+                            </span>
+                        </div>
+                        <div class="flex flex-wrap gap-2 text-xs">
+                            <span class="badge badge-sm badge-outline">
+                                Backend · {{ (active_profile.backend ?? 'n/d')|capitalize }}
+                            </span>
+                            <span class="badge badge-sm badge-outline">
+                                Chat · {{ active_profile.ai.chat_model ?? 'n/d' }}
+                            </span>
+                            <span class="badge badge-sm badge-outline">
+                                Embedding · {{ active_profile.ai.embed_model ?? 'n/d' }}
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 text-sm mt-2">
+                            <div class="space-y-1">
+                                <p class="uppercase tracking-wide text-xs opacity-60">Chunking</p>
+                                <ul class="space-y-0.5">
+                                    <li>min: <strong>{{ active_profile.chunking.min ?? '—' }}</strong></li>
+                                    <li>max: <strong>{{ active_profile.chunking.max ?? '—' }}</strong></li>
+                                    <li>overlap: <strong>{{ active_profile.chunking.overlap ?? '—' }}</strong></li>
+                                </ul>
+                            </div>
+                            <div class="space-y-1">
+                                <p class="uppercase tracking-wide text-xs opacity-60">Retrieval</p>
+                                <ul class="space-y-0.5">
+                                    <li>top_k: <strong>{{ active_profile.retrieval.top_k ?? '—' }}</strong></li>
+                                    <li>min score: <strong>{{ active_profile.retrieval.min_score ?? '—' }}</strong></li>
+                                    <li>test mode: <strong>{{ active_profile.ai.test_mode ? 'ON' : 'OFF' }}</strong></li>
+                                    <li>fallback: <strong>{{ active_profile.ai.offline_fallback ? 'ON' : 'OFF' }}</strong></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300">
+                    <div class="card-body space-y-3 text-sm">
+                        <div class="flex items-center justify-between gap-3">
+                            <h3 class="text-base font-semibold">Preset disponibili</h3>
+                            <a href="{{ path('app_cli_operations') }}#deploy-tuning" class="btn btn-xs btn-outline">Guida CLI</a>
+                        </div>
+                        <p class="opacity-70">
+                            Attiva qui il profilo desiderato: l’impostazione viene salvata e applicata al motore RAG (chunking, embedding, backend AI).
+                        </p>
+                        <div class="alert alert-error text-sm">
+                            <div>
+                                <span class="font-semibold">☠️ Importante:</span><br>
+                                Il cambio del profilo prevede:
+                                <ol class="list-decimal ml-5">
+                                    <li>
+                                        <b>Aggiornamento di DocumentChunk->embedding</b>, impostando la <b>dimensione corretta</b> per il profilo utilizzato
+                                    </li>
+                                    <li>
+                                        <b>Wipe completo dello Schema RAG(DB)</b> e ricreazione dello stesso tramite l'esecuzione di <code class="kbd kbd-sm">php bin/console app:reset-rag-schema --force</code>
+                                    </li>
+                                    <li>
+                                        <b>Re-index completo dell'archivio</b> documenti con <code class="kbd kbd-sm">php bin/console app:index-docs --force-reindex</code>
+                                    </li>
+                                </ol>
+                                <b>In questo modo verranno allineati dimensioni embedding e modelli.</b>
+                            </div>
+                        </div>
+                        <ul class="space-y-2">
+                            {% for profile in available_profiles %}
+                                <li class="flex items-center justify-between text-sm px-2 py-1 rounded border {% if profile.name == active_profile_name %}border-primary/60 bg-primary/5{% else %}border-base-300{% endif %}">
+                                    <div>
+                                        <p class="font-medium">{{ profile.label ?? profile.name }}</p>
+                                        <p class="text-xs opacity-70">{{ profile.name }} · Backend {{ (profile.backend ?? 'n/d')|capitalize }}</p>
+                                    </div>
+                                    {% if profile.name == active_profile_name %}
+                                        <span class="badge badge-success badge-sm">Attivo</span>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <form method="post" action="{{ path('app_rag_profile_switch') }}" class="flex flex-col gap-3 pt-3 border-t border-base-300">
+                            <input type="hidden" name="_token" value="{{ csrf_token('rag_profile_switch') }}">
+                            <div class="form-control w-full">
+                                <div class="label">
+                                    <span class="label-text text-xs uppercase opacity-70">Cambia profilo</span>
+                                </div>
+                                <div class="flex flex-col sm:flex-row gap-2">
+                                    <select name="profile" class="select select-bordered select-sm sm:flex-1 sm:max-w-[30%]">
+                                        {% for profile in available_profiles %}
+                                            <option value="{{ profile.name }}" {% if profile.name == active_profile_name %}selected{% endif %}>
+                                                {{ profile.label ?? profile.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="btn btn-primary btn-sm">
+                                        Attiva
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="text-sm opacity-60">
+                                Preferisci la CLI? Usa <code class="kbd kbd-sm">RAG_PROFILE=&lt;nome&gt;</code> o <code class="kbd kbd-sm">php bin/console app:index-docs --rag-profile=&lt;nome&gt;</code>.
+                            </p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full text-xs">
+                Documenti di riferimento:
+                <button class="btn btn-xs btn-outline"
+                        onclick="document.getElementById('modal-elara-definizione').showModal()">
+                    <code>ElaRA - Definizione</code>
+                </button>
+                <button class="btn btn-xs btn-outline"
+                        onclick="document.getElementById('modal-elara-readme').showModal()">
+                    <code>ElaRA - README</code>
+                </button>
+                <button class="btn btn-xs btn-outline"
+                        onclick="document.getElementById('modal-elara-chunking-embedding').showModal()">
+                    <code>ElaRA - Guida Chunking Embedding</code>
+                </button>
+                <button class="btn btn-xs btn-outline"
+                        onclick="document.getElementById('modal-elara-parametri-risposte').showModal()">
+                    <code>ElaRA - Parametri Qualità Risposte</code>
+                </button>
+            </div>
+        </section>
+
+    </div>
+</div>
+{% endblock %}

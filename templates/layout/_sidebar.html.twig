@@ -25,6 +25,12 @@
                     <span>Pipeline & Architettura</span>
                 </a>
 
+                <a href="{{ path('app_rag_tuning') }}"
+                   class="{% if controller_name == constant('App\\Controller\\RagTuningController::CONTROLLER_NAME') %}menu-active{% endif %}">
+                    {{ include('icons/tuning.html.twig') }}
+                    <span>RAG Tuning</span>
+                </a>
+
                 <a href="{{ path('app_cli_operations') }}"
                    class="{% if controller_name == constant('App\\Controller\\CliController::CONTROLLER_NAME') %}menu-active{% endif %}">
                     {{ include('icons/terminal.html.twig') }}
@@ -55,10 +61,10 @@
 
             <li class="menu-title">Status</li>
             <li>
-                <a href="{{ path('app_rag_tuning') }}"
-                   class="{% if controller_name == constant('App\\Controller\\RagTuningController::CONTROLLER_NAME') %}menu-active{% endif %}">
-                    {{ include('icons/tuning.html.twig') }}
-                    <span>RAG Tuning</span>
+                <a href="{{ path('app_rag_profiles') }}"
+                   class="{% if controller_name == constant('App\\Controller\\RagProfileController::CONTROLLER_NAME') %}menu-active{% endif %}">
+                    {{ include('icons/rag-profiles.html.twig') }}
+                    <span>RAG Profiles</span>
                 </a>
 
                 <a href="{{ path('app_api_tokens') }}"
