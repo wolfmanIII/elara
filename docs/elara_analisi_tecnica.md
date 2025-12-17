@@ -155,6 +155,11 @@ ELARA supporta entrambi ma **si sconsiglia vivamente l’uso simultaneo**.
 
 > **Linea guida rapida:** se non stai gestendo un grafo di milioni di chunk, resta su HNSW. IVF-FLAT diventa utile solo su collezioni gigantesche in cui vale la pena pagare tuning e manutenzione.
 
+### Riepilogo flash
+- **Default:** HNSW per dataset piccoli/medi e per la maggior parte delle knowledge base.
+- **Solo eccezione:** IVF-FLAT quando i chunk superano i milioni e servono indici più leggeri da calibrare.
+- **Mai insieme:** un solo indice attivo evita sprechi e incoerenze.
+
 ---
 
 # 9. Ricerca Vettoriale e Retrieval

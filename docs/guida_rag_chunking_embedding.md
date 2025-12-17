@@ -734,6 +734,11 @@ Solo se:
 
 In qualunque altro caso → **HNSW è migliore, più semplice e più affidabile**.
 
+### TL;DR finale
+- **HNSW** = scelta predefinita per praticamente ogni knowledge base.
+- **IVF-FLAT** = strumento specialistico per dataset enormi dove il tuning è accettabile.
+- **Uno alla volta**: duplicare gli indici porta solo costi.
+
 ---
 
 # 🧪 11.4. Come verificare che Postgres sta davvero usando HNSW
