@@ -19,9 +19,9 @@ final class ChatController extends BaseController
     ) {}
 
     /**
-     * Console grafica del chatbot (ELARA).
+     * Console grafica del chatbot (ELARA - Almeno).
      */
-    #[Route('/ai/console', name: 'app_ai_console', methods: ['GET'])]
+    #[Route('/status/ai/console', name: 'app_ai_console', methods: ['GET'])]
     public function console(): Response
     {
         return $this->render('chat/console.html.twig', [
@@ -29,7 +29,7 @@ final class ChatController extends BaseController
         ]);
     }
 
-    #[Route('/engine/status', name: 'app_engine_status', methods: ['GET'])]
+    #[Route('/status/engine', name: 'app_engine_status', methods: ['GET'])]
     public function engineStatus(): JsonResponse
     {
         $profile     = $this->profiles->getActiveProfile();

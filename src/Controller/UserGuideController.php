@@ -9,7 +9,7 @@ final class UserGuideController extends BaseController
 {
     public const CONTROLLER_NAME = 'UserGuideController';
 
-    #[Route('/descrizione/guida-utente', name: 'app_user_guide', methods: ['GET'])]
+    #[Route('/codex/guida-utente', name: 'app_user_guide', methods: ['GET'])]
     public function index(): Response
     {
         return $this->render('user/guide.html.twig', [

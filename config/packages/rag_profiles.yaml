@@ -42,7 +42,7 @@ parameters:
                 backend: 'gemini'
                 chunking:
                     min: 380
-                    max: 1300
+                    max: 1200
                     overlap: 220
                 retrieval:
                     top_k: 5
@@ -50,7 +50,7 @@ parameters:
                 ai:
                     chat_model: 'gemini-2.5-flash'
                     embed_model: 'gemini-embedding-001'
-                    embed_dimension: 768
+                    embed_dimension: 1536
                     test_mode: false
                     offline_fallback: true
                     show_sources: true

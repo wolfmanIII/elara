@@ -66,7 +66,7 @@ final class DocsIndexer
         $totalSkipped    = 0;
         $totalFailed     = 0;
 
-        // 1) Prima passata: individua i file candidati
+        // 1) Primo passaggio: per individuare i file candidati
         $candidateFiles = [];
 
         $iterator = new \RecursiveIteratorIterator(
@@ -252,7 +252,6 @@ final class DocsIndexer
         }
         $docFile->setSize($fileSize);
         $docFile->setExtension($extension);
-        $docFile->setIndexedAt(new \DateTimeImmutable());
 
         // Cancella chunk esistenti
         $this->em->createQueryBuilder()

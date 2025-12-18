@@ -261,7 +261,7 @@ OLLAMA_EMBED_DIMENSION=1024
 #GEMINI_API_KEY=...
 #GEMINI_CHAT_MODEL=gemini-2.5-flash
 #GEMINI_EMBED_MODEL=gemini-embedding-001
-#GEMINI_EMBED_DIMENSION=768
+#GEMINI_EMBED_DIMENSION=1536
 
 ## RAG Test Mode e Fallback
 APP_AI_TEST_MODE=true        # ora configurato nel profilo, tengo questi flag per override veloci
