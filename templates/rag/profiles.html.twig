@@ -89,96 +89,104 @@
                         <p class="opacity-70">
                             Attiva qui il profilo desiderato: l’impostazione viene salvata e applicata al motore RAG (chunking, embedding, backend AI).
                         </p>
-                        {# Wizard cambio profilo #}
-                        <div class="rounded border border-primary/30 bg-primary/5 p-3 space-y-2">
-                            <div class="flex items-center justify-between gap-2">
-                                <p class="uppercase tracking-wide text-[11px] opacity-70">Wizard cambio profilo</p>
-                                <span class="badge badge-primary badge-outline badge-xs">Guida</span>
+                        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-[minmax(260px,320px),1fr]">
+                            <div class="space-y-3">
+                                {% set rag_profile_csrf = csrf_token('rag_profile_switch') %}
+                                <ul class="space-y-2">
+                                    {% for profile in available_profiles %}
+                                        <li class="flex items-center justify-between text-sm px-2 py-1 rounded border {% if profile.name == active_profile_name %}border-primary/60 bg-primary/5{% else %}border-base-300{% endif %}">
+                                            <div>
+                                                <p class="font-medium">{{ profile.label ?? profile.name }}</p>
+                                                <p class="text-xs opacity-70">{{ profile.name }} · Backend {{ (profile.backend ?? 'n/d')|capitalize }}</p>
+                                            </div>
+                                            {% if profile.name == active_profile_name %}
+                                                <span class="badge badge-success badge-sm">Attivo</span>
+                                            {% else %}
+                                                <form method="post"
+                                                      action="{{ path('app_rag_profile_switch') }}"
+                                                      class="flex items-center gap-2"
+                                                      data-action="submit->rag-profile-switch#handleSubmit">
+                                                    <input type="hidden" name="_token" value="{{ rag_profile_csrf }}">
+                                                    <input type="hidden" name="profile" value="{{ profile.name }}">
+                                                    <button type="submit"
+                                                            class="btn btn-primary btn-xs"
+                                                            data-rag-profile-switch-target="button">
+                                                        Attiva
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
                             </div>
-                            <ol class="space-y-2 text-xs">
-                                <li class="flex gap-2 items-start">
-                                    <div class="badge badge-primary badge-sm">1</div>
-                                    <div class="space-y-0.5">
-                                        <p class="font-semibold">Verifica dimensione embedding</p>
-                                        <p class="opacity-70">
-                                            Schema: <strong>{{ schema_embedding_dimension ?? 'n/d' }}</strong> · Profilo: <strong>{{ profile_embedding_dimension ?? 'n/d' }}</strong>
-                                        </p>
-                                        {% if schema_profile_aligned %}
-                                            <span class="badge badge-success badge-sm">OK</span>
-                                        {% else %}
-                                            <span class="badge badge-warning badge-sm">Da allineare</span>
-                                        {% endif %}
-                                    </div>
-                                </li>
-                                <li class="flex gap-2 items-start">
-                                    <div class="badge badge-primary badge-sm">2</div>
-                                    <div class="space-y-0.5">
-                                        <p class="font-semibold">Aggiorna colonna embedding</p>
-                                        <p class="opacity-70">Imposta <code>DocumentChunk->embedding</code> a <strong>{{ profile_embedding_dimension ?? 'n/d' }}</strong> e genera la migration.</p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-2 items-start">
-                                    <div class="badge badge-primary badge-sm">3</div>
-                                    <div class="space-y-0.5">
-                                        <p class="font-semibold">Reset schema RAG</p>
-                                        <p class="opacity-70">Esegui <code class="kbd kbd-xs">php bin/console app:reset-rag-schema --force</code></p>
-                                    </div>
-                                </li>
-                                <li class="flex gap-2 items-start">
-                                    <div class="badge badge-primary badge-sm">4</div>
-                                    <div class="space-y-0.5">
-                                        <p class="font-semibold">Re-indicizza documenti</p>
-                                        <p class="opacity-70">Esegui <code class="kbd kbd-xs">php bin/console app:index-docs --force-reindex</code> con il profilo attivo.</p>
-                                    </div>
-                                </li>
-                            </ol>
-                        </div>
-                        {% set rag_profile_csrf = csrf_token('rag_profile_switch') %}
-                        <ul class="space-y-2">
-                            {% for profile in available_profiles %}
-                                <li class="flex items-center justify-between text-sm px-2 py-1 rounded border {% if profile.name == active_profile_name %}border-primary/60 bg-primary/5{% else %}border-base-300{% endif %}">
-                                    <div>
-                                        <p class="font-medium">{{ profile.label ?? profile.name }}</p>
-                                        <p class="text-xs opacity-70">{{ profile.name }} · Backend {{ (profile.backend ?? 'n/d')|capitalize }}</p>
-                                    </div>
-                                    {% if profile.name == active_profile_name %}
-                                        <span class="badge badge-success badge-sm">Attivo</span>
-                                    {% else %}
-                                        <form method="post"
-                                              action="{{ path('app_rag_profile_switch') }}"
-                                              class="flex items-center gap-2"
-                                              data-action="submit->rag-profile-switch#handleSubmit">
-                                            <input type="hidden" name="_token" value="{{ rag_profile_csrf }}">
-                                            <input type="hidden" name="profile" value="{{ profile.name }}">
-                                            <button type="submit"
-                                                    class="btn btn-primary btn-xs"
-                                                    data-rag-profile-switch-target="button">
-                                                Attiva
-                                            </button>
-                                        </form>
-                                    {% endif %}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                        <div class="alert alert-warning alert-outline text-sm">
-                            <div>
-                                <span class="font-semibold">☠️ Importante:</span><br>
-                                Il cambio del profilo prevede:
-                                <ol class="list-decimal ml-5">
-                                    <li>
-                                        <b>Aggiornamento di DocumentChunk->embedding</b>, impostando la <b>dimensione corretta</b> per il profilo utilizzato
+
+                            {# Wizard cambio profilo #}
+                            <div class="rounded border border-primary/30 bg-primary/5 p-3 space-y-2">
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="uppercase tracking-wide text-[11px]">Wizard cambio profilo</p>
+                                    <span class="badge badge-info badge-outline badge-xs">Guida</span>
+                                </div>
+                                <ol class="space-y-2 text-xs">
+                                    <li class="flex gap-2 items-start">
+                                        <div class="badge badge-primary badge-sm">1</div>
+                                        <div class="flex-1 space-y-0.5">
+                                            <div class="flex items-center justify-between gap-2">
+                                                <p class="font-semibold">Verifica dimensione embedding</p>
+                                                {% if schema_profile_aligned %}
+                                                    <span class="badge badge-success badge-sm">OK</span>
+                                                {% else %}
+                                                    <span class="badge badge-warning badge-sm">Da allineare</span>
+                                                {% endif %}
+                                            </div>
+                                            <p class="opacity-70">
+                                                Schema: <strong>{{ schema_embedding_dimension ?? 'n/d' }}</strong> · Profilo: <strong>{{ profile_embedding_dimension ?? 'n/d' }}</strong>
+                                            </p>
+                                        </div>
                                     </li>
-                                    <li>
-                                        <b>Wipe completo dello Schema RAG(DB)</b> e ricreazione dello stesso tramite l'esecuzione di <code class="kbd kbd-sm">php bin/console app:reset-rag-schema --force</code>
+                                    <li class="flex gap-2 items-start">
+                                        <div class="badge badge-primary badge-sm">2</div>
+                                        <div class="space-y-0.5">
+                                            <p class="font-semibold">Aggiorna colonna embedding</p>
+                                            <p class="opacity-70">Imposta <code>DocumentChunk->embedding</code> a <strong>{{ profile_embedding_dimension ?? 'n/d' }}</strong> e genera la migration.</p>
+                                        </div>
                                     </li>
-                                    <li>
-                                        <b>Re-index completo</b> dell'archivio documenti con <code class="kbd kbd-sm">php bin/console app:index-docs --force-reindex</code>
+                                    <li class="flex gap-2 items-start">
+                                        <div class="badge badge-primary badge-sm">3</div>
+                                        <div class="space-y-0.5">
+                                            <p class="font-semibold">Reset schema RAG</p>
+                                            <p class="opacity-70">Esegui <code class="kbd kbd-xs">php bin/console app:reset-rag-schema --force</code></p>
+                                        </div>
+                                    </li>
+                                    <li class="flex gap-2 items-start">
+                                        <div class="badge badge-primary badge-sm">4</div>
+                                        <div class="space-y-0.5">
+                                            <p class="font-semibold">Re-indicizza documenti</p>
+                                            <p class="opacity-70">Esegui <code class="kbd kbd-xs">php bin/console app:index-docs --force-reindex</code> con il profilo attivo.</p>
+                                        </div>
                                     </li>
                                 </ol>
-                                <b>In questo modo verranno allineati dimensioni embedding e modelli.</b>
                             </div>
+                            
                         </div>
-                        <div class="border-t border-base-300 pt-3">
+                        <div class="space-y-3">
+                            <div class="alert alert-warning alert-outline text-sm">
+                                <div>
+                                    <span class="font-semibold">☠️ Importante:</span><br>
+                                    Il cambio del profilo prevede:
+                                    <ol class="list-decimal ml-5">
+                                        <li>
+                                            <b>Aggiornamento di DocumentChunk->embedding</b>, impostando la <b>dimensione corretta</b> per il profilo utilizzato
+                                        </li>
+                                        <li>
+                                            <b>Wipe completo dello Schema RAG(DB)</b> e ricreazione dello stesso tramite l'esecuzione di <code class="kbd kbd-sm">php bin/console app:reset-rag-schema --force</code>
+                                        </li>
+                                        <li>
+                                            <b>Re-index completo</b> dell'archivio documenti con <code class="kbd kbd-sm">php bin/console app:index-docs --force-reindex</code>
+                                        </li>
+                                    </ol>
+                                    <b>In questo modo verranno allineati dimensioni embedding e modelli.</b>
+                                </div>
+                            </div>
                             <div class="text-sm alert alert-info alert-outline flex flex-wrap items-center gap-2">
                                 <span>Preferisci la CLI? Usa</span>
                                 <code class="kbd kbd-sm">RAG_PROFILE=&lt;nome&gt;</code>
