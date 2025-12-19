@@ -63,7 +63,7 @@ final class ChatController extends BaseController
     #[Route('/api/chat', name: 'app_api_chat', methods: ['POST'])]
     public function apiChat(Request $request, ChatbotService $bot): JsonResponse
     {
-        // 1) Proviamo a leggere JSON
+        // 1) leggo il JSON
         $payload = json_decode($request->getContent() ?? '', true);
         $question = null;
 
@@ -130,7 +130,25 @@ final class ChatController extends BaseController
             ], 400);
         }
 
-        $response = new StreamedResponse(function () use ($bot, $question) {
+        $aiConfig = $this->profiles->getAi();
+        $testMode = (bool) ($aiConfig['test_mode'] ?? false);
+
+        $cacheKey = sprintf(
+            'chat_answer_stream_%s_%s',
+            $this->profiles->getActiveProfileName(),
+            hash('xxh3', $question . '|' . ($testMode ? 'test' : 'live'))
+        );
+        $ttlSeconds = (int) ($_ENV['APP_CHAT_CACHE_TTL'] ?? 600);
+        $cacheEnabled = $ttlSeconds > 0;
+
+        $cached = $cacheEnabled
+            ? $this->cache->get($cacheKey, static function (ItemInterface $item) {
+                $item->expiresAfter(0); // non memorizzare nulla su miss
+                return null;
+            })
+            : null;
+
+        $response = new StreamedResponse(function () use ($bot, $question, $cacheEnabled, $cacheKey, $ttlSeconds, $cached) {
             $flush = static function () {
                 if (function_exists('ob_flush')) {
                     @ob_flush();
@@ -138,7 +156,24 @@ final class ChatController extends BaseController
                 flush();
             };
 
-            $sources = $bot->askStream($question, static function (string $chunk) use ($flush) {
+            // Se in cache ho già la risposta con le fonti, la mando subito e chiudiamo.
+            if ($cacheEnabled && is_array($cached) && isset($cached['answer'])) {
+                $chunks = $cached['chunks'] ?? [$cached['answer']];
+                foreach ($chunks as $chunk) {
+                    $payload = json_encode(['chunk' => $chunk], JSON_UNESCAPED_UNICODE);
+                    echo "data: " . $payload . "\n\n";
+                }
+                echo "data: " . json_encode(['done' => true, 'sources' => $cached['sources'] ?? []], JSON_UNESCAPED_UNICODE) . "\n\n";
+                $flush();
+                return;
+            }
+
+            $bufferedAnswer = '';
+            $streamChunks   = [];
+
+            $sources = $bot->askStream($question, static function (string $chunk) use (&$bufferedAnswer, &$streamChunks, $flush) {
+                $bufferedAnswer .= $chunk;
+                $streamChunks[]  = $chunk;
                 $payload = json_encode(['chunk' => $chunk], JSON_UNESCAPED_UNICODE);
                 echo "data: " . $payload . "\n\n";
                 $flush();
@@ -146,6 +181,18 @@ final class ChatController extends BaseController
 
             echo "data: " . json_encode(['done' => true, 'sources' => $sources], JSON_UNESCAPED_UNICODE) . "\n\n";
             $flush();
+
+            if ($cacheEnabled) {
+                $this->cache->delete($cacheKey);
+                $this->cache->get($cacheKey, static function (ItemInterface $item) use ($bufferedAnswer, $sources, $ttlSeconds, $streamChunks) {
+                    $item->expiresAfter($ttlSeconds);
+                    return [
+                        'answer' => $bufferedAnswer,
+                        'chunks' => $streamChunks,
+                        'sources' => $sources,
+                    ];
+                });
+            }
         });
 
         $response->headers->set('Content-Type', 'text/event-stream');

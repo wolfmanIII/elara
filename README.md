@@ -63,21 +63,15 @@ sudo apt install postgresql-18 postgresql-18-pgvector
 CREATE EXTENSION IF NOT EXISTS vector;
 ```
 Sono necessari i permessi relativi
-### Eseguire il comando:
+### Eseguire i comandi:
 ```bash
+php bin/console make:migration
 php bin/console doctrine:migrations:migrate
 ```
 > **Nota importante sulle migration Doctrine**  
 > Ad ogni `doctrine:migrations:diff`(make:migration), Doctrine prova a rimuovere l'indice vettoriale HNSW perché non è modellabile nei metadata. Prima di eseguire una nuova migration aperta sotto `migrations/`, eliminare manualmente la riga  
-> `\$this->addSql('DROP INDEX document_chunk_embedding_hnsw');`  
+> `$this->addSql('DROP INDEX document_chunk_embedding_hnsw');`  
 > così si evita che l'indice venga cancellato dalla tabella `document_chunk`.
-
-### Gestione ruoli utente (CLI)
-- Creazione utente (ruoli ripetibili):  
-  `php bin/console app:user-create email@example.com --role=ROLE_ADMIN`
-- Aggiunzione/Rimozione ruoli su utente esistente:  
-  `php bin/console app:user-role email@example.com --add=ROLE_ADMIN`  
-  `php bin/console app:user-role email@example.com --remove=ROLE_ADMIN`
 
 ### Creare indice HNSW per velocizzare le ricerche(tabella document_chunk)
 ```sql
@@ -272,7 +266,7 @@ OLLAMA_EMBED_DIMENSION=1024
 
 ## Cache chatbot
 # TTL in secondi per cache risposta/fonti; se 0 la cache è disabilitata
-APP_CHAT_CACHE_TTL=600
+APP_CHAT_CACHE_TTL=0
 
 ## RAG Test Mode e Fallback
 APP_AI_TEST_MODE=true        # ora configurato nel profilo, tengo questi flag per override veloci
@@ -285,6 +279,31 @@ APP_AI_OFFLINE_FALLBACK=false
 # Xdebug vscode
 XDEBUG_MODE=debug
 XDEBUG_CONFIG="client_host=127.0.0.1 client_port=9003"
+```
+### Cache APCu(opzionale)
+Se si decide si usare la cache, installare l'estensione per php:
+```bash
+sudo apt install php-apcu
+```
+abilitare il CLI in /etc/php/8.{v}/mods-available/apcu.ini:
+```ini
+apc.enable_cli=1 
+```
+per verificare che il supporto per APCu è abilitato:
+```bash
+php -i | grep -i apcu
+```
+si vedrà una cosa simile a questa:
+```bash
+apcu
+APCu Support => Enabled
+```
+nel file config/packages/cache.yaml
+```yaml
+# config/packages/cache.yaml
+framework:
+    cache:
+        app: cache.adapter.apcu
 ```
 ### Configurazione servizi (RagProfileManager, AiClient, PDF parser)
 ```yaml
