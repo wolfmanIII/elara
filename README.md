@@ -72,6 +72,13 @@ php bin/console doctrine:migrations:migrate
 > `\$this->addSql('DROP INDEX document_chunk_embedding_hnsw');`  
 > così si evita che l'indice venga cancellato dalla tabella `document_chunk`.
 
+### Gestione ruoli utente (CLI)
+- Creazione utente (ruoli ripetibili):  
+  `php bin/console app:user-create email@example.com --role=ROLE_ADMIN`
+- Aggiunzione/Rimozione ruoli su utente esistente:  
+  `php bin/console app:user-role email@example.com --add=ROLE_ADMIN`  
+  `php bin/console app:user-role email@example.com --remove=ROLE_ADMIN`
+
 ### Creare indice HNSW per velocizzare le ricerche(tabella document_chunk)
 ```sql
 CREATE INDEX document_chunk_embedding_hnsw
