@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 final class ChatController extends BaseController
 {
@@ -16,6 +18,7 @@ final class ChatController extends BaseController
 
     public function __construct(
         private readonly RagProfileManager $profiles,
+        private readonly CacheInterface $cache,
     ) {}
 
     /**
@@ -79,7 +82,26 @@ final class ChatController extends BaseController
             ], 400);
         }
 
-        $result = $bot->ask($question);
+        $aiConfig = $this->profiles->getAi();
+        $testMode = (bool) ($aiConfig['test_mode'] ?? false);
+
+        $cacheKey = sprintf(
+            'chat_answer_%s_%s',
+            $this->profiles->getActiveProfileName(),
+            hash('xxh3', $question . '|' . ($testMode ? 'test' : 'live'))
+        );
+
+        $ttlSeconds = (int) ($_ENV['APP_CHAT_CACHE_TTL'] ?? 600);
+        $cacheEnabled = $ttlSeconds > 0;
+
+        if (!$cacheEnabled) {
+            $result = $bot->ask($question);
+        } else {
+            $result = $this->cache->get($cacheKey, function (ItemInterface $item) use ($bot, $question, $ttlSeconds) {
+                $item->expiresAfter($ttlSeconds); // cache risposta+fonti
+                return $bot->ask($question);
+            });
+        }
 
         return $this->json([
             'question' => $question,

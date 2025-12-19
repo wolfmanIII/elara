@@ -270,6 +270,10 @@ OLLAMA_EMBED_DIMENSION=1024
 #GEMINI_EMBED_MODEL=gemini-embedding-001
 #GEMINI_EMBED_DIMENSION=1536
 
+## Cache chatbot
+# TTL in secondi per cache risposta/fonti; se 0 la cache è disabilitata
+APP_CHAT_CACHE_TTL=600
+
 ## RAG Test Mode e Fallback
 APP_AI_TEST_MODE=true        # ora configurato nel profilo, tengo questi flag per override veloci
 APP_AI_OFFLINE_FALLBACK=false
@@ -378,7 +382,25 @@ php bin/console app:unindex-file "\\.pdf$"
 ```bash
 php bin/console app:unindex-file ".*"
 ```
-# 8. API come utilizzarla(ApiTokenAuthenticator)
+# 8. Gestione utenti (CLI)
+## 1. Creare un utente con ruoli
+- Ruoli ripetibili:  
+  ```bash
+  php bin/console app:user-create email@example.com --role=ROLE_ADMIN --role=ROLE_USER
+  ```
+- Se ometti `--role`, viene assegnato comunque `ROLE_USER` di default.
+
+## 2. Aggiungere o rimuovere ruoli a un utente esistente
+- Aggiungere ruoli:  
+  ```bash
+  php bin/console app:user-role email@example.com --add=ROLE_ADMIN --add=ROLE_EDITOR
+  ```
+- Rimuovere ruoli (ROLE_USER non viene mai eliminato):  
+  ```bash
+  php bin/console app:user-role email@example.com --remove=ROLE_EDITOR
+  ```
+
+# 9. API come utilizzarla(ApiTokenAuthenticator)
 Dashboard dedicata: da **Status → API Token** puoi vedere elenco, utilizzi e revocare rapidamente i token in uso.
 ## 1. Command per generare token
 ### ttl scadenza di default 1 anno
