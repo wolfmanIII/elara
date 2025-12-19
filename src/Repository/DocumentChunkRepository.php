@@ -18,22 +18,20 @@ class DocumentChunkRepository extends ServiceEntityRepository
     }
 
     /**
-     * Query ottimizzata
-     * 
-     * Trova i chunk più simili a un embedding
-     * 
-     * Non avendo a disposizione l'operatore vettoriale <=>
-     * utilizzo l'estensione cosine_similarity di pgvector per Postgres
+     * Trova i chunk più simili a un embedding usando cosine_similarity di pgvector.
      *
      * @param array $embedding
-     * @param int $k
-     * @return array
+     * @param int|null $topK     fallback al profilo attivo (o 5)
+     * @param float|null $minScore fallback al profilo attivo (o 0.55)
      */
-    public function findTopKCosineSimilarity(array $embedding): array
-    {
+    public function findTopKCosineSimilarity(
+        array $embedding,
+        ?int $topK = null,
+        ?float $minScore = null
+    ): array {
         $retrieval = $this->profiles->getRetrieval();
-        $topK      = (int) ($retrieval['top_k'] ?? ($_ENV['TOP_K'] ?? 5));
-        $minScore  = (float) ($retrieval['min_score'] ?? 0.55);
+        $topK      = (int) ($topK ?? $retrieval['top_k'] ?? 5);
+        $minScore  = (float) ($minScore ?? $retrieval['min_score'] ?? 0.55);
 
         return $this->createQueryBuilder('c')
             ->select('c.id')

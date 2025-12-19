@@ -23,6 +23,7 @@ class ChatbotService
     public function ask(string $question): array
     {
         $aiConfig = $this->profiles->getAi();
+        $retrievalConfig = $this->profiles->getRetrieval();
         $testMode = (bool) ($aiConfig['test_mode'] ?? false);
         $offlineFallbackEnabled = (bool) ($aiConfig['offline_fallback'] ?? true);
         // Modalità test: niente AI, solo ricerca testuale nel DB.
@@ -38,7 +39,11 @@ class ChatbotService
             $queryVec = $this->ai->embed($question);
 
             // 2) recupera chunk più simili (top 5) usando cosine_similarity
-            $chunks = $this->em->getRepository(DocumentChunk::class)->findTopKCosineSimilarity($queryVec);
+            $chunks = $this->em->getRepository(DocumentChunk::class)->findTopKCosineSimilarity(
+                $queryVec,
+                topK: (int) ($retrievalConfig['top_k'] ?? 5),
+                minScore: (float) ($retrievalConfig['min_score'] ?? 0.55),
+            );
             if (!$chunks) {
                 return [
                     'answer' => 'Non trovo informazioni rilevanti nei documenti indicizzati.',
@@ -79,6 +84,7 @@ class ChatbotService
     public function askStream(string $question, callable $onChunk): array
     {
         $aiConfig = $this->profiles->getAi();
+        $retrievalConfig = $this->profiles->getRetrieval();
         $testMode = (bool) ($aiConfig['test_mode'] ?? false);
         $offlineFallbackEnabled = (bool) ($aiConfig['offline_fallback'] ?? true);
         if ($testMode) {
@@ -88,7 +94,11 @@ class ChatbotService
 
         try {
             $queryVec = $this->ai->embed($question);
-            $chunks = $this->em->getRepository(DocumentChunk::class)->findTopKCosineSimilarity($queryVec);
+            $chunks = $this->em->getRepository(DocumentChunk::class)->findTopKCosineSimilarity(
+                $queryVec,
+                topK: (int) ($retrievalConfig['top_k'] ?? 5),
+                minScore: (float) ($retrievalConfig['min_score'] ?? 0.55),
+            );
 
             if (!$chunks) {
                 $onChunk('Non trovo informazioni rilevanti nei documenti indicizzati.');

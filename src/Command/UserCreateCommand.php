@@ -33,7 +33,13 @@ final class UserCreateCommand extends Command
         $this
             ->addArgument('email', InputArgument::REQUIRED, 'Email dell\'utente')
             ->addOption('password', null, InputOption::VALUE_OPTIONAL, 'Password in chiaro (se non specificata verrà richiesto)')
-            ->addOption('role', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL, 'Ruolo da assegnare (ripetibile)', ['ROLE_USER']);
+            ->addOption(
+                'role',
+                null,
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                'Ruolo da assegnare (ripetibile, es. --role=ROLE_ADMIN)',
+                ['ROLE_USER']
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
