@@ -24,6 +24,9 @@ use Doctrine\ORM\EntityManagerInterface;
  */
 final class DocsIndexer
 {
+    /**
+     * 2^32-1: serve a convertire un blocco da 32 bit (md5) in un float [-1,1] quando generiamo embedding finti.
+     */
     private const HASH_NORMALIZER = 4294967295;
 
     private int $embeddingDimension;
@@ -407,9 +410,9 @@ final class DocsIndexer
         bool &$isPlaceholder
     ): array {
         // Accetto solo vettori corretti e della dimensione attesa, forzando i valori a float
-        if (is_array($embedding) && count($embedding) === $this->embeddingDimension) {
+        if (is_array($embedding) && \count($embedding) === $this->embeddingDimension) {
             $isPlaceholder = false;
-            
+
             return array_map(static fn($value) => (float) $value, $embedding);
         }
 
@@ -424,6 +427,7 @@ final class DocsIndexer
 
     /**
      * Genera un embedding deterministico (placeholder) con la stessa dimensione del modello configurato.
+     * Ogni componente è ottenuta dall'hash del testo e normalizzata tramite HASH_NORMALIZER in [-1, 1].
      */
     private function fakeEmbeddingFromText(string $text): array
     {
