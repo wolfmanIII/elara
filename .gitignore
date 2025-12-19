@@ -23,3 +23,6 @@
 ###> node modules ###
 /node_modules/
 ###< node modules ###
+
+# Cartella locale creata da Symfony CLI
+/.symfony5/
