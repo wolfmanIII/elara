@@ -111,6 +111,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // If you store any temporary, sensitive data on the user, clear it here
     }
 
+    public function getGravatarUrl(int $size = 32): string
+    {
+        $email = strtolower(trim((string) $this->email));
+        $hash = md5($email);
+
+        return sprintf('https://www.gravatar.com/avatar/%s?s=%d&d=identicon', $hash, $size);
+    }
+
     /**
      * @return Collection<int, ApiToken>
      */

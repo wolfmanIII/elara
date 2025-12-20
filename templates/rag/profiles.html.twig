@@ -15,7 +15,8 @@
                 </span>
             </div>
 
-            <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr),minmax(0,1fr)]">
+            {% set gridClasses = is_granted('ROLE_ADMIN') ? 'grid gap-6 lg:grid-cols-[minmax(0,1fr),minmax(0,1fr)]' : 'grid gap-6' %}
+            <div class="{{ gridClasses }}">
                 <div class="card bg-base-100 border border-base-300">
                     <div class="card-body space-y-3 text-sm">
                         <div class="flex items-center justify-between gap-3">
@@ -83,6 +84,7 @@
                     </div>
                 </div>
 
+                {% if is_granted('ROLE_ADMIN') %}
                 <div class="card bg-base-100 border border-base-300">
                     <div class="card-body space-y-3 text-sm" data-controller="rag-profile-switch">
                         <h3 class="text-base font-semibold">Preset disponibili</h3>
@@ -196,6 +198,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
             </div>
 
             <div class="w-full text-xs">

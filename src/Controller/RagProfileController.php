@@ -7,6 +7,7 @@ use App\Rag\RagProfileManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class RagProfileController extends BaseController
 {
@@ -33,7 +34,8 @@ final class RagProfileController extends BaseController
         ]);
     }
 
-    #[Route('/status/rag-tuning/profile', name: 'app_rag_profile_switch', methods: ['POST'])]
+    #[Route('/status/rag-profiles/switch', name: 'app_rag_profile_switch', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function switchProfile(Request $request): Response
     {
         if (!$this->isCsrfTokenValid('rag_profile_switch', (string) $request->request->get('_token'))) {

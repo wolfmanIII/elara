@@ -54,7 +54,15 @@
                 <div class="flex-none px-4">
                     {% if app.user %}
                         <div class="flex items-center gap-2">
+                            <img src="{{ app.user.gravatarUrl(32) }}"
+                                 alt="avatar"
+                                 class="w-8 h-8 rounded-full border border-base-300">
                             <span class="text-sm opacity-80">{{ app.user.userIdentifier }}</span>
+                            {% if is_granted('ROLE_SUPER_ADMIN') %}
+                                <span class="badge badge-error badge-outline badge-sm">Super Admin</span>
+                            {% elseif is_granted('ROLE_ADMIN') %}
+                                <span class="badge badge-warning badge-outline badge-sm">Admin</span>
+                            {% endif %}
                             <form method="post" action="{{ path('app_logout') }}">
                                 <button class="btn btn-sm btn-outline">Logout</button>
                             </form>
