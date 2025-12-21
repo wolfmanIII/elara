@@ -13,6 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Serializer\Annotation\Ignore;
 
 #[AsCommand(
     name: 'app:user-create',
@@ -57,7 +58,9 @@ final class UserCreateCommand extends Command
             $question = new Question('Password: ');
             $question->setHidden(true);
             $question->setHiddenFallback(false);
-            $password = $this->getHelper('question')->ask($input, $output, $question);
+            /** @var \Symfony\Component\Console\Helper\QuestionHelper $helper */
+            $helper = $this->getHelper('question');
+            $password = $helper->ask($input, $output, $question);
         }
 
         if (!$password) {
