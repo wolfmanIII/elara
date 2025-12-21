@@ -53,7 +53,7 @@
                                 <p class="uppercase tracking-wide text-xs opacity-60">Retrieval</p>
                                 <ul class="space-y-0.5">
                                     <li>top_k: <strong>{{ active_profile.retrieval.top_k ?? '—' }}</strong></li>
-                                    <li>min score: <strong>{{ active_profile.retrieval.min_score ?? '—' }}</strong></li>
+                                    <li>min score: > <strong>{{ active_profile.retrieval.min_score ?? '—' }}</strong></li>
                                     <li>test mode: <strong>{{ active_profile.ai.test_mode ? 'ON' : 'OFF' }}</strong></li>
                                     <li>fallback: <strong>{{ active_profile.ai.offline_fallback ? 'ON' : 'OFF' }}</strong></li>
                                 </ul>
