@@ -95,9 +95,10 @@
                             <li>CLI Symfony per indicizzare, elencare, ripulire e resettare schema/documents.</li>
                             <li>Supporto backend AI multipli (Ollama / OpenAI / Gemini) configurabili via profili.</li>
                             <li>Persistenza PostgreSQL + pgvector con indice HNSW e DQL cosine_similarity.</li>
-                            <li>Dashboard profili RAG con pulsanti inline, alert embedding e modali guida.</li>
-                            <li>Chatbot console + API JSON/SSE con fallback test/offline.</li>
-                            <li>Autenticazione utenti + API token con revoca e tracking utilizzi.</li>
+                            <li>Dashboard profili RAG + wizard base cambio profilo con alert embedding.</li>
+                            <li>Retrieval allineato ai profili (top_k / min_score letti dal preset attivo).</li>
+                            <li>Chatbot console + API JSON/SSE con fallback test/offline e loader fonti dedicato.</li>
+                            <li>Autenticazione utenti + API token con revoca e tracking utilizzi; CLI ruoli (user-role).</li>
                             <li>Documentazione completa disponibile in-app (modali markdown) e in README/docs.</li>
                         </ul>
                     </div>
@@ -107,9 +108,9 @@
                     <div class="card-body space-y-3">
                         <h3 class="card-title text-base">Prossimi step</h3>
                         <ul class="list-disc list-inside text-sm opacity-80 space-y-1">
-                            <li>Workflow guidato “Cambio profilo → Reset schema → Reindex”.</li>
+                            <li>Automatizzare il flusso cambio profilo con CTA (reset schema / reindex) e stato.</li>
                             <li>Scheduler re-index (Messenger) con notifiche e controlli incrementali.</li>
-                            <li>Dashboard file upload + gestione knowledge base.</li>
+                            <li>Dashboard file upload + gestione/sincronizzazione knowledge base.</li>
                             <li>Audit delle chat: log modello/latency/top_k + filtri.</li>
                             <li>Test di regressione RAG e baseline comparativa.</li>
                             <li>Alert stato indice (webhook/email) quando chunk non cercabili superano soglie.</li>
