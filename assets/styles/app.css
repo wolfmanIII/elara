@@ -50,3 +50,12 @@
 .prose tbody tr:nth-child(even) {
     background-color: hsl(var(--b1));
 }
+
+.elara-logo-spin {
+  animation: elara-rotate 2s linear infinite;
+  display: inline-block;
+}
+@keyframes elara-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}

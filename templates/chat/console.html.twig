@@ -89,17 +89,13 @@
                                         name="question"
                                     ></textarea>
 
-                                    <button
-                                        type="submit"
-                                        class="btn btn-primary join-item h-auto px-4"
-                                        data-chat-target="submitButton"
-                                    >
-                                        <span data-chat-target="submitLabel">Invia</span>
-                                        <span
-                                            class="loading loading-spinner loading-sm ml-2 hidden"
-                                            data-chat-target="spinner"
-                                        ></span>
-                                    </button>
+                                <button
+                                    type="submit"
+                                    class="btn btn-primary join-item h-auto px-4"
+                                    data-chat-target="submitButton"
+                                >
+                                    <span data-chat-target="submitLabel">Invia</span>
+                                </button>
                                 </div>
 
                                 <div class="mt-1 flex justify-between items-center">
@@ -141,7 +137,7 @@
                                     <h2 class="card-title text-sm">Fonti</h2>
                                     <span class="badge badge-outline badge-sm" data-chat-target="sourcesBadge">0</span>
                                 </div>
-                                <p class="text-xs opacity-70" data-chat-target="sourcesEmpty">Ancora nessuna risposta.</p>
+                                <p class="text-xs opacity-70" data-chat-target="sourcesEmpty" data-logo-src="{{ asset('img/elara-logo.png') }}">Ancora nessuna risposta.</p>
                                 <div class="flex-1 overflow-y-auto pr-1">
                                     <ul class="text-xs space-y-2 hidden" data-chat-target="sourcesList"></ul>
                                 </div>

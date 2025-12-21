@@ -2,7 +2,7 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-    static targets = ['form', 'input', 'submitButton', 'submitLabel', 'spinner', 'sourcesList', 'sourcesEmpty', 'sourcesBadge'];
+    static targets = ['form', 'input', 'submitButton', 'submitLabel', 'sourcesList', 'sourcesEmpty', 'sourcesBadge'];
     static values = {
         endpoint: String,
         streamEndpoint: String,
@@ -344,7 +344,20 @@ export default class extends Controller {
     }
 
     setSourcesLoading() {
-        this.clearSources('Recupero fonti…');
+        if (this.hasSourcesEmptyTarget) {
+            const logoSrc = this.sourcesEmptyTarget.dataset.logoSrc || '/img/elara-logo.png';
+            this.sourcesEmptyTarget.innerHTML = `
+                <div class="flex items-center justify-center py-15 min-h-[140px]">
+                    <img src="${logoSrc}" alt="Recupero fonti" class="elara-logo-spin w-30 h-30">
+                </div>
+            `;
+            this.sourcesEmptyTarget.classList.remove('hidden');
+        }
+        if (this.hasSourcesListTarget) {
+            this.sourcesListTarget.innerHTML = '';
+            this.sourcesListTarget.classList.add('hidden');
+        }
+        this.updateSourcesBadge(0);
     }
 
     renderSources(sources) {
