@@ -58,6 +58,11 @@ chatStream(
 
 Il backend è configurabile tramite i preset dichiarati in `config/packages/rag_profiles.yaml` (variabile `RAG_PROFILE=<nome>` o opzione CLI `--rag-profile=<nome>`); ogni profilo definisce backend, modelli chat/embedding e flag di fallback.
 
+### 2.2 RagProfileManager e ActiveProfileStorage
+- `RagProfileManager` centralizza i preset RAG e fornisce ai servizi (ChatbotService, DocumentChunkRepository, ChunkingService) i parametri correnti di chunking, retrieval (`top_k`, `min_score`) e AI.
+- `ActiveProfileStorage` persiste la scelta del profilo su filesystem, così la selezione resta tra riavvii ed è condivisa fra UI e CLI.
+- La UI “RAG Profiles” usa un controller Stimulus per lo switch (disabilita i bottoni per evitare doppi invii) e mostra un alert quando la dimensione embedding del profilo non coincide con `DocumentChunk->embedding`, suggerendo reset schema + reindex.
+
 ---
 
 # 3. DocumentTextExtractor

@@ -65,6 +65,7 @@ Principi chiave:
 - Ogni pulsante invia un form dedicato (`rag_profile_switch_controller`) che disabilita tutti i bottoni finché lo switch non termina, evitando click multipli.
 - Quando il profilo richiede una dimensione embedding diversa da quella attualmente salvata in `DocumentChunk->embedding`, viene mostrato automaticamente un alert con la dimensione mancante e i due comandi da eseguire (`reset-rag-schema`, `index-docs --force-reindex`).
 - La sezione include link rapidi a tutta la documentazione (modali Markdown) così l’operatore può verificare chunking, parametri e guide senza uscire dall’app.
+- `RagProfileManager` centralizza i preset (`config/packages/rag_profiles.yaml`), persiste la scelta corrente (`ActiveProfileStorage`) e fornisce a runtime i parametri di chunking, retrieval (`top_k`, `min_score`) e AI. ChatbotService e DocumentChunkRepository leggono da qui per restare allineati al profilo attivo.
 
 ---
 

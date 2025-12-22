@@ -26,6 +26,14 @@ FILE → Estrattore → Chunking → Embedding → PostgreSQL
 
 ---
 
+# Nota: Gestione profili RAG
+- I preset RAG sono definiti in `config/packages/rag_profiles.yaml` (backend, modelli chat/embed, dimensione embedding, chunking, retrieval).
+- Il profilo attivo è selezionabile da UI (`Status → RAG Profiles`) o da CLI con `--rag-profile`/variabile `RAG_PROFILE`.
+- ChatbotService e DocumentChunkRepository leggono `top_k` e `min_score` dal profilo attivo; ChunkingService e AiClient si allineano alla dimensione embedding del preset.
+- La UI mostra un alert quando la dimensione embedding del profilo non coincide con lo schema (`DocumentChunk->embedding`), suggerendo reset schema + reindex; è presente un wizard base con i passaggi.
+
+---
+
 # 3. Fase 1 — Acquisizione e gestione dei file
 La fase è gestita dal comando:
 ```
