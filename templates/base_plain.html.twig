@@ -4,7 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>{% block title %}ELaRA{% endblock %}</title>
+    
     <link rel="icon" href="{{ asset('img/favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('img/favicon-16.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/favicon-32.png') }}">
+    <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('img/favicon-48.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('img/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('img/android-chrome-192.png') }}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{{ asset('img/android-chrome-512.png') }}">
+    <link rel="shortcut icon" href="{{ asset('img/favicon.ico') }}">
+
     {% block stylesheets %}{% endblock %}
     {% block javascripts %}
         {% block importmap %}{{ importmap('app') }}{% endblock %}

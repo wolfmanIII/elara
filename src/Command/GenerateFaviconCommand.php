@@ -143,7 +143,7 @@ final class GenerateFaviconCommand extends Command
             return Command::FAILURE;
         }
 
-        $io->success('Fatto. File creati in public/: favicon.ico, favicon-16.png, favicon-32.png, favicon-48.png, apple-touch-icon.png, android-chrome-192.png, android-chrome-512.png');
+        $io->success('Fatto. File creati in assets/img/: favicon.ico, favicon-16.png, favicon-32.png, favicon-48.png, apple-touch-icon.png, android-chrome-192.png, android-chrome-512.png');
         return Command::SUCCESS;
     }
 

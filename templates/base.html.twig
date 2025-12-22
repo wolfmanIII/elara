@@ -4,11 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>{% block title %}ELaRA - Embedding Linking and Retrieval Answering{% endblock %}</title>
-    {#
-    <link rel="icon"
-          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-    #}
+    
     <link rel="icon" href="{{ asset('img/favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('img/favicon-16.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/favicon-32.png') }}">
+    <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('img/favicon-48.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('img/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('img/android-chrome-192.png') }}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{{ asset('img/android-chrome-512.png') }}">
+    <link rel="shortcut icon" href="{{ asset('img/favicon.ico') }}">
+
     {% block stylesheets %}
     {% endblock %}
 
