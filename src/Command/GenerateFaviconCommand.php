@@ -69,9 +69,9 @@ final class GenerateFaviconCommand extends Command
             return Command::FAILURE;
         }
 
-        $publicDir = $this->projectDir . DIRECTORY_SEPARATOR . 'public';
-        if (!is_dir($publicDir)) {
-            $io->error("Cartella public/ non trovata: {$publicDir}");
+        $outputDir = $assetsImgDirReal;
+        if (!is_dir($outputDir)) {
+            $io->error("Cartella di destinazione non trovata: {$outputDir}");
             return Command::FAILURE;
         }
 
@@ -91,7 +91,7 @@ final class GenerateFaviconCommand extends Command
 
         $io->title('Generazione favicon');
         $io->text('Sorgente: ' . $this->shortPath($sourceReal));
-        $io->text('Output: public/');
+        $io->text('Output: assets/img/');
 
         // 1) crea un master quadrato 1024x1024 con trasparenza (shrink-only + padding)
         $io->section('Creo master.png (1024x1024) con padding');
@@ -121,7 +121,7 @@ final class GenerateFaviconCommand extends Command
         ];
 
         foreach ($targets as $filename => $size) {
-            $outFile = $publicDir . DIRECTORY_SEPARATOR . $filename;
+            $outFile = $outputDir . DIRECTORY_SEPARATOR . $filename;
             $cmd = [$magick, $master, '-resize', $size, $outFile];
 
             $io->text(" - {$filename} ({$size})");
@@ -132,7 +132,7 @@ final class GenerateFaviconCommand extends Command
 
         // 3) favicon.ico multi-size
         $io->section('Genero favicon.ico multi-risoluzione');
-        $ico = $publicDir . DIRECTORY_SEPARATOR . 'favicon.ico';
+        $ico = $outputDir . DIRECTORY_SEPARATOR . 'favicon.ico';
         $cmdIco = [
             $magick,
             $master,
