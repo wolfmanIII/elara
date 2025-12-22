@@ -11,7 +11,7 @@ export default class extends Controller {
 
     connect() {
         this.chatLog = this.element.querySelector('#chat-log');
-        this.clearSources('Ancora nessuna risposta.');
+        this.clearSources('In attesa di query.');
 
         // Controllo stato motore all’avvio
         if (this.hasEngineStatusUrlValue) {

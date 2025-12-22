@@ -239,18 +239,22 @@ Per commutare basta impostare `RAG_PROFILE=<nome>` (o usare l'opzione CLI `--rag
 DATABASE_URL="postgresql://app:!ChangeMe!@127.0.0.1:5432/app?serverVersion=16&charset=utf8"
 
 # Parametri AI Backend
-RAG_PROFILE=ollama-bgem3   # preset definito in config/packages/rag_profiles.yaml
+# ora arriva tutto dal profilo in config/packages/rag_profiles.yaml
+# lascio come referenzce
+RAG_PROFILE=ollama-bgem3
 AI_BACKEND=ollama          # fallback legacy per servizi non profilati
-SHOW_SOURCES=true          # oggi arriva dal profilo, lo lascio come reference
-TOP_K=5                   # idem, i servizi core leggono retrieval.top_k
+SHOW_SOURCES=false
+TOP_K=5
 
 # Ollama
+# ora arriva tutto dal profilo in config/packages/rag_profiles.yaml
 OLLAMA_HOST=http://localhost:11434
 OLLAMA_CHAT_MODEL=llama3.2
 OLLAMA_EMBED_MODEL=bge-m3
 OLLAMA_EMBED_DIMENSION=1024
 
 # OpenAI
+# ora arriva tutto dal profilo in config/packages/rag_profiles.yaml
 #AI_BACKEND=openai
 #OPENAI_API_KEY=sk-...
 #OPENAI_CHAT_MODEL=gpt-5.1-mini
@@ -258,19 +262,21 @@ OLLAMA_EMBED_DIMENSION=1024
 #OPENAI_EMBED_DIMENSION=768
 
 # Gemini
+# ora arriva tutto dal profilo in config/packages/rag_profiles.yaml
 #AI_BACKEND=gemini
 #GEMINI_API_KEY=...
 #GEMINI_CHAT_MODEL=gemini-2.5-flash
 #GEMINI_EMBED_MODEL=gemini-embedding-001
-#GEMINI_EMBED_DIMENSION=1536
+#GEMINI_EMBED_DIMENSION=768
 
 ## Cache chatbot
 # TTL in secondi per cache risposta/fonti; se 0 la cache è disabilitata
 APP_CHAT_CACHE_TTL=0
 
 ## RAG Test Mode e Fallback
-APP_AI_TEST_MODE=true        # ora configurato nel profilo, tengo questi flag per override veloci
-APP_AI_OFFLINE_FALLBACK=false
+## configurati nel profilo
+# APP_AI_TEST_MODE=false        
+# APP_AI_OFFLINE_FALLBACK=true
 
 ## Uso solo indici hwsn
 # Postgres pgvector - sonde per indice ivfflat
