@@ -287,7 +287,7 @@ Tutti i dettagli tecnici sono riportati nel documento dedicato, ma riportiamo i 
 - modello chat
 - chunking (min/max/overlap)
 - top_k
-- soglia cosine
+- soglia di similarità(calcolata con la cosine similarity di pgvector)
 - indice vettoriale (HNSW consigliato)
 - system prompt
 - qualità del testo estratto
