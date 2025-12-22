@@ -19,7 +19,7 @@
                         <h3 class="card-title text-base">Definizione</h3>
                         <p class="text-sm opacity-80">
                             ELaRA è un motore RAG che combina un motore di ricerca vettoriale
-                            sui tuoi documenti con un modello di AI generativa. Risponde
+                            sui documenti con un modello di AI generativa. Risponde
                             usando esclusivamente le fonti indicizzate, riducendo le
                             hallucination rispetto ai chatbot “generici”.
                         </p>
@@ -43,8 +43,8 @@
                         <ul class="text-sm opacity-80 space-y-1 list-disc list-inside">
                             <li>Indicizza PDF, MD, DOCX, ODT con estrazione testo pulita</li>
                             <li>Gestisce embedding e ricerca vettoriale con pgvector</li>
-                            <li>Espone un’unica API semplice: <code>POST /api/chat</code></li>
-                            <li>Supporta backend AI switchabile (Ollama / OpenAI)</li>
+                            <li>Espone API semplici: <code>POST /api/chat</code></li>
+                            <li>Supporta backend AI switchabile (Ollama / OpenAI / Gemini)</li>
                         </ul>
                     </div>
                 </div>
@@ -67,7 +67,7 @@
                         <ul class="list-disc list-inside text-sm opacity-80 space-y-1">
                             <li>Dati sempre on-premise / nel proprio cluster.</li>
                             <li>Stack standard: Symfony, PostgreSQL, PHP.</li>
-                            <li>Configurabile via ENV, senza lock-in di vendor.</li>
+                            <li>Configurabile via config rag_profiles), senza lock-in di vendor.</li>
                         </ul>
                     </div>
                 </div>
@@ -103,7 +103,7 @@
                 <div class="stat-title text-base">Backend AI</div>
                 <div class="stat-value text-lg">Ollama · OpenAI - Gemini</div>
                 <div class="text-sm opacity-70">
-                    Selezionabile via <code class="kbd kbd-base">AI_BACKEND</code>
+                    Selezionabile via <code class="kbd kbd-base">config rag_profiles</code>
                 </div>
             </div>
 
@@ -111,7 +111,7 @@
                 <div class="stat-title text-base">Database</div>
                 <div class="stat-value text-lg">PostgreSQL + pgvector</div>
                 <div class="text-sm opacity-70">
-                    Colonna <code class="kbd kbd-sm">vector(1024)</code> su <code>DocumentChunk</code>
+                    Colonna <code class="kbd kbd-sm">embedding(vector)</code> su <code>DocumentChunk</code>
                 </div>
             </div>
 

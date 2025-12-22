@@ -37,9 +37,8 @@
                     <div class="card-body space-y-2">
                         <h3 class="card-title text-lg">2 · Embedding</h3>
                         <p class="text-sm opacity-80">
-                            Ogni chunk viene trasformato in un embedding vettoriale
-                            (attualmente 1024 dimensioni tramite modello
-                            <code>bge-m3</code> via Ollama | OpenAi | Gemini) e memorizzato su PostgreSQL
+                            Ogni chunk viene trasformato in un embedding vettoriale via
+                            Ollama | OpenAi | Gemini) e memorizzato su PostgreSQL
                             in <code>document_chunk.embedding</code> usando pgvector.
                         </p>
                     </div>
@@ -64,7 +63,7 @@
                             <span class="font-semibold">ChatbotService</span> costruisce
                             il contesto con i chunk trovati, aggiunge un prompt che
                             impone “rispondi solo usando il contesto” e chiama il modello
-                            AI selezionato (Ollama | OpenAI | Gemini), restituendo una risposta JSON
+                            AI selezionato (Ollama / OpenAI / Gemini), restituendo una risposta JSON
                             pulita tramite <code>ChatController</code>.
                         </p>
                     </div>
@@ -89,7 +88,7 @@
                             <div>
                                 <p class="font-semibold mb-1">Core</p>
                                 <ul class="space-y-1 opacity-80">
-                                    <li><code>AI/</code> — client Ollama | OpenAI | Gemini + factory</li>
+                                    <li><code>AI/</code> — client Ollama / OpenAI / Gemini + factory</li>
                                     <li><code>Service/</code> — DocsIndexer, DocumentTextExtractor, ChunkingService, ChatbotService</li>
                                     <li><code>Repository/</code> — ricerca vettoriale DocumentChunkRepository</li>
                                 </ul>
@@ -98,7 +97,8 @@
                                 <p class="font-semibold mb-1">Integrazione</p>
                                 <ul class="space-y-1 opacity-80">
                                     <li><code>Command/</code> — app:index-docs, app:list-docs, app:unindex-file</li>
-                                    <li><code>Controller/</code> — ChatController (/api/chat)</li>
+                                    <li><code>Rag/</code> — RagProfileManager, EmbeddingSchemaInspector, ActiveProfileStorage</li>
+                                    <li><code>Controller/</code> — ChatController (/api/chat e /api/chat/stream)</li>
                                     <li><code>Entity/</code> — DocumentFile, DocumentChunk</li>
                                     <li><code>Middleware/</code> — PgvectorIvfflatMiddleware (se usato)</li>
                                 </ul>
