@@ -1,0 +1,3 @@
+# Modello messaggi commit (italiano, terza persona)
+# Esempio: "Aggiunge gestione policy deploy" / "Corregge importmap live component" / "Aggiorna README"
+# Lascia una riga vuota dopo il titolo per eventuale descrizione puntata (opzionale).
