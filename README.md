@@ -514,3 +514,6 @@ log minimale (utente/timestamp/latency/modello) per capire carico e qualità, ma
 un comando che esegue richieste “di riferimento” e confronta score/risposte con baseline, utile prima di cambiare modello embedding o parametri.
 ## 4. Alerting per stato indice
 Live component per aggiungere webhooks/email quando chunk non cercabili superano una soglia o l’indexer fallisce.
+
+# 11. Licenza
+Il progetto è distribuito con licenza MIT. I dettagli completi sono disponibili nel file `LICENSE`.

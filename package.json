@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/wolfmanIII/elara.git"
   },
-  "license": "ISC",
+  "license": "MIT",
   "author": "Space Wolf",
   "type": "commonjs",
   "main": "tailwind.config.js",
