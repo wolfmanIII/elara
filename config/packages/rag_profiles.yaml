@@ -7,8 +7,8 @@ parameters:
                 label: 'Ollama · bge-m3'
                 backend: 'ollama'
                 chunking:
-                    min: 400
-                    max: 1400
+                    min: 380
+                    max: 1200
                     overlap: 250
                 retrieval:
                     top_k: 5
