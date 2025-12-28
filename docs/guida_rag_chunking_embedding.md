@@ -1,10 +1,10 @@
 # Linee guida RAG: Dimensione Chunk e top_k per Diverse Dimensioni di Embedding
 
-Questo documento riassume in forma ordinata e chiara le raccomandazioni per:
+Questo documento riassume in forma ordinata e chiara le impostazioni di riferimento per:
 
 - **dimensione massima del chunk di testo**
 - **numero massimo di risultati (top_k)** nella query di cosine similarity
-- valori consigliati per differenti **dimensioni del vettore embedding**: 384, 768, 1024, 1536.
+- valori di riferimento per differenti **dimensioni del vettore embedding**: 384, 768, 1024, 1536.
 
 Include inoltre note operative utili per il setup self‑hosted (16GB RAM no GPU + pgvector + Ollama).
 
@@ -19,7 +19,7 @@ La qualità e l’efficienza del RAG dipendono soprattutto da:
 - **dimensione del vettore** (costo di similarity e memoria)
 - **assenza di chunk "vuoti"** (problema frequente quando si spezza per caratteri fissi)
 
-Per evitare chunk inutili ad una sola parola (es. nomi come *Malen Trast*), si consiglia:
+Per evitare chunk inutili ad una sola parola (es. nomi come *Malen Trast*):
 
 - definire una **dimensione minima del chunk**
 - un **overlap** del 10–20%
@@ -27,44 +27,44 @@ Per evitare chunk inutili ad una sola parola (es. nomi come *Malen Trast*), si c
 
 ---
 
-# 📏 2. Tabella riassuntiva (valori consigliati)
+# 📏 2. Tabella riassuntiva (valori di riferimento)
 
-| Dimensione Vettore | Chunk max (caratteri)  | Chunk target | Chunk min | top_k consigliato |
+| Dimensione Vettore | Chunk max (caratteri)  | Chunk target | Chunk min | top_k |
 |--------------------|------------------------|--------------|-----------|-------------------|
 | **384**            | 800–1200               | ~1000        | 400       | **6**             |
 | **768**            | 900–1400               | ~1200        | 400       | **5**             |
 | **1024**           | 1000–1600              | ~1300–1400   | 400–500   | **4**             |
 | **1536**           | 1200–1800              | ~1400–1600   | 500       | **3**             |
 
-I valori nella colonna *target* sono quelli consigliati come default pratici.
+I valori nella colonna *target* sono quelli usati come default pratici.
 
 ---
 
 # 🧠 3. Note specifiche per ciascuna dimensione
 
 ## 🔹 Embedding **384** (es. MiniLM)
-- Molto veloce ma meno preciso.
-- Meglio aumentare leggermente top_k → **6**.
-- Chunk non troppo lunghi: **1000 caratteri** è un ottimo valore.
+- Veloce ma meno preciso.
+- top_k impostato a **6**.
+- Chunk non troppo lunghi: **1000 caratteri**.
 
 ## 🔹 Embedding **768** (es. nomic‑embed‑text)
-- Punto di equilibrio perfetto per self‑hosting.
-- Chunk più robusti: **1200 caratteri**.
-- top_k ideale: **5**.
+- Punto di equilibrio per self‑hosting.
+- Chunk di circa **1200 caratteri**.
+- top_k impostato a **5**.
 
 ## 🔹 Embedding **1024** (es. mxbai‑embed‑large) attualmente usato in ELARA
-- Ottima qualità, costo computazionale maggiore.
-- Chunk un po’ più ampi (1300–1400).
-- top_k ridotto a **4**.
+- Qualità alta con costo computazionale maggiore.
+- Chunk 1300–1400.
+- top_k impostato a **4**.
 
 ## 🔹 Embedding **1536** (modelli heavy stile OpenAI|Gemini)
-- Costosissimi in pgvector su CPU.
-- Per self-hosting → top_k basso (**3**).
-- Chunk ampi: 1400–1600 caratteri.
+- Costosi in pgvector su CPU.
+- Per self-hosting → top_k **3**.
+- Chunk 1400–1600 caratteri.
 
 ---
 
-# 🧩 4. Parametri di chunking consigliati per un sistema (16GB RAM senza GPU)
+# 🧩 4. Parametri di chunking di riferimento per un sistema (16GB RAM senza GPU)
 
 Con embedding **768** + modello chat 8B:
 
@@ -76,7 +76,7 @@ Con embedding **768** + modello chat 8B:
 - **token totali contesto**: ~1200–1500 token
 
 Questo bilancia qualità del retrieval e performance, evitando timeout e surriscaldamenti.  
->*Nell'implementazione di ELARA, per problemi di Ollama 0.13.1(latest) [`GitHub`]("https://github.com/ollama/ollama/issues/13340") sul modello nomic-text-embed, sono stato costretto ad usare il modello bge-m3, che utilizza vettori a 1024*
+>*Nell'implementazione di ELARA, per un problema di Ollama 0.13.1 [`GitHub`]("https://github.com/ollama/ollama/issues/13340") sul modello nomic-text-embed, è stato utilizzato il modello bge-m3 (vettori a 1024).*
 
 ---
 # 🛠️ 5. Considerazioni aggiuntive
@@ -93,11 +93,11 @@ I modelli 7B/8B in self-hosting non amano contesti da 2500+ token.
 
 ---
 
-# ✅ 6. Valori preconfigurati consigliati (riassunto finale)
+# ✅ 6. Valori preconfigurati di riferimento (riassunto finale)
 
 Per un setup self‑hosted moderno ma non estremo (16GB RAM):
 
-- **Embedding 768** → *scelta raccomandata*
+- **Embedding 768** → configurazione più usata
 - **Chunk target 1200**
 - **Chunk max 1400**
 - **top_k = 5**
@@ -116,19 +116,19 @@ Questi valori sono adatti a documenti tecnici e qualunque tipo di conoscenza
   - **zero‑padding** per vettori più piccoli
 - Il modo più stabile è scegliere il formato per il proprio progetto.
 
-### Consiglio pratico
-Per self‑hosting → **VECTOR(768)** è la scelta più equilibrata.
+### Nota pratica
+Per self‑hosting → **VECTOR(768)** è una configurazione equilibrata.
 
 ---
 
 ## 🚀 Ottimizzazione database pgvector
 
-### Indici raccomandati
+### Indici disponibili
 ```sql
 CREATE INDEX document_chunk_embedding_hnsw
 ON document_chunk USING hnsw (embedding vector_cosine_ops);
 ```
-- HNSW è molto più veloce dell’IVF-Flat, specialmente su dataset medi (< 500k chunk).
+- HNSW offre prestazioni elevate su dataset medi (< 500k chunk).
 
 ### Quando usare IVF-Flat
 - Solo se si hanno **milioni** di chunk, dataset di grandi dimensioni.
@@ -592,7 +592,7 @@ class ChunkingService
 ### Benefici di questo metodo
 - Evita chunk “cadaveri” (solo titoletti o nomi)
 - Mantiene la coerenza semantica
-- Inserisce un overlap che migliora drasticamente la recall
+- Inserisce un overlap che aumenta la recall
 - Produce chunk di lunghezza prevedibile
 
 ---
@@ -627,11 +627,11 @@ LIMIT 5;
 ```
 
 ### Nota
-- Le soglie sono sensibili al modello: per embedding 768 di qualità, **0.55–0.60** è un buon range.
+- Le soglie dipendono dal modello: per embedding 768 di qualità, **0.55–0.60** è un range comune.
 
 ---
 
-# 🧠 10. Prompt template consigliato per RAG
+# 🧠 10. Prompt template per RAG
 
 ```text
 Sei un assistente e DEVI rispondere esclusivamente usando il contesto sotto.
@@ -653,19 +653,19 @@ Rispondi in modo chiaro e sintetico nella lingua dell'utente.
 
 ---
 
-# 🗄️ 11. È utile usare **IVF-FLAT + HNSW insieme?**
+# 🗄️ 11. Uso combinato di **IVF-FLAT + HNSW**
 
-## ❌ Risposta breve
-Per un sistema RAG **self‑hosted**, con **16 GB di RAM** e dataset di dimensioni medio‑piccole (documentazione, lore, manuali), **NO**: usare **entrambi gli indici** sulla stessa colonna di embedding **non è né necessario né utile**.
+## Panoramica
+Per un sistema RAG **self‑hosted**, con **16 GB di RAM** e dataset di dimensioni medio‑piccole (documentazione, lore, manuali), usare entrambi gli indici sulla stessa colonna di embedding non aggiunge benefici misurabili.
 
-Un solo indice — **HNSW** — è la scelta corretta nel 99% dei casi.
+In questo scenario si impiega un solo indice, tipicamente **HNSW**.
 
 ---
 
 # 🧩 11.1. Differenze tra IVF-FLAT e HNSW
 
 ## 🔹 HNSW
-**Ideale per:** dataset piccoli/medi (fino a milioni moderati), contesti RAG.
+**Usato per:** dataset piccoli/medi (fino a milioni moderati), contesti RAG.
 
 **Pro:**
 - Ottima qualità dei risultati (alta recall)
@@ -679,7 +679,7 @@ Un solo indice — **HNSW** — è la scelta corretta nel 99% dei casi.
 ---
 
 ## 🔹 IVF-FLAT
-**Ideale per:** dataset **molto grandi** (milioni di embedding).
+**Impiegato su:** dataset **molto grandi** (milioni di embedding).
 
 **Pro:**
 - Scalabile su enormi volumi
@@ -689,7 +689,7 @@ Un solo indice — **HNSW** — è la scelta corretta nel 99% dei casi.
 - Recall più bassa se `lists`/`probes` non sono calibrati
 - Necessita tuning
 - Richiede "REINDEX" dopo grandi batch di insert
-- **Non adatto** a knowledge base medio-piccole: in quei casi HNSW offre risultati migliori con meno sforzo.
+- Su knowledge base medio-piccole, HNSW offre risultati più stabili con meno configurazione.
 
 ---
 
@@ -710,11 +710,11 @@ Avere **due indici** (HNSW + IVF-FLAT) sulla stessa colonna comporta:
 - Performance già buone con HNSW
 - Nessuna necessità di clusterizzazione (IV-FFLAT)
 
-👉 **Conclusione:** usare entrambi è overkill e rischia di peggiorare la qualità.
+👉 **Conclusione:** l'uso simultaneo non è previsto in questo contesto e aumenta costi e complessità.
 
 ---
 
-# 🟢 11.3. Raccomandazione generali
+# 🟢 11.3. Scelte operative
 
 ### Usa **solo HNSW**:
 ```sql
@@ -723,7 +723,7 @@ ON document_chunk
 USING hnsw (embedding vector_cosine_ops);
 ```
 
-### Quando considerare IVF-FLAT?
+### Quando valutare IVF-FLAT?
 Solo se:
 - superi **1–2 milioni di chunk**
 - e hai problemi di latenza sulla similarity
@@ -732,11 +732,11 @@ Solo se:
   - `probes`
   - strategie di REINDEX
 
-In qualunque altro caso → **HNSW è migliore, più semplice e più affidabile**.
+Negli altri casi → **HNSW** mantiene configurazione semplice e stabile.
 
 ### TL;DR finale
-- **HNSW** = scelta predefinita per praticamente ogni knowledge base.
-- **IVF-FLAT** = strumento specialistico per dataset enormi dove il tuning è accettabile.
+- **HNSW** = default usato sulla maggior parte delle knowledge base.
+- **IVF-FLAT** = strumento per dataset enormi dove il tuning è accettabile.
 - **Uno alla volta**: duplicare gli indici porta solo costi.
 
 ---

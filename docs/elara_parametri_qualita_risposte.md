@@ -41,7 +41,7 @@ Ollama → locale, meno costo, più latenza.
 # 3. Parametri di Chunking
 Il chunking ha impatto diretto sulla qualità del contesto fornito all’AI.
 
-## 3.1 Valori consigliati
+## 3.1 Valori di riferimento
 - **Chunk min:** 400–500 caratteri
 - **Chunk target:** 1200–1600 caratteri
 - **Chunk max:** 1500–1800 caratteri
@@ -60,7 +60,7 @@ Il chunking ha impatto diretto sulla qualità del contesto fornito all’AI.
 ## 4.1 top_k
 Numero di chunk recuperati per la costruzione del contesto.
 
-Valori consigliati:
+Valori di riferimento:
 - embedding 384 → top_k **6**
 - embedding 768 → top_k **5**
 - embedding 1024 → top_k **4**
@@ -74,8 +74,8 @@ WHERE (1 - (embedding <=> :v)) > 0.55
 Permette di escludere chunk poco rilevanti.
 
 ## 4.3 Indice vettoriale
-Scelta consigliata:
-### ✔ HNSW (default raccomandato)
+Configurazione in uso:
+### ✔ HNSW (default attivo)
 - Ottima qualità dei risultati
 - Alta velocità
 - Nessun tuning necessario

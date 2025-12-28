@@ -196,7 +196,7 @@ Contiene:
 
 ## 8. Abilitare CUDA (NVIDIA) in modo PERMANENTE
 
-⚠️ Se utilizzi una GPU **NVIDIA**, è fortemente consigliato usare **CUDA invece di Vulkan** per massime prestazioni.
+⚠️ Su GPU **NVIDIA**, **CUDA** offre prestazioni più alte rispetto a **Vulkan**.
 
 ### 8.1 Verifica driver NVIDIA
 
@@ -317,9 +317,9 @@ sudo systemctl restart ollama
 
 ---
 
-## 10. Riepilogo backend consigliato per tipo di GPU
+## 10. Riepilogo backend per tipo di GPU
 
-| Tipo GPU  | Backend consigliato |
+| Tipo GPU  | Backend |
 |-----------|---------------------|
 | NVIDIA    | cuda ✅              |
 | AMD       | vulkan ✅            |

@@ -152,23 +152,22 @@ Quando faccio una domanda:
 
 È come cercare un libro in una biblioteca già ordinata, invece che sfogliare ogni libro uno per uno.
 
-> HNSW è un indice che permette a pgvector di trovare rapidamente gli embedding più simili alla mia domanda, rendendo il motore RAG veloce, preciso e scalabile(il tutto è sempre relativo al hardware che si ha a disposizione).
+> HNSW è un indice che permette a pgvector di trovare rapidamente gli embedding più simili alla domanda, rendendo il motore RAG veloce, preciso e scalabile (in base all'hardware disponibile).
 
-In generale l'indice HMSW è ideale per data set di piccole e medie dimensioni, non richiede nessun tuning.
+In generale l'indice HMSW è usato per dataset di piccole e medie dimensioni e non richiede tuning.
 
-***Attenzione, non è utile avere due indici vettoriali diversi sullo stesso campo, è solo uno spreco di spazio e di tempo in scrittura.***
+***Mantenere due indici vettoriali sullo stesso campo aumenta spazio e tempi di scrittura senza benefici.***
 
 > ***Gli indici vettoriali IVF-FLAT e HNSW, sono da considerare mutualmente esclusivi***
 
 > **Promemoria pratico**  
-> - HNSW = scelta predefinita per knowledge base aziendali: dataset moderati, tanta precisione, zero parametri da calibrare.  
-> - IVF-FLAT = solo quando i chunk superano i milioni e sei disposto a gestire `lists`, `probes` e REINDEX periodici.  
-> - Se hai dubbi, resta su HNSW: aggiungere IVF-FLAT “per sicurezza” genera solo confusione al planner e rallenta la manutenzione.
+> - HNSW = default per knowledge base aziendali: dataset moderati, alta precisione, zero parametri da calibrare.  
+> - IVF-FLAT = quando i chunk superano i milioni e serve gestire `lists`, `probes` e REINDEX periodici.  
 
 ### Riepilogo operativo
-- Se il dataset contiene documenti aziendali tipici, crea **solo l’indice HNSW**.
-- Passa a **IVF-FLAT** soltanto quando i chunk superano abbondantemente il milione e hai risorse per il tuning.
-- Non attivare mai entrambi gli indici contemporaneamente.
+- Per dataset aziendali tipici viene creato **solo l’indice HNSW**.
+- **IVF-FLAT** entra in gioco quando i chunk superano il milione e sono disponibili risorse per il tuning.
+- Gli indici non vengono attivati contemporaneamente sulla stessa colonna.
 
 # 5. L’operatore vettoriale <=> di Postgres/pgvector
 L’operatore <=> è una delle funzionalità che pgvector aggiunge a PostgreSQL.

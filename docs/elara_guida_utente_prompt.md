@@ -21,7 +21,7 @@ Quando scrivi una domanda, ELARA:
 
 ---
 
-# 2. ✔️ Domande efficaci: struttura consigliata
+# 2. ✔️ Domande efficaci: struttura di riferimento
 
 Le domande migliori seguono uno di questi schemi:
 
@@ -54,7 +54,7 @@ Perché funziona: è un concetto presente nei documenti, quindi ELARA lo recuper
 
 🟥 Problema: troppo vaga.
 
-🟩 Meglio:
+🟩 Variante utile:
 > “Puoi spiegare l’architettura complessiva di ELARA descritta nei documenti?”
 
 ---
@@ -69,7 +69,7 @@ ELARA risponde solo usando i documenti indicizzati.
 ### **3) Domande troppo brevi**
 > “Indicizzazione?”
 
-🟩 Meglio:
+🟩 Variante utile:
 > “Come funziona il processo di indicizzazione dei documenti in ELARA?”
 
 ---
@@ -81,7 +81,7 @@ ELARA può rispondere solo con ciò che è presente nei documenti.
 
 ---
 
-# 4. 🎒 Template consigliati per domande “perfette”
+# 4. 🎒 Template di esempio per domande “perfette”
 
 ### **Template 1 — Per capire un concetto**
 > *“Nei documenti caricati, come viene definito **{concetto}** e qual è il suo ruolo nel flusso RAG?”*
@@ -138,7 +138,7 @@ Sì. L’embedding ragiona sul significato, non sulle singole parole.
 > “Cos’è un indice?”
 
 ### ✔️ Domanda efficace
-> “Cosa si intende per indice HNSW e perché è consigliato rispetto a IVF-Flat?”
+> “Cosa si intende per indice HNSW e quali differenze ci sono rispetto a IVF-Flat?”
 
 ---
 

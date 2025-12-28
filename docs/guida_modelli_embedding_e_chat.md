@@ -134,7 +134,7 @@ Modelli grandi gestiscono conversazioni lunghe e complesse.
 Più grande → più conoscenze incorporate.
 
 ### ✔ Capacità di seguire istruzioni
-Modelli enormi (70B+) sono molto migliori nelle istruzioni complesse.
+Modelli enormi (70B+) gestiscono meglio istruzioni complesse.
 
 ---
 
@@ -203,4 +203,3 @@ Fattori importanti:
 - La scelta dipende da: prestazioni desiderate, hardware e complessità delle richieste.
 
 ---
-

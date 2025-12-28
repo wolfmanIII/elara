@@ -61,7 +61,7 @@ Il backend è configurabile tramite i preset dichiarati in `config/packages/rag_
 ### 2.2 RagProfileManager e ActiveProfileStorage
 - `RagProfileManager` centralizza i preset RAG e fornisce ai servizi (ChatbotService, DocumentChunkRepository, ChunkingService) i parametri correnti di chunking, retrieval (`top_k`, `min_score`) e AI.
 - `ActiveProfileStorage` persiste la scelta del profilo su filesystem, così la selezione resta tra riavvii ed è condivisa fra UI e CLI.
-- La UI “RAG Profiles” usa un controller Stimulus per lo switch (disabilita i bottoni per evitare doppi invii) e mostra un alert quando la dimensione embedding del profilo non coincide con `DocumentChunk->embedding`, suggerendo reset schema + reindex.
+- La UI “RAG Profiles” usa un controller Stimulus per lo switch (disabilita i bottoni per evitare doppi invii) e mostra un alert quando la dimensione embedding del profilo non coincide con `DocumentChunk->embedding`, indicando i comandi di reset schema e reindex.
 
 ---
 
@@ -96,7 +96,7 @@ Elemento centrale del flusso.
 - overlap intelligente basato su numero di caratteri,
 - limite assoluto HARD_MAX_CHARS.
 
-## 4.2 Parametri di default consigliati
+## 4.2 Parametri di default
 - `min = 400–500`,
 - `target = 1200–1600`,
 - `max = 1500–1800`,
@@ -137,11 +137,11 @@ Middleware opzionale che gestisce la ricostruzione dell’indice vettoriale.
 - creazione indici personalizzati.
 
 ## 6.2 Indici disponibili
-- **HNSW** → raccomandato,
-- **IVF-FLAT** → solo dataset molto grandi.
+- **HNSW**,
+- **IVF-FLAT** (dataset molto grandi).
 
 ## 6.3 Best practice
-**Mai usare entrambi gli indici sulla stessa colonna**, per motivi di:
+**Usare un solo indice per colonna**, per motivi di:
 - performance,
 - coerenza,
 - recall instabile.

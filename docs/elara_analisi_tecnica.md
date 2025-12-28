@@ -116,7 +116,7 @@ ELARA implementa un **chunking intelligente**, che:
 - aggiunge overlap tra chunk basato su numero di caratteri,
 - unisce l’ultimo chunk se troppo corto.
 
-### Parametri consigliati
+### Parametri di riferimento
 - `min`: 400–500
 - `target`: 1200–1600
 - `max`: 1500–1800
@@ -174,14 +174,14 @@ Due possibili indici vettoriali, entrambi supportati da pgvector.
 - Necessita REINDEX dopo grandi batch
 - Recall più bassa se configurato male
 
-ELARA supporta entrambi ma **si sconsiglia vivamente l’uso simultaneo**.
+ELARA supporta entrambi, ma l'uso simultaneo non è previsto.
 
-> **Linea guida rapida:** se non stai gestendo un grafo di milioni di chunk, resta su HNSW. IVF-FLAT diventa utile solo su collezioni gigantesche in cui vale la pena pagare tuning e manutenzione.
+> **Linea guida rapida:** HNSW copre dataset piccoli/medi; IVF-FLAT si applica a collezioni molto estese dove il tuning e la manutenzione aggiuntiva sono accettabili.
 
 ### Riepilogo flash
 - **Default:** HNSW per dataset piccoli/medi e per la maggior parte delle knowledge base.
-- **Solo eccezione:** IVF-FLAT quando i chunk superano i milioni e servono indici più leggeri da calibrare.
-- **Mai insieme:** un solo indice attivo evita sprechi e incoerenze.
+- **Eccezione:** IVF-FLAT quando i chunk superano i milioni e servono indici più leggeri da calibrare.
+- **Uno alla volta:** un solo indice attivo evita sprechi e incoerenze.
 
 ---
 
@@ -256,7 +256,7 @@ ELARA permette di cambiare backend tramite i preset RAG (`config/packages/rag_pr
 - qualità superiore
 - costi per token
 
-Modelli chat consigliati: 7B–8B per uso locale.
+Modelli chat usati in locale: 7B–8B.
 
 ---
 
@@ -288,7 +288,7 @@ Tutti i dettagli tecnici sono riportati nel documento dedicato, ma riportiamo i 
 - chunking (min/max/overlap)
 - top_k
 - soglia di similarità(calcolata con la cosine similarity di pgvector)
-- indice vettoriale (HNSW consigliato)
+- indice vettoriale (HNSW)
 - system prompt
 - qualità del testo estratto
 
@@ -308,7 +308,7 @@ Rimuove un documento e i suoi chunk.
 
 # 16. Considerazioni su Performance e Scalabilità
 ### Per dataset piccoli/medi
-- HNSW è perfetto
+- HNSW è il default
 - embedding 768–1024
 - modelli chat 7B–8B
 
@@ -318,7 +318,7 @@ Rimuove un documento e i suoi chunk.
 - limitare overlap
 
 ### Hardware
-- CPU-only → evitare modelli troppo grandi
+- CPU-only → modelli di dimensioni contenute
 - 16 GB RAM → limite operativo ideale 1024-dim + chat 7B
 
 ---

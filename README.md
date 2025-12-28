@@ -71,7 +71,7 @@ php bin/console doctrine:migrations:migrate
 > **Nota importante sulle migration Doctrine**  
 > Ad ogni `doctrine:migrations:diff`(make:migration), Doctrine prova a rimuovere l'indice vettoriale HNSW perché non è modellabile nei metadata. Prima di eseguire una nuova migration aperta sotto `migrations/`, eliminare manualmente la riga  
 > `$this->addSql('DROP INDEX document_chunk_embedding_hnsw');`  
-> così si evita che l'indice venga cancellato dalla tabella `document_chunk`.
+> altrimenti l'indice verrebbe cancellato dalla tabella `document_chunk`.
 
 ### Creare indice HNSW per velocizzare le ricerche(tabella document_chunk)
 ```sql
@@ -86,14 +86,14 @@ ON document_chunk
 USING ivfflat (embedding vector_cosine_ops)
 WITH (lists = 100);
 ```
-***Attenzione, non è utile avere due indici vettoriali diversi sullo stesso campo, è solo uno spreco di spazio e di tempo in scrittura.***
+***Mantenere due indici vettoriali sullo stesso campo aumenta spazio occupato e tempi di scrittura senza benefici.***
 
 > ***Gli indici vettoriali IVF-FLAT e HNSW, sono da considerare mutualmente esclusivi***
 
 > **Quale indice usare?**  
-> - **HNSW** è il default consigliato per dataset piccoli/medi (documentazione interna, manuali, knowledge base self-hosted): offre ottima precisione senza tuning.  
-> - **IVF-FLAT** va considerato solo con dataset enormi (milioni di chunk) e con tempo per calibrare `lists`/`probes` e pianificare REINDEX periodici.  
-> - Evita di abilitarli entrambi: pgvector sceglie un indice alla volta e mantenere il secondo porta solo costi addizionali.
+> - **HNSW** è il default per dataset piccoli/medi (documentazione interna, manuali, knowledge base self-hosted) e funziona senza tuning aggiuntivo.  
+> - **IVF-FLAT** è pensato per dataset molto estesi (milioni di chunk) e richiede la calibrazione di `lists`/`probes` e REINDEX periodici.  
+> - Pgvector utilizza un indice alla volta: mantenere due indici paralleli comporta solo costi addizionali.
 
 ### Cos'è pgvector
 __pgvector__ è un’estensione per PostgreSQL che aggiunge:
@@ -343,9 +343,9 @@ Tramite la variabile di ambiente `APP_IVFFLAT_PROBES`(solo se usato), impostiamo
 
 ***Alla fine ho deciso di utilizzare solo indici HNSW***
 
-## 5. Command per indicizzare i file
+## 5. Command Symfony per indicizzare i file
 ### Esempi di utilizzo
-I file da indicizzare devono essere caricati nella cartella var/knowledge
+Tutti i comandi CLI elencati sono Symfony Command eseguiti via `php bin/console`. I file da indicizzare devono essere caricati nella cartella var/knowledge
 ### 1. Full index, sfruttando hash (solo file nuovi/modificati)
 ```bash
 php bin/console app:index-docs
@@ -371,7 +371,7 @@ php bin/console app:index-docs --dry-run
 php bin/console app:index-docs --test-mode
 # oppure: APP_AI_TEST_MODE=true php bin/console app:index-docs
 ```
-## 6. Command per vedere l'elenco dei file indicizzati
+## 6. Command Symfony per vedere l'elenco dei file indicizzati
 ### Esempi di utilizzo
 ### 1. Elenco base (max 50):
 ```bash
@@ -389,7 +389,7 @@ php bin/console app:list-docs --limit=200
 ```bash
 php bin/console app:list-docs --path=manuali --limit=20
 ```
-# 7. Command per rimuovere file dell'indice
+# 7. Command Symfony per rimuovere file dall'indice
 ### Esempi di utilizzo
 ### 1. Eliminare un singolo file indicizzato
 ```bash
@@ -407,7 +407,7 @@ php bin/console app:unindex-file "\\.pdf$"
 ```bash
 php bin/console app:unindex-file ".*"
 ```
-# 8. Gestione utenti (CLI)
+# 8. Gestione utenti (Symfony Command)
 ## 1. Creare un utente con ruoli
 - Ruoli ripetibili:  
   ```bash
@@ -425,25 +425,27 @@ php bin/console app:unindex-file ".*"
   php bin/console app:user-role email@example.com --remove=ROLE_EDITOR
   ```
 
-# 9. API come utilizzarla(ApiTokenAuthenticator)
-Dashboard dedicata: da **Status → API Token** puoi vedere elenco, utilizzi e revocare rapidamente i token in uso.
-## 1. Command per generare token
-### ttl scadenza di default 1 anno
+# 9. Symfony Command per generare API token
+## 1. ttl scadenza di default 1 anno
 ```bash
 php bin/console app:api-token:create user@email.dev
 ```
-### Con scadenza impostatata tramite il parametro ttl, indicata in ore
+## 2. Con scadenza impostata tramite il parametro ttl, indicata in ore
 ```bash
 php bin/console app:api-token:create user@email.dev --ttl=48
 ```
-## 2. Normale
+
+# 10. API come utilizzarla(ApiTokenAuthenticator)
+Dashboard dedicata: da **Status → API Token** puoi vedere elenco, utilizzi e revocare rapidamente i token in uso.
+
+## 1. Normale
 ```bash
 curl -X POST https://localhost/api/chat \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token_generato>" \
   -d '{"question":"Riassumi la pipeline"}'
 ```
-## 3. Streaming
+## 2. Streaming
 ```bash
 curl -X POST https://localhost/api/chat/stream \
   -H "Content-Type: application/json" \
@@ -452,7 +454,7 @@ curl -X POST https://localhost/api/chat/stream \
   -d '{"question":"Riassumi la pipeline"}'
 ```
 
-# 9. Xdebug e vscode debugger configuration
+# 11. Xdebug e vscode debugger configuration
 ## VsCode -> Run & Debug -> Add Configuration
 ```json
 {
@@ -505,7 +507,7 @@ xdebug.log_level=0
 #xdebug.mode=debug
 ```
 
-# 10. Da implementare
+# 12. Da implementare
 ## 1. Scheduler di re-index  
 comando che pianifica via cron (o Symfony Messenger) scansioni incrementali, con notifica se trova documenti non indicizzati o fallimenti.  
 ## 2. Audit delle chat
@@ -515,5 +517,5 @@ un comando che esegue richieste “di riferimento” e confronta score/risposte 
 ## 4. Alerting per stato indice
 Live component per aggiungere webhooks/email quando chunk non cercabili superano una soglia o l’indexer fallisce.
 
-# 11. Licenza
+# 13. Licenza
 Il progetto è distribuito con licenza MIT. I dettagli completi sono disponibili nel file `LICENSE`.

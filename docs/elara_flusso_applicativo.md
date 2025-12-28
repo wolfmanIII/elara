@@ -84,7 +84,7 @@ Implementato dal **ChunkingService**.
 - overlap basato sulle ultime parole del chunk precedente,
 - divisione ragionata dei paragrafi.
 
-### Parametri consigliati
+### Parametri utilizzati
 - `min`: 400–500 caratteri
 - `target`: 1200–1600 caratteri
 - `max`: 1500–1800 caratteri
@@ -107,7 +107,7 @@ La dimensionalità vettoriale è dichiarata nel database come:
 ```
 VECTOR(1024)
 ```
-(consigliato, stabile e compatibile con bge-m3).
+(valore stabile e compatibile con bge-m3).
 
 ---
 
@@ -133,12 +133,12 @@ I chunk e i file vengono memorizzati tramite Doctrine.
 # 8. Fase 6 — Costruzione o aggiornamento dell’indice vettoriale
 ELARA supporta entrambi gli indici disponibili in pgvector:
 
-## ✔ HNSW (consigliato)
+## ✔ HNSW
 - più preciso
 - più semplice
 - più veloce
 
-## ✔ IVF-FLAT (solo dataset enormi)
+## ✔ IVF-FLAT (dataset molto grandi)
 - richiede tuning `lists` e `probes`
 - richiede REINDEX
 - meno preciso se configurato male
