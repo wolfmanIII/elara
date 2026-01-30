@@ -66,7 +66,7 @@ I valori nella colonna *target* sono quelli usati come default pratici.
 
 # 🧩 4. Parametri di chunking di riferimento per un sistema (16GB RAM senza GPU)
 
-Con embedding **768** + modello chat 8B:
+Con embedding **768** + modello chat 8B (valori teorici di riferimento):
 
 - **min_chunk**: 400 caratteri
 - **target_chunk**: 1200 caratteri
@@ -75,8 +75,18 @@ Con embedding **768** + modello chat 8B:
 - **top_k**: 5
 - **token totali contesto**: ~1200–1500 token
 
-Questo bilancia qualità del retrieval e performance, evitando timeout e surriscaldamenti.  
->*Nell'implementazione di ELARA, per un problema di Ollama 0.13.1 [`GitHub`]("https://github.com/ollama/ollama/issues/13340") sul modello nomic-text-embed, è stato utilizzato il modello bge-m3 (vettori a 1024).*
+Questo bilancia qualità del retrieval e performance, evitando timeout e surriscaldamenti.
+
+### Configurazione attuale ELARA (bge-m3, 1024 dim)
+
+I profili in `config/packages/rag_profiles.yaml` usano valori leggermente diversi:
+
+| Profilo | min | max | overlap | top_k |
+|---------|-----|-----|---------|-------|
+| ollama-bgem3 | 380 | 1200 | 250 | 5 |
+| openai-mini | 380 | 1200 | 220 | 5 |
+| gemini-flash | 380 | 1200 | 220 | 5 |
+| offline-test | 300 | 900 | 150 | 3 |
 
 ---
 # 🛠️ 5. Considerazioni aggiuntive
