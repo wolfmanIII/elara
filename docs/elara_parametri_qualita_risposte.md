@@ -109,13 +109,11 @@ Riduce il rischio di hallucination.
 Chiaro, robusto e aderente ai documenti.
 
 ## 5.3 Modalità operative
-Queste modalità sono configurate dentro ogni profilo RAG (`ai.test_mode`, `ai.offline_fallback`).  
-Posso comunque override locale con:
-```
-APP_AI_TEST_MODE=true|false
-APP_AI_OFFLINE_FALLBACK=true|false
-```
-Determinano se il chatbot usa la modalità test (solo estratti) o il fallback locale in caso di errore del backend.
+Queste modalità sono configurate in `config/packages/rag_profiles.yaml` per ogni profilo:
+- `ai.test_mode` — se `true`, restituisce solo estratti dei chunk (no chiamata AI)
+- `ai.offline_fallback` — se `true`, in caso di errore backend AI restituisce contenuti testuali dai chunk
+
+Per attivare il test mode da CLI: `php bin/console app:index-docs --test-mode`
 
 ---
 

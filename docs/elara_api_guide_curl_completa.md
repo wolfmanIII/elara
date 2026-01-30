@@ -134,32 +134,31 @@ Le principali variabili che influenzano il comportamento dell’API sono:
 ```env
 # Profilo RAG (backend AI + modelli + flag test/fallback)
 RAG_PROFILE=ollama-bgem3
-# Fallback legacy per servizi non profilati
-AI_BACKEND=ollama
-APP_CHAT_CONSOLE_TOKEN=1234...
 
-# Modalità test (nessuna chiamata al modello AI)
-APP_AI_TEST_MODE=true|false
+# API keys per backend cloud
+OPENAI_API_KEY=sk-...
+GEMINI_API_KEY=...
 
-# Fallback testuale in caso di errore del backend AI
-APP_AI_OFFLINE_FALLBACK=true|false
+# Host Ollama (default: http://localhost:11434)
+OLLAMA_HOST=http://localhost:11434
 ```
 
 ### 4.1 Profilo RAG / backend
 - `RAG_PROFILE=<nome>` seleziona un preset definito in `config/packages/rag_profiles.yaml`.
-- Ogni preset specifica backend (`ollama|openai|gemini`), modelli chat/embedding e flag test/fallback.
+- Ogni preset specifica backend (`ollama|openai|gemini`), modelli chat/embedding e flag `test_mode`/`offline_fallback`.
 - È possibile forzare un profilo al volo sul comando di indicizzazione (`php bin/console app:index-docs --rag-profile=openai-mini`).
-`AI_BACKEND` resta come variabile di retrocompatibilità per eventuali script legacy.
 
-### 4.2 APP_AI_TEST_MODE
-- `true` → la risposta mostrerà estratti chunk (modalità test),
+### 4.2 test_mode (nel profilo)
+- `true` → la risposta mostrerà estratti chunk (modalità test, no chiamata AI),
 - `false` → normale comportamento RAG + LLM.
-(è impostato dentro il profilo, ma resta overridabile da ENV)
 
-### 4.3 APP_AI_OFFLINE_FALLBACK
-- `true` → se il backend AI è giù, ELARA prova a restituire contenuti testuali rilevanti,
+Configurato in `config/packages/rag_profiles.yaml` → `ai.test_mode`.
+
+### 4.3 offline_fallback (nel profilo)
+- `true` → se il backend AI è giù, ELARA restituisce contenuti testuali dai chunk,
 - `false` → in caso di problemi del backend AI viene propagato un errore.
-(anche questo flag è nei profili, le ENV servono solo per override rapido)
+
+Configurato in `config/packages/rag_profiles.yaml` → `ai.offline_fallback`.
 
 ---
 
@@ -183,10 +182,10 @@ curl -X POST https://127.0.0.1:8000/api/chat \
 
 ## 5.2 Richiesta — modalità TEST attiva
 
-Assicurarsi che in `.env.local` sia presente:
+Usare un profilo con `test_mode: true` (es. `offline-test`) oppure il flag CLI:
 
-```env
-APP_AI_TEST_MODE=true
+```bash
+php bin/console app:index-docs --test-mode
 ```
 
 Quindi:
@@ -196,7 +195,6 @@ curl -X POST https://127.0.0.1:8000/api/chat \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {token_generato}" \
   -d '{"question":"Riassumi la pipeline di indicizzazione"}'
-  }'
 ```
 
 ### Comportamento atteso

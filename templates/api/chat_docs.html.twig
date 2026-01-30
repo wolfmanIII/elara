@@ -56,11 +56,32 @@
                         <pre data-prefix=" "><code>{ "error": "Messaggio vuoto" }</code></pre>
                     </div>
 
+                    <div class="divider text-xs opacity-60">Streaming</div>
+
+                    <p class="text-sm opacity-80">
+                        Esempio con curl (streaming SSE):
+                    </p>
+                    <div class="mockup-code text-sm overflow-x-auto">
+                        <pre data-prefix="$"><code>curl -N -X POST https://127.0.0.1:8000/api/chat/stream \</code></pre>
+                        <pre data-prefix=" "><code>  -H "Content-Type: application/json" \</code></pre>
+                        <pre data-prefix=" "><code>  -H "Accept: text/event-stream" \</code></pre>
+                        <pre data-prefix=" "><code>  -H "Authorization: Bearer {token_generato}" \</code></pre>
+                        <pre data-prefix=" "><code>  -d '{"question":"Cosa fa ELARA?"}'</code></pre>
+                    </div>
+
+                    <p class="text-sm opacity-80 mt-2">
+                        Risposta streaming (Server-Sent Events):
+                    </p>
+                    <div class="mockup-code text-sm">
+                        <pre data-prefix=" "><code>data: {"chunk": "ELARA è"}</code></pre>
+                        <pre data-prefix=" "><code>data: {"chunk": " un motore RAG..."}</code></pre>
+                        <pre data-prefix=" "><code>data: {"done": true, "sources": ["file.md"]}</code></pre>
+                    </div>
+
                     <p class="text-sm opacity-70">
-                        Modalità e backend sono controllati da variabili ambiente:
-                        <code>AI_BACKEND</code>,
-                        <code>APP_AI_TEST_MODE</code>,
-                        <code>APP_AI_OFFLINE_FALLBACK</code>.
+                        Modalità e backend sono controllati dal profilo RAG attivo
+                        (<code>RAG_PROFILE</code>). Il <em>test mode</em> e <em>offline fallback</em>
+                        sono configurati in <code>config/packages/rag_profiles.yaml</code>.
                     </p>
                 </div>
 

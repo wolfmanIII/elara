@@ -317,9 +317,9 @@ OLLAMA_EMBED_DIMENSION=1024
 APP_CHAT_CACHE_TTL=0
 
 ## RAG Test Mode e Fallback
-## configurati nel profilo
-# APP_AI_TEST_MODE=false        
-# APP_AI_OFFLINE_FALLBACK=true
+## Queste opzioni sono configurate in config/packages/rag_profiles.yaml
+## per ogni profilo (ai.test_mode, ai.offline_fallback)
+## NON sono variabili d'ambiente
 
 ## Uso solo indici hwsn
 # Postgres pgvector - sonde per indice ivfflat

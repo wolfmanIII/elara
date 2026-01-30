@@ -73,15 +73,20 @@
                         <div>
                             <h3 class="card-title text-base">Variabili chiave (.env.local)</h3>
                             <p class="opacity-70">
-                                I <strong>RAG Profiles</strong> gestiscono backend, modelli e parametri operativi.
-                                Nel file <code>.env.local</code> restano soltanto poche variabili globali utili per l’istanza:
+                                I <strong>RAG Profiles</strong> gestiscono backend, modelli e parametri operativi
+                                (inclusi <em>test_mode</em> e <em>offline_fallback</em>).
+                                Nel file <code>.env.local</code> restano soltanto poche variabili globali:
                             </p>
                             <ul class="list-disc list-inside space-y-1 mt-2">
                                 <li><code>DATABASE_URL</code> → connessione PostgreSQL con estensione <code>vector</code>.</li>
-                                <li><code>APP_AI_TEST_MODE</code> → forza il ritorno dei chunk senza chiamare l’AI (debug).</li>
-                                <li><code>APP_AI_OFFLINE_FALLBACK</code> → abilita la risposta basata esclusivamente sui chunk.</li>
-                                <li><code>RAG_PROFILE</code> (opzionale) → imposta via ambiente il profilo attivo per CLI/cron.</li>
+                                <li><code>RAG_PROFILE</code> → imposta via ambiente il profilo attivo per CLI/cron.</li>
+                                <li><code>OLLAMA_HOST</code> → host del server Ollama (default: <code>http://localhost:11434</code>).</li>
+                                <li><code>OPENAI_API_KEY</code> / <code>GEMINI_API_KEY</code> → API key per backend cloud.</li>
                             </ul>
+                            <p class="opacity-70 mt-2">
+                                Le opzioni <code>test_mode</code> e <code>offline_fallback</code> sono configurate
+                                in <code>config/packages/rag_profiles.yaml</code> per ogni profilo.
+                            </p>
                         </div>
 
                         <div class="space-y-2">
@@ -114,19 +119,9 @@
                                     <td><code>llama3.2</code> | <code>gpt-5.1-mini</code>> | <code>gemini-2.5-flash</code></td>
                                 </tr>
                                 <tr>
-                                    <td><code>OLLAMA_EMBED_MODEL | OPENAI_EMBED_MODEL | GEMINI_CHAT_MODEL</code></td>
+                                    <td><code>OLLAMA_EMBED_MODEL | OPENAI_EMBED_MODEL | GEMINI_EMBED_MODEL</code></td>
                                     <td>Modello usato per generare gli embedding dei chunk.</td>
-                                    <td><code>bge-m3</code> | <code>text-embedding-3-small</code> | <code>gemini-embedding-001</code> (1024 | 1536 | 1536 dim)</td>
-                                </tr>
-                                <tr>
-                                    <td><code>APP_AI_TEST_MODE</code></td>
-                                    <td>Se <code>true</code>, restituisce direttamente i chunk invece di chiamare l’AI.</td>
-                                    <td><code>false</code> | <code>true</code></td>
-                                </tr>
-                                <tr>
-                                    <td><code>APP_AI_OFFLINE_FALLBACK</code></td>
-                                    <td>Abilita risposta basata solo sui chunk in caso di errore del backend.</td>
-                                    <td><code>false</code> | <code>true</code></td>
+                                    <td><code>bge-m3</code> | <code>text-embedding-3-small</code> | <code>gemini-embedding-001</code></td>
                                 </tr>
                                 <tr>
                                     <td><code>DATABASE_URL</code></td>
