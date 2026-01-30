@@ -30,24 +30,13 @@
                     </div>
 
                     <p class="text-sm opacity-80">
-                        Esempio in modalità normale:
+                        Esempio con curl:
                     </p>
                     <div class="mockup-code text-sm overflow-x-auto">
-                        <pre data-prefix="$"><code>curl -X POST http://localhost:8000/api/chat \</code></pre>
+                        <pre data-prefix="$"><code>curl -X POST https://127.0.0.1:8000/api/chat \</code></pre>
                         <pre data-prefix=" "><code>  -H "Content-Type: application/json" \</code></pre>
                         <pre data-prefix=" "><code>  -H "Authorization: Bearer {token_generato}" \</code></pre>
-                        <pre data-prefix=" "><code>  -d '{"question":"Riassumi ELaRA"}'</code></pre>
-                    </div>
-
-                    <p class="text-sm opacity-80">
-                        Esempio in modalità streaming:
-                    </p>
-                    <div class="mockup-code text-sm overflow-x-auto">
-                        <pre data-prefix="$"><code>curl -X POST http://localhost:8000/api/chat/stream \</code></pre>
-                        <pre data-prefix=" "><code>  -H "Content-Type: application/json" \</code></pre>
-                        <pre data-prefix=" "><code>  -H "Accept: text/event-stream" \</code></pre>
-                        <pre data-prefix=" "><code>  -H "Authorization: Bearer {token_generato}" \</code></pre>
-                        <pre data-prefix=" "><code>  -d '{"question":"Riassumi ELaRA"}'</code></pre>
+                        <pre data-prefix=" "><code>  -d '{"question":"Riassumi la pipeline di indicizzazione"}'</code></pre>
                     </div>
 
                     <p class="text-sm opacity-80 mt-2">
