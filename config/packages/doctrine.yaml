@@ -9,6 +9,9 @@ doctrine:
         profiling_collect_backtrace: '%kernel.debug%'
         use_savepoints: true
 
+        # Ignore HNSW index from migrations (pgvector index not supported by Doctrine ORM)
+        schema_filter: ~^(?!document_chunk_embedding_hnsw$)~
+
         types:
             # Postgres Uuid
             uuid: Symfony\Bridge\Doctrine\Types\UuidType

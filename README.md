@@ -91,10 +91,18 @@ Sono necessari i permessi relativi
 php bin/console make:migration
 php bin/console doctrine:migrations:migrate
 ```
-> **Nota importante sulle migration Doctrine**  
-> Ad ogni `doctrine:migrations:diff`(make:migration), Doctrine prova a rimuovere l'indice vettoriale HNSW perché non è modellabile nei metadata. Prima di eseguire una nuova migration aperta sotto `migrations/`, eliminare manualmente la riga  
-> `$this->addSql('DROP INDEX document_chunk_embedding_hnsw');`  
-> altrimenti l'indice verrebbe cancellato dalla tabella `document_chunk`.
+> **Nota sugli indici vettoriali HNSW**  
+> L'indice HNSW (`document_chunk_embedding_hnsw`) non è modellabile direttamente in Doctrine ORM.  
+> Per evitare che `doctrine:migrations:diff` generi `DROP INDEX`, l'indice è escluso tramite `schema_filter` in `config/packages/doctrine.yaml`:
+> ```yaml
+> doctrine:
+>     dbal:
+>         schema_filter: ~^(?!document_chunk_embedding_hnsw$)~
+> ```
+> Se l'indice viene cancellato accidentalmente, ricrearlo con:
+> ```sql
+> CREATE INDEX document_chunk_embedding_hnsw ON document_chunk USING hnsw (embedding vector_cosine_ops);
+> ```
 
 ### Creare indice HNSW per velocizzare le ricerche(tabella document_chunk)
 ```sql
