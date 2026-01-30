@@ -226,7 +226,7 @@ parameters:
       ollama-bgem3:
         label: 'Ollama · bge-m3'
         backend: 'ollama'
-        chunking: { min: 400, max: 1400, overlap: 250 }
+        chunking: { min: 380, max: 1200, overlap: 250 }
         retrieval: { top_k: 5, min_score: 0.55 }
         ai:
           chat_model: 'llama3.2'
