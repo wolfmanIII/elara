@@ -36,6 +36,7 @@ src/
   Controller/         # dashboard, API REST, profili RAG
   Entity/             # DocumentFile, DocumentChunk, ApiToken, User
   Middleware/         # supporto pgvector (IVF-FLAT probes)
+  Model/              # DTO: IndexSummary, FileIndexStatus, IndexedFileResult
   Rag/                # RagProfileManager + storage profilo attivo
   Repository/         # query vettoriali ottimizzate
   Security/           # autenticazione via API token
@@ -295,14 +296,33 @@ Tutti i dettagli tecnici sono riportati nel documento dedicato, ma riportiamo i 
 ---
 
 # 15. Command Disponibili
-### `app:index-docs`
-Indicizza o reindicizza documenti.
 
-### `app:list-docs`
-Mostra documenti indicizzati, hash, numero chunk.
+### Indicizzazione
+| Comando | Descrizione |
+|---------|-------------|
+| `app:index-docs` | Indicizza file nuovi/modificati |
+| `app:index-docs --force-reindex` | Reindicizza tutto ignorando hash |
+| `app:index-docs --rag-profile=<nome>` | Indicizza con profilo specifico |
+| `app:list-docs` | Mostra documenti indicizzati, hash, numero chunk |
+| `app:unindex-file <pattern>` | Rimuove documento(i) dall'indice |
 
-### `app:unindex-file`
-Rimuove un documento e i suoi chunk.
+### Gestione Schema e Knowledge Base
+| Comando | Descrizione |
+|---------|-------------|
+| `app:reset-rag-schema --force` | Reset schema vettoriale (cancella tutti i chunk) |
+| `app:knowledge-sync` | Sincronizza `docs/` → `var/knowledge/` |
+
+### Utenti e Autenticazione
+| Comando | Descrizione |
+|---------|-------------|
+| `app:user-create <email>` | Crea utente (opzioni: --role) |
+| `app:user-role <email>` | Gestisce ruoli (opzioni: --add, --remove) |
+| `app:api-token:create <email>` | Genera token API (opzioni: --ttl, --label) |
+
+### Utility
+| Comando | Descrizione |
+|---------|-------------|
+| `app:generate-favicon` | Genera favicon da template |
 
 ---
 

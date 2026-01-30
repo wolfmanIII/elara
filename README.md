@@ -8,6 +8,29 @@ ELARA (Embedding Linking & Retrieval Answering) è un motore RAG progettato per 
 
 Il tutto con un flusso semplice, trasparente e controllabile.
 
+## 1.1 Architettura del Progetto
+```
+src/
+  AI/                 # Client per Ollama, OpenAI, Gemini (AiClientInterface)
+  Command/            # CLI: index-docs, list-docs, reset-rag-schema, user-*, api-token
+  Controller/         # Dashboard, API REST /api/chat, profili RAG
+  Entity/             # DocumentFile, DocumentChunk, ApiToken, User
+  Middleware/         # Supporto pgvector (IVF-FLAT probes)
+  Model/              # DTO: IndexSummary, FileIndexStatus, IndexedFileResult
+  Rag/                # RagProfileManager, ActiveProfileStorage, EmbeddingSchemaInspector
+  Repository/         # Query vettoriali ottimizzate (cosine similarity)
+  Security/           # Autenticazione via API token
+  Service/            # DocsIndexer, ChatbotService, ChunkingService, DocumentTextExtractor
+  Twig/               # Componenti UX (modali, badge, Stimulus controllers)
+
+config/packages/
+  rag_profiles.yaml   # Definizione profili RAG
+
+templates/            # UI Tailwind/DaisyUI
+var/knowledge/        # Knowledge base indicizzabile
+docs/                 # Documentazione tecnica (mirror in var/knowledge/)
+```
+
 ## 2. Installare le dipendenze e abilitare Symfony UX Live Components:
 ```bash
 composer install
@@ -222,7 +245,27 @@ parameters:
           embed_dimension: 1536
           test_mode: false
           offline_fallback: true
+      gemini-flash:
+        label: 'Gemini · 2.5 Flash'
+        backend: 'gemini'
+        chunking: { min: 380, max: 1200, overlap: 220 }
+        retrieval: { top_k: 5, min_score: 0.60 }
+        ai:
+          chat_model: 'gemini-2.5-flash'
+          embed_model: 'gemini-embedding-001'
+          embed_dimension: 1536
+          test_mode: false
+          offline_fallback: true
 ```
+
+#### Profili disponibili
+| Profilo | Backend | Modello Chat | Modello Embedding | Dimensione |
+|---------|---------|--------------|-------------------|------------|
+| `ollama-bgem3` | Ollama | llama3.2 | bge-m3 | 1024 |
+| `openai-mini` | OpenAI | gpt-4.1-mini | text-embedding-3-small | 1536 |
+| `gemini-flash` | Gemini | gemini-2.5-flash | gemini-embedding-001 | 1536 |
+| `offline-test` | Ollama | llama3.2 | bge-m3 (fake) | 1024 |
+
 Per commutare basta impostare `RAG_PROFILE=<nome>` (o usare l'opzione CLI `--rag-profile=<nome>` durante l'indicizzazione).
 
 #### Switch tramite UI
@@ -507,15 +550,45 @@ xdebug.log_level=0
 #xdebug.mode=debug
 ```
 
-# 12. Da implementare
-## 1. Scheduler di re-index  
-comando che pianifica via cron (o Symfony Messenger) scansioni incrementali, con notifica se trova documenti non indicizzati o fallimenti.  
-## 2. Audit delle chat
-log minimale (utente/timestamp/latency/modello) per capire carico e qualità, magari con filtri su top-k e soglia similitudine usata.
-## 3. Test di regressione RAG
-un comando che esegue richieste “di riferimento” e confronta score/risposte con baseline, utile prima di cambiare modello embedding o parametri.
-## 4. Alerting per stato indice
-Live component per aggiungere webhooks/email quando chunk non cercabili superano una soglia o l’indexer fallisce.
+# 12. Riepilogo Comandi CLI
+Tutti i comandi sono eseguiti via `php bin/console`:
 
-# 13. Licenza
+### Indicizzazione
+| Comando | Descrizione |
+|---------|-------------|
+| `app:index-docs` | Indicizza file nuovi/modificati |
+| `app:index-docs --force-reindex` | Reindicizza tutto ignorando hash |
+| `app:index-docs --rag-profile=<nome>` | Indicizza con profilo specifico |
+| `app:index-docs --dry-run` | Simulazione (nessuna scrittura) |
+| `app:index-docs --test-mode` | Embedding finti per test locale |
+| `app:list-docs` | Elenca documenti indicizzati |
+| `app:list-docs --path=<pattern>` | Filtra per path |
+| `app:unindex-file <pattern>` | Rimuovi file dall'indice |
+
+### Gestione Schema RAG
+| Comando | Descrizione |
+|---------|-------------|
+| `app:reset-rag-schema --force` | Reset schema vettoriale (⚠️ cancella tutti i chunk) |
+| `app:knowledge-sync` | Sincronizza `docs/` → `var/knowledge/` |
+
+### Utenti e Autenticazione
+| Comando | Descrizione |
+|---------|-------------|
+| `app:user-create <email> --role=ROLE_ADMIN` | Crea utente con ruoli |
+| `app:user-role <email> --add=ROLE_ADMIN` | Aggiungi ruolo |
+| `app:user-role <email> --remove=ROLE_EDITOR` | Rimuovi ruolo |
+| `app:api-token:create <email> --ttl=720` | Genera token API (TTL in ore) |
+
+### Utility
+| Comando | Descrizione |
+|---------|-------------|
+| `app:generate-favicon` | Genera favicon da template |
+
+# 13. Da implementare
+- **Scheduler re-index** — Pianificazione via cron/Messenger per scansioni incrementali automatiche
+- **Audit chat** — Log minimale (utente/timestamp/latenza/modello) per monitoraggio
+- **Test regressione RAG** — Comando per confrontare risposte con baseline
+- **Alerting stato indice** — Webhooks/email quando chunk non cercabili superano soglia
+
+# 14. Licenza
 Il progetto è distribuito con licenza MIT. I dettagli completi sono disponibili nel file `LICENSE`.

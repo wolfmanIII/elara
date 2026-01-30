@@ -20,8 +20,38 @@ Content-Type: application/json
 ```
 
 Protocollo previsto:
-- ambiente locale: `http://localhost:8000/api/chat`
+- ambiente locale: `https://127.0.0.1:8000/api/chat`
 - in produzione: tipicamente dietro reverse proxy (es. Nginx, Caddy, ecc.)
+
+## 1.2 Endpoint streaming
+
+Per risposte in tempo reale (Server-Sent Events):
+
+```http
+POST /api/chat/stream
+Content-Type: application/json
+Accept: text/event-stream
+```
+
+L'endpoint streaming restituisce la risposta token per token in formato SSE:
+
+```
+data: {"chunk": "La risposta"}
+data: {"chunk": " inizia qui..."}
+...
+data: {"done": true, "sources": ["file1.md", "file2.pdf"]}
+```
+
+### Esempio curl streaming
+```bash
+curl -N -X POST "https://127.0.0.1:8000/api/chat/stream" \
+  -H "Content-Type: application/json" \
+  -H "Accept: text/event-stream" \
+  -H "Authorization: Bearer <token>" \
+  -d '{"question": "Cosa fa ELARA?"}'
+```
+
+> **Nota**: L'opzione `-N` disabilita il buffering per vedere i chunk in tempo reale.
 
 ---
 
@@ -138,20 +168,12 @@ APP_AI_OFFLINE_FALLBACK=true|false
 Di seguito una serie di esempi pratici per interagire con `/api/chat`.
 
 ## 5.1 Richiesta base
-### modalità normale
+### curl
 ```bash
-curl -X POST http://localhost:8000/api/chat \
+curl -X POST https://127.0.0.1:8000/api/chat \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {token_generato}" \
-  -d '{"question":"Riassumi ELaRA"}'
-```
-### in streaming
-```bash
-curl -X POST http://localhost:8000/api/chat/stream \
-  -H "Content-Type: application/json" \
-  -H "Accept: text/event-stream" \
-  -H "Authorization: Bearer {token_generato}" \
-  -d '{"question":"Riassumi ELaRA"}'
+  -d '{"question":"Riassumi la pipeline di indicizzazione"}'
 ```
 
 ### Comportamento atteso
@@ -170,10 +192,10 @@ APP_AI_TEST_MODE=true
 Quindi:
 
 ```bash
-curl -X POST http://localhost:8000/api/chat \
+curl -X POST https://127.0.0.1:8000/api/chat \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {token_generato}" \
-  -d '{"question":"Riassumi ELaRA"}'
+  -d '{"question":"Riassumi la pipeline di indicizzazione"}'
   }'
 ```
 
@@ -188,7 +210,7 @@ curl -X POST http://localhost:8000/api/chat \
 ## 5.3 Richiesta con messaggio vuoto (errore)
 
 ```bash
-curl -X POST http://localhost:8000/api/chat \
+curl -X POST https://127.0.0.1:8000/api/chat \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {token_generato}" \
   -d '{"question":""}'
@@ -219,10 +241,10 @@ oppure lanciando `php bin/console app:index-docs --rag-profile=openai-mini`, cam
 La chiamata curl rimane la stessa:
 
 ```bash
-curl -X POST http://localhost:8000/api/chat \
+curl -X POST https://127.0.0.1:8000/api/chat \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {token_generato}" \
-  -d '{"question":"Riassumi ELaRA"}'
+  -d '{"question":"Riassumi la pipeline di indicizzazione"}'
 ```
 
 ---
@@ -350,15 +372,9 @@ La natura JSON dell’API la rende adatta a qualunque ecosistema.
 Esempio curl minimal:
 
 ```bash
-curl -X POST http://localhost:8000/api/chat \
+curl -X POST https://127.0.0.1:8000/api/chat \
   -H "Content-Type: application/json" \
-  -d '{"question":"Riassumi ELaRA"}'
-
-curl -X POST http://localhost:8000/api/chat/stream \
-  -H "Content-Type: application/json" \
-  -H "Accept: text/event-stream" \
   -H "Authorization: Bearer {token_generato}" \
-  -d '{"question":"Riassumi ELaRA"}'
+  -d '{"question":"Riassumi la pipeline di indicizzazione"}'
 ```
-
 ---
