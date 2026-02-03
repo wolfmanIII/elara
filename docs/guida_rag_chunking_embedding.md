@@ -718,7 +718,7 @@ Avere **due indici** (HNSW + IVF-FLAT) sulla stessa colonna comporta:
 - Dataset non enorme
 - Self‑hosting 16GB RAM senza GPU
 - Performance già buone con HNSW
-- Nessuna necessità di clusterizzazione (IV-FFLAT)
+- Nessuna necessità di clusterizzazione (IVF-FLAT)
 
 👉 **Conclusione:** l'uso simultaneo non è previsto in questo contesto e aumenta costi e complessità.
 
