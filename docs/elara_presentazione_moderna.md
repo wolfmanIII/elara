@@ -101,7 +101,7 @@ Risposta:
 ---
 
 # 🏗️ 7. Stack Tecnologico
-- **Symfony 7.3** (backend)
+- **Symfony 7.4** (backend)
 - **Doctrine ORM**
 - **PostgreSQL + pgvector**
 - **Ollama / OpenAI / Gemini**

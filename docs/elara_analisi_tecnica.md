@@ -7,7 +7,7 @@ L’obiettivo è offrire una panoramica chiara, strutturata e dettagliata dell�
 ---
 
 # 1. Panoramica Generale
-ELARA è un **motore RAG (Retrieval-Augmented Generation)** scritto in Symfony 7.3, che consente di:
+ELARA è un **motore RAG (Retrieval-Augmented Generation)** scritto in Symfony 7.4, che consente di:
 
 - indicizzare documenti locali (PDF, MD, DOCX, ODT),
 - estrarre il testo in modo pulito e normalizzato,
