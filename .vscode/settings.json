@@ -1,4 +1,13 @@
 {
+    "symfony-vscode.shellExecutable": "/usr/bin/php",
+    "symfony-vscode.phpExecutablePath": "/usr/bin/php",
+    "symfony-vscode.consolePath": "${workspaceFolder}/bin/console",
     "css.lint.unknownAtRules": "ignore",
-    "tailwindCSS.experimental.configFile": "tailwind.config.js"
+    "tailwindCSS.experimental.configFile": "tailwind.config.js",
+    "files.watcherExclude": {
+        "**/vendor/**": true,
+        "**/var/**": true,
+        "**/node_modules/**": true,
+        "**/.git/objects/**": true
+    }
 }
