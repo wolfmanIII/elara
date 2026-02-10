@@ -111,5 +111,37 @@
         {{ include('layout/_sidebar.html.twig') }}
     </div>
 
+    <!-- modulo javascript per la visualizzazione di diagrammi mermaid nel rendering di file markdown -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
+        // 2. Configura e inizializza
+        mermaid.initialize({ startOnLoad: false });
+
+        // 3. Trova i blocchi CommonMark e trasformali per Mermaid
+        document.addEventListener("DOMContentLoaded", function() {
+            // CommonMark crea <pre><code class="language-mermaid">
+            // Mermaid vuole <div class="mermaid"> o <pre class="mermaid">
+            
+            const blocks = document.querySelectorAll('pre code.language-mermaid');
+            
+            blocks.forEach((block) => {
+                // Prendi il codice dentro
+                const graphDefinition = block.textContent;
+                
+                // Crea un nuovo div che piace a Mermaid
+                const newDiv = document.createElement('div');
+                newDiv.className = 'mermaid';
+                newDiv.textContent = graphDefinition;
+                
+                // Sostituisci il blocco <pre> con il nuovo <div>
+                block.parentNode.replaceWith(newDiv);
+            });
+
+            // 4. Ora che il DOM è giusto, fai partire il rendering
+            mermaid.run();
+        });
+    </script>
+
 </body>
 </html>
