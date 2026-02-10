@@ -5,15 +5,12 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Rag\RagProfileManager;
+use IntlBreakIterator;
 
 class ChunkingService
 {
     /**
-     * Limite assoluto di sicurezza sulla lunghezza di un chunk (in caratteri).
-     * Serve ad evitare di mandare a Ollama input troppo lunghi, che possono
-     * generare errori tipo:
-     *
-     *   "panic: caching disabled but unable to fit entire input in a batch"
+     * Limite assoluto di sicurezza. Nessun chunk può mai superare questo valore.
      */
     private const HARD_MAX_CHARS = 1500;
 
@@ -25,16 +22,7 @@ class ChunkingService
     }
 
     /**
-     * Algoritmo di chunking:
-     * - sistema alcuni spazi mancanti (da PDF/OCR) con fixMissingSpaces()
-     * - splitta per paragrafi (2+ newline consecutivi)
-     * - per ogni paragrafo crea chunk usando frasi/parole, rispettando:
-     *     - $max come limite “logico”
-     *     - HARD_MAX_CHARS come limite assoluto
-     * - fa una pass veloce per evitare un ultimo chunk ridicolmente corto
-     * - aggiunge overlap tra chunk (basato su parole) senza superare HARD_MAX_CHARS
-     *
-     * @return string[] Elenco di chunk testuali pronti per embedding / RAG
+     * Algoritmo di chunking moderno (Intl) che rispetta la configurazione del profilo.
      */
     public function chunkText(
         string $text,
@@ -42,413 +30,228 @@ class ChunkingService
         ?int $max = null,
         ?int $overlap = null
     ): array {
+        // 1. Recupero configurazione
         $chunkConfig = $this->profiles->getChunking();
-        $min ??= (int) ($chunkConfig['min'] ?? 400);
-        $max ??= (int) ($chunkConfig['max'] ?? 1500);
-        $overlap ??= (int) ($chunkConfig['overlap'] ?? 250);
+        $min       ??= (int) ($chunkConfig['min'] ?? 400);
+        $max       ??= (int) ($chunkConfig['max'] ?? 1000);
+        $overlap   ??= (int) ($chunkConfig['overlap'] ?? 200);
 
-        $text = trim($text);
+        // Safety check sul max per non superare mai l'hard limit
+        $max = min($max, self::HARD_MAX_CHARS);
+
+        // 2. Pulizia preliminare
+        $text = $this->cleanText($text);
         if ($text === '') {
             return [];
         }
 
-        // Prova a correggere alcuni difetti tipici del testo estratto da PDF
-        $text = $this->fixMissingSpaces($text);
+        // 3. Generazione dei chunk base (rispettando SOLO $max per ora)
+        $baseChunks = $this->createBaseChunks($text, $max);
 
-        // 1) Splitta per paragrafi (due o più newline consecutivi)
-        $parts = preg_split("/\R{2,}/u", $text, -1, PREG_SPLIT_NO_EMPTY) ?: [];
-
-        $baseChunks = [];
-        $buffer     = '';
-
-        foreach ($parts as $p) {
-            $p = trim($p);
-            if ($p === '') {
-                continue;
-            }
-
-            $pLen = mb_strlen($p, 'UTF-8');
-
-            // Se il paragrafo è già troppo lungo, lo spezzettiamo subito
-            if ($pLen > $max) {
-                // Flush eventuale del buffer corrente
-                if ($buffer !== '') {
-                    foreach ($this->splitIntoChunks($buffer, $max) as $chunk) {
-                        $chunk = trim($chunk);
-                        if ($chunk !== '') {
-                            $baseChunks[] = $chunk;
-                        }
-                    }
-                    $buffer = '';
-                }
-
-                foreach ($this->splitIntoChunks($p, $max) as $chunk) {
-                    $chunk = trim($chunk);
-                    if ($chunk !== '') {
-                        $baseChunks[] = $chunk;
-                    }
-                }
-
-                continue;
-            }
-
-            // Proviamo ad accumulare paragrafi nel buffer finché restiamo <= $max
-            if ($buffer === '') {
-                $buffer = $p;
-                continue;
-            }
-
-            $candidate = $buffer . "\n\n" . $p;
-            $len       = mb_strlen($candidate, 'UTF-8');
-
-            if ($len <= $max) {
-                // Ci sta ancora nel chunk "ideale"
-                $buffer = $candidate;
-            } else {
-                // Il nuovo paragrafo farebbe sforare $max
-                // → chiudiamo il buffer attuale come chunk
-                foreach ($this->splitIntoChunks($buffer, $max) as $chunk) {
-                    $chunk = trim($chunk);
-                    if ($chunk !== '') {
-                        $baseChunks[] = $chunk;
-                    }
-                }
-
-                // e mettiamo il paragrafo corrente in un nuovo buffer
-                $buffer = $p;
-            }
-        }
-
-        // Flush finale del buffer, se è rimasto qualcosa
-        if ($buffer !== '') {
-            foreach ($this->splitIntoChunks($buffer, $max) as $chunk) {
-                $chunk = trim($chunk);
-                if ($chunk !== '') {
-                    $baseChunks[] = $chunk;
-                }
-            }
-        }
-
-        // 2) Se l'ultimo chunk è troppo corto rispetto al minimo, uniscilo al precedente
+        // 4. Applicazione logica MinLen (unisce l'ultimo chunk se troppo corto)
         $baseChunks = $this->mergeLastIfTooShort($baseChunks, $min);
 
-        // 3) Aggiungi overlap tra chunk basato su parole, ma senza superare HARD_MAX_CHARS
-        $finalChunks = $this->applyOverlap($baseChunks, $overlap);
-
-        return $finalChunks;
+        // 5. Applicazione Overlap
+        return $this->applyOverlap($baseChunks, $overlap);
     }
 
     /**
-     * Spezza una stringa in chunk "ragionevoli" usando frasi e, se necessario, parole.
-     * Garantisce che nessun chunk superi HARD_MAX_CHARS.
-     *
-     * @return string[]
+     * Crea i chunk primari usando IntlBreakIterator invece delle Regex.
+     * Rispetta rigorosamente $maxLen.
      */
-    private function splitIntoChunks(string $text, int $maxLen): array
+    private function createBaseChunks(string $text, int $maxLen): array
     {
-        $text = preg_replace('/\s+/u', ' ', $text);
-        $text = trim($text);
-
-        if ($text === '') {
-            return [];
-        }
-
-        // Non andiamo mai oltre l'hard limit assoluto
-        $maxLen = min($maxLen, self::HARD_MAX_CHARS);
-
-        // 1) Prova a splittare per frasi
-        $sentences = preg_split(
-            '/(?<=[\.!?])\s+/u',
-            $text,
-            -1,
-            PREG_SPLIT_NO_EMPTY
-        ) ?: [$text];
+        $iterator = IntlBreakIterator::createSentenceInstance('it_IT');
+        $iterator->setText($text);
 
         $chunks = [];
-        $buffer = '';
+        $currentBuffer = '';
 
-        foreach ($sentences as $sentence) {
-            $sentence = trim($sentence);
-            if ($sentence === '') {
+        foreach ($iterator->getPartsIterator() as $sentence) {
+            $sentenceLen = mb_strlen($sentence);
+
+            // CASO A: La frase singola è più lunga del massimo consentito?
+            // Dobbiamo spezzarla forzatamente (fallback sulle parole)
+            if ($sentenceLen > $maxLen) {
+                // Se c'era qualcosa nel buffer, salviamolo prima
+                if ($currentBuffer !== '') {
+                    $chunks[] = trim($currentBuffer);
+                    $currentBuffer = '';
+                }
+
+                // Spezza la frase gigante e aggiungi i pezzi
+                $subChunks = $this->splitLargeSentence($sentence, $maxLen);
+                $chunks = array_merge($chunks, $subChunks);
                 continue;
             }
 
-            $sLen = mb_strlen($sentence, 'UTF-8');
-
-            // Se la singola frase è già più lunga di $maxLen, spezza per parole
-            if ($sLen > $maxLen) {
-                if ($buffer !== '') {
-                    $chunks[] = $buffer;
-                    $buffer   = '';
-                }
-
-                foreach ($this->splitByWords($sentence, $maxLen) as $wChunk) {
-                    $wChunk = trim($wChunk);
-                    if ($wChunk !== '') {
-                        $chunks[] = $wChunk;
-                    }
-                }
-
-                continue;
-            }
-
-            // Prova ad aggiungerla al buffer
-            $candidate = $buffer === '' ? $sentence : $buffer . ' ' . $sentence;
-            $len       = mb_strlen($candidate, 'UTF-8');
-
-            if ($len <= $maxLen) {
-                $buffer = $candidate;
+            // CASO B: La frase ci sta nel buffer corrente?
+            // Nota: +1 considererebbe lo spazio virtuale tra frasi, ma Intl lo include spesso nella frase prec.
+            if (mb_strlen($currentBuffer . $sentence) <= $maxLen) {
+                $currentBuffer .= $sentence;
             } else {
-                // Il buffer attuale va bene, chiudilo e ricomincia
-                if ($buffer !== '') {
-                    $chunks[] = $buffer;
-                }
-                $buffer = $sentence;
+                // CASO C: Il buffer è pieno -> Flush
+                $chunks[] = trim($currentBuffer);
+                $currentBuffer = $sentence;
             }
         }
 
-        if ($buffer !== '') {
-            $chunks[] = $buffer;
-        }
-
-        // Safety finale: tutto comunque <= HARD_MAX_CHARS
-        $safe = [];
-        foreach ($chunks as $c) {
-            $cLen = mb_strlen($c, 'UTF-8');
-            if ($cLen <= self::HARD_MAX_CHARS) {
-                $safe[] = $c;
-                continue;
-            }
-
-            foreach ($this->splitByWords($c, self::HARD_MAX_CHARS) as $wChunk) {
-                $wChunk = trim($wChunk);
-                if ($wChunk !== '') {
-                    $safe[] = $wChunk;
-                }
-            }
-        }
-
-        return $safe;
-    }
-
-    /**
-     * Split "brutale" per parole, garantendo chunk <= $maxLen.
-     *
-     * @return string[]
-     */
-    private function splitByWords(string $text, int $maxLen): array
-    {
-        $words = preg_split('/\s+/u', $text, -1, PREG_SPLIT_NO_EMPTY) ?: [];
-
-        $chunks = [];
-        $buffer = '';
-
-        foreach ($words as $word) {
-            $word = trim($word);
-            if ($word === '') {
-                continue;
-            }
-
-            $candidate = $buffer === '' ? $word : $buffer . ' ' . $word;
-            $len       = mb_strlen($candidate, 'UTF-8');
-
-            if ($len <= $maxLen) {
-                $buffer = $candidate;
-                continue;
-            }
-
-            if ($buffer !== '') {
-                $chunks[] = $buffer;
-            }
-
-            // Se la singola parola supera il limite, taglio brutale
-            if (mb_strlen($word, 'UTF-8') > $maxLen) {
-                $chunks[] = mb_substr($word, 0, $maxLen, 'UTF-8');
-                $buffer   = '';
-            } else {
-                $buffer = $word;
-            }
-        }
-
-        if ($buffer !== '') {
-            $chunks[] = $buffer;
+        if (trim($currentBuffer) !== '') {
+            $chunks[] = trim($currentBuffer);
         }
 
         return $chunks;
     }
 
     /**
-     * Unisce l’ultimo chunk al precedente se è molto più corto del minimo desiderato.
+     * Se l'ultimo chunk è misero (< min), prova ad accorparlo al penultimo,
+     * a patto di non sfondare HARD_MAX_CHARS.
      */
-    private function mergeLastIfTooShort(array $chunks, int $min): array
+    private function mergeLastIfTooShort(array $chunks, int $minLen): array
     {
         $count = count($chunks);
         if ($count < 2) {
             return $chunks;
         }
 
-        $last     = $chunks[$count - 1];
-        $lastLen  = mb_strlen($last, 'UTF-8');
+        $lastIdx = $count - 1;
+        $lastChunk = $chunks[$lastIdx];
 
-        if ($lastLen >= $min) {
+        // Se l'ultimo chunk è già abbastanza lungo, non facciamo nulla
+        if (mb_strlen($lastChunk) >= $minLen) {
             return $chunks;
         }
 
-        $prev     = $chunks[$count - 2];
-        $merged   = $prev . "\n\n" . $last;
-        $mergedLen = mb_strlen($merged, 'UTF-8');
+        // Proviamo a unire con il penultimo
+        $prevIdx = $count - 2;
+        $prevChunk = $chunks[$prevIdx];
+        
+        // Calcoliamo la lunghezza unita (aggiungendo uno spazio o newline separatore)
+        $mergedText = $prevChunk . ' ' . $lastChunk;
 
-        if ($mergedLen <= self::HARD_MAX_CHARS) {
-            $chunks[$count - 2] = $merged;
-            array_pop($chunks);
+        // Se l'unione è sicura (non supera il limite hardware), procediamo
+        if (mb_strlen($mergedText) <= self::HARD_MAX_CHARS) {
+            $chunks[$prevIdx] = $mergedText;
+            unset($chunks[$lastIdx]);
+            // Reindicizza l'array per evitare buchi negli indici
+            return array_values($chunks); 
         }
 
         return $chunks;
     }
 
     /**
-     * Applica overlap tra chunk, usando le *ultime parole* del chunk precedente.
-     * L'overlap è espresso in "caratteri obiettivo", non in numero di parole.
-     * Si assicura di non superare HARD_MAX_CHARS.
-     *
-     * @param string[] $chunks
-     * @return string[]
+     * Applica l'overlap usando mb_substr (molto più veloce dello split per parole).
+     * Prende la coda del chunk N-1 e la incolla in testa al chunk N.
      */
     private function applyOverlap(array $chunks, int $overlapChars): array
     {
-        if ($overlapChars <= 0 || count($chunks) === 0) {
+        if ($overlapChars <= 0 || count($chunks) < 2) {
             return $chunks;
         }
 
-        $final = [];
-        $count = count($chunks);
+        $result = [];
+        $result[] = $chunks[0]; // Il primo non ha overlap
 
-        for ($i = 0; $i < $count; $i++) {
-            $chunk = trim($chunks[$i]);
-            if ($chunk === '') {
+        for ($i = 1; $i < count($chunks); $i++) {
+            $prevChunk = $chunks[$i - 1];
+            $currChunk = $chunks[$i];
+
+            // Calcola quanto spazio abbiamo nel chunk corrente prima di esplodere
+            $currentLen = mb_strlen($currChunk);
+            $availableSpace = self::HARD_MAX_CHARS - $currentLen - 1; // -1 per lo spazio
+
+            if ($availableSpace <= 0) {
+                $result[] = $currChunk;
                 continue;
             }
 
-            // Nessun overlap per il primo chunk
-            if ($i === 0) {
-                $final[] = $chunk;
-                continue;
+            // L'overlap effettivo non può superare lo spazio disponibile
+            $effectiveOverlap = min($overlapChars, $availableSpace);
+
+            // Estrae la coda del precedente
+            $overlapText = $this->extractCleanTail($prevChunk, $effectiveOverlap);
+
+            if ($overlapText !== '') {
+                $result[] = $overlapText . ' ' . $currChunk;
+            } else {
+                $result[] = $currChunk;
             }
-
-            $prev = $chunks[$i - 1];
-
-            // Quanto spazio abbiamo per il prefisso, restando entro HARD_MAX_CHARS?
-            $chunkLen  = mb_strlen($chunk, 'UTF-8');
-            $available = self::HARD_MAX_CHARS - $chunkLen - 2; // -2 per "\n\n"
-
-            if ($available <= 0) {
-                // Non c'è spazio per overlap, teniamo solo il chunk
-                $final[] = $chunk;
-                continue;
-            }
-
-            // L'overlap reale è il min tra richiesto e disponibile
-            $effectiveOverlap = min($overlapChars, $available);
-
-            $prefix = $this->buildWordOverlap($prev, $effectiveOverlap);
-            if ($prefix === '') {
-                $final[] = $chunk;
-                continue;
-            }
-
-            $candidate = $prefix . "\n\n" . $chunk;
-
-            // Safety extra, nel caso l'overlap sia ancora troppo grande
-            if (mb_strlen($candidate, 'UTF-8') > self::HARD_MAX_CHARS) {
-                $final[] = $chunk;
-                continue;
-            }
-
-            $final[] = $candidate;
         }
 
-        return $final;
+        return $result;
     }
 
     /**
-     * Costruisce un overlap basato su parole (non su caratteri).
-     * Prende le ultime parole del chunk precedente finché non
-     * supera approssimativamente overlapChars caratteri.
+     * Estrae gli ultimi N caratteri, ma tagliando all'inizio di una parola
+     * per evitare troncatu... (troncature).
      */
-    private function buildWordOverlap(string $prev, int $overlapChars): string
+    private function extractCleanTail(string $text, int $length): string
     {
-        $prev = trim($prev);
-        if ($overlapChars <= 0 || $prev === '') {
-            return '';
+        if ($length <= 0) return '';
+        
+        $textLen = mb_strlen($text);
+        if ($textLen <= $length) return $text;
+
+        // Prendi la sottostringa finale grezza
+        $substr = mb_substr($text, -$length);
+
+        // Cerca il primo spazio per allinearsi all'inizio di una parola
+        $firstSpace = mb_strpos($substr, ' ');
+
+        if ($firstSpace !== false) {
+            return trim(mb_substr($substr, $firstSpace + 1));
         }
 
-        $words = preg_split('/\s+/u', $prev, -1, PREG_SPLIT_NO_EMPTY);
-        if (!$words || count($words) === 0) {
-            return '';
-        }
-
-        $selected = [];
-        $totalLen = 0;
-
-        // Parti dalla fine e risali
-        for ($i = count($words) - 1; $i >= 0; $i--) {
-            $w = $words[$i];
-
-            $wLen = mb_strlen($w, 'UTF-8');
-
-            // +1 per lo spazio che si aggiunge tra le parole
-            if ($totalLen > 0) {
-                $wLen += 1;
-            }
-
-            if ($totalLen + $wLen > $overlapChars && !empty($selected)) {
-                break;
-            }
-
-            array_unshift($selected, $w);
-            $totalLen += $wLen;
-
-            if ($totalLen >= $overlapChars) {
-                break;
-            }
-        }
-
-        return implode(' ', $selected);
+        // Se non trova spazi (parola lunghissima), ritorna tutto per non perdere info
+        return $substr;
     }
 
     /**
-     * Corregge alcuni casi tipici di "spazi mancanti" dovuti all'estrazione da PDF:
-     *  1) Nessuno spazio dopo . ! ? ; :
-     *  2) ALL-CAPS subito seguite da parola capitalizzata (MOTIVAZIONIRuolo)
-     *  3) minuscola seguita da maiuscola senza spazio (standard.Origini)
+     * Fallback per frasi giganti (usa iteratore di parole).
      */
-    public function fixMissingSpaces(string $text): string
+    private function splitLargeSentence(string $sentence, int $maxLen): array
     {
-        // 1) Spazio dopo ., !, ?, ;, : se NON c'è già uno spazio
-        // es: "dominanti:Carisma" -> "dominanti: Carisma"
-        $text = preg_replace(
-            '/([\.!?;:])([^\s])/u',
-            '$1 $2',
-            $text
-        );
+        $iterator = IntlBreakIterator::createWordInstance('it_IT');
+        $iterator->setText($sentence);
 
-        // 2) Spazio tra parola ALL-CAPS e parola Capitalized attaccate
-        // es: "MOTIVAZIONIRuolo" -> "MOTIVAZIONI Ruolo"
-        //     "PSICOLOGICOEtà"   -> "PSICOLOGICO Età"
-        $text = preg_replace(
-            '/\b([A-ZÀ-ÖØ-Ý]{2,})([A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ]+)/u',
-            '$1 $2',
-            $text
-        );
+        $chunks = [];
+        $current = '';
 
-        // 3) Spazio tra minuscola e maiuscola attaccate (caso generico)
-        // es: "standard.Origini" -> "standard. Origini"
-        $text = preg_replace(
-            '/([\p{Ll}])([\p{Lu}])/u',
-            '$1 $2',
-            $text
-        );
+        foreach ($iterator->getPartsIterator() as $word) {
+            if (mb_strlen($current . $word) > $maxLen) {
+                if (trim($current) !== '') {
+                    $chunks[] = trim($current);
+                }
+                $current = $word;
+            } else {
+                $current .= $word;
+            }
+        }
+        if (trim($current) !== '') {
+            $chunks[] = trim($current);
+        }
 
-        return $text;
+        return $chunks;
+    }
+
+    /**
+     * Pulizia Regex ottimizzata (PDF Fixes).
+     */
+    private function cleanText(string $text): string
+    {
+        // 1. Normalizza spazi
+        $text = preg_replace('/\s+/u', ' ', $text);
+
+        // 2. Fix punteggiatura attaccata
+        $text = preg_replace('/(?<=[.!?;:])(?=[^\s])/u', ' ', $text);
+
+        // 3. Fix CamelCase errato (PDF headers)
+        $text = preg_replace('/([A-ZÀ-ÖØ-Ý]{2,})([A-ZÀ-ÖØ-Ý][a-zà-öø-ÿ]+)/u', '$1 $2', $text);
+
+        // 4. Fix lowerUpper case
+        $text = preg_replace('/([\p{Ll}])([\p{Lu}])/u', '$1 $2', $text);
+
+        return trim($text ?? '');
     }
 }
