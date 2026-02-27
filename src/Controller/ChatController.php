@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -19,6 +20,7 @@ final class ChatController extends BaseController
     public function __construct(
         private readonly RagProfileManager $profiles,
         private readonly CacheInterface $cache,
+        private readonly HttpClientInterface $httpClient,
     ) {}
 
     /**
@@ -40,20 +42,90 @@ final class ChatController extends BaseController
         $backend     = $profile['backend'] ?? 'ollama';
         $profileName = $this->profiles->getActiveProfileName();
         $label       = $profile['label'] ?? ucfirst($backend);
+        $health      = $backend === 'ollama'
+            ? $this->checkOllamaStatus($aiConfig)
+            : ['ok' => true, 'backend_ok' => true, 'source' => ucfirst($backend)];
 
         $status = [
-            'ok' => true,
+            'ok' => (bool) ($health['ok'] ?? true),
             'profile' => [
                 'name'   => $profileName,
                 'label'  => $label,
                 'backend'=> $backend,
             ],
             'model' => $aiConfig['chat_model'] ?? 'n/d',
-            'source' => ucfirst($backend),
+            'source' => $health['source'] ?? ucfirst($backend),
             'test_mode'   => ($aiConfig['test_mode'] ?? false) ? 'Attivo' : 'Disabilitato',
             'offline_fallback' => ($aiConfig['offline_fallback'] ?? false) ? 'Attivo' : 'Disabilitato',
+            'backend_ok' => (bool) ($health['backend_ok'] ?? true),
+            'model_available' => $health['model_available'] ?? null,
+            'endpoint' => $health['endpoint'] ?? null,
+            'error' => $health['error'] ?? null,
         ];
         return $this->json($status);
+    }
+
+    private function checkOllamaStatus(array $aiConfig): array
+    {
+        $host = rtrim((string) ($_ENV['OLLAMA_HOST'] ?? 'http://localhost:11434'), '/');
+        $chatModel = (string) ($aiConfig['chat_model'] ?? ($_ENV['OLLAMA_CHAT_MODEL'] ?? 'llama3.2'));
+
+        try {
+            $response = $this->httpClient->request('GET', $host . '/api/tags', [
+                'timeout' => 2.5,
+            ]);
+
+            $payload = $response->toArray(false);
+            $models = [];
+
+            foreach (($payload['models'] ?? []) as $modelData) {
+                if (is_array($modelData) && isset($modelData['name']) && is_string($modelData['name'])) {
+                    $models[] = $modelData['name'];
+                }
+            }
+
+            $modelAvailable = $this->isOllamaModelAvailable($chatModel, $models);
+            $ok = $modelAvailable;
+
+            return [
+                'ok' => $ok,
+                'backend_ok' => true,
+                'model_available' => $modelAvailable,
+                'source' => 'Ollama',
+                'endpoint' => $host,
+                'error' => $ok ? null : sprintf('Backend raggiungibile, ma modello "%s" non trovato.', $chatModel),
+            ];
+        } catch (\Throwable $e) {
+            return [
+                'ok' => false,
+                'backend_ok' => false,
+                'model_available' => false,
+                'source' => 'Ollama',
+                'endpoint' => $host,
+                'error' => sprintf('Ollama non raggiungibile su %s (%s).', $host, $e->getMessage()),
+            ];
+        }
+    }
+
+    private function isOllamaModelAvailable(string $chatModel, array $installedModels): bool
+    {
+        $needle = strtolower(trim($chatModel));
+        if ($needle === '') {
+            return false;
+        }
+
+        foreach ($installedModels as $installed) {
+            if (!is_string($installed)) {
+                continue;
+            }
+
+            $candidate = strtolower(trim($installed));
+            if ($candidate === $needle || str_starts_with($candidate, $needle . ':')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

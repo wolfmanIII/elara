@@ -62,7 +62,7 @@ export default class extends Controller {
                         : 'Motore attivo e raggiungibile.';
                 }
             } else {
-                this.setEngineError('Motore non disponibile.');
+                this.setEngineError(data.error || 'Motore non disponibile.');
             }
         } catch (e) {
             this.setEngineError('Errore nel controllo dello stato motore.');
